@@ -19,8 +19,20 @@
 ## Commands
 Only these `bun run` scripts: `build-local`, `lint`, `check:types`, `check:deps`, `check:i18n`, `test`, `test:e2e`.
 
+## Git Branching & Feature Workflow
+- **Branch Prefix**: Every feature, enhancement, or custom version initiated for the user MUST use the prefix `ghal/`.
+- **Branch Naming**: `ghal/<feature-slug>` or `ghal/<type>-<feature-slug>` (e.g. `ghal/feat-presensi`, `ghal/feat-kedisiplinan`, `ghal/fix-auth-token`).
+- **Isolation Rule**: NEVER commit directly to `main` for new feature requests unless explicitly instructed. Always create and switch to a `ghal/*` branch first.
+- **Workflow Steps**:
+  1. Sync base: `git checkout main && git pull origin main`
+  2. Create branch: `git checkout -b ghal/<feature-name>`
+  3. Implement code & tests according to project principles.
+  4. Validate: run `npm run check:types`, `npm run check:i18n`, and relevant test suites.
+  5. Commit with Conventional Commits format.
+  6. Push: `git push -u origin ghal/<feature-name>`
+
 ## Git Commits
-Conventional Commits: `type: summary` without scope. The summary should be a short, specific sentence that explains what changed and where or why, not a vague phrase. Types: `feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert`. `BREAKING CHANGE:` footer when needed.
+Conventional Commits: `type: summary` without scope. The summary should be a short, specific sentence that explains what changed and where or why, not a vague phrase. Types: `feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert`. `BREAKING CHANGE:` footer when needed. Always maintain clean commit structure so team PR reviews remain seamless.
 
 ## Env
 All env vars validated in `Env.ts`; never read `process.env` directly.
