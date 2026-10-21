@@ -58,6 +58,14 @@ export default async function DashboardLayout(props: DashboardLayoutProps) {
           </li>
           <li>
             <Link
+              href="/dashboard/piket/"
+              className="border-none text-gray-700 hover:text-gray-900"
+            >
+              {t('piket_link')}
+            </Link>
+          </li>
+          <li>
+            <Link
               href="/dashboard/user-profile/"
               className="border-none text-gray-700 hover:text-gray-900"
             >
