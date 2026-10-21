@@ -70,13 +70,11 @@
     ] // Enable Next.js TypeScript plugin
   },
   // Files to include/exclude from the project
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", ".next"],
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    ".storybook/**/*.ts",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".storybook/**/*.ts"
   ]
 }
