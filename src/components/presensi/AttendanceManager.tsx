@@ -25,9 +25,7 @@ import type {
  * @param props - Component properties.
  * @returns Complete attendance interactive workspace.
  */
-export function AttendanceManager(props: {
-  initialStudents?: StudentAttendanceRecord[];
-}) {
+export function AttendanceManager(props: { initialStudents?: StudentAttendanceRecord[] }) {
   const t = useTranslations('AttendancePage');
 
   const [students, setStudents] = useState<StudentAttendanceRecord[]>(
@@ -54,9 +52,9 @@ export function AttendanceManager(props: {
 
   // Status updates
   const handleStatusChange = (id: string, newStatus: AttendanceStatus) => {
-    setStudents(prev =>
+    setStudents((prev) =>
       prev.map((s) => {
-        if (s.id !== id) return s;
+        if (s.id !== id) {return s;}
         return {
           ...s,
           status: newStatus,
@@ -69,8 +67,8 @@ export function AttendanceManager(props: {
 
   // Bulk set all present
   const handleMarkAllPresent = () => {
-    setStudents(prev =>
-      prev.map(s => ({
+    setStudents((prev) =>
+      prev.map((s) => ({
         ...s,
         status: 'hadir',
         timestamp: '07:15 WIB',
@@ -99,24 +97,22 @@ export function AttendanceManager(props: {
   let alpaCount = 0;
 
   for (const s of students) {
-    if (s.status === 'hadir') hadirCount++;
-    else if (s.status === 'sakit') sakitCount++;
-    else if (s.status === 'izin') izinCount++;
-    else if (s.status === 'alpa') alpaCount++;
+    if (s.status === 'hadir') {hadirCount++;}
+    else if (s.status === 'sakit') {sakitCount++;}
+    else if (s.status === 'izin') {izinCount++;}
+    else if (s.status === 'alpa') {alpaCount++;}
   }
 
   const query = searchQuery.trim().toLowerCase();
   const filteredStudents = students.filter((s) => {
     const matchesFilter = activeFilter === 'all' || s.status === activeFilter;
     const matchesQuery =
-      query === '' ||
-      s.name.toLowerCase().includes(query) ||
-      s.nisn.toLowerCase().includes(query);
+      query === '' || s.name.toLowerCase().includes(query) || s.nisn.toLowerCase().includes(query);
     return matchesFilter && matchesQuery;
   });
 
   return (
-    <div className="flex flex-col w-full pb-10">
+    <div className="flex w-full flex-col pb-10">
       {/* Page Header */}
       <AttendanceHeader />
 
@@ -188,7 +184,7 @@ export function AttendanceManager(props: {
       {/* Document Preview Modal */}
       <AttendanceDocumentModal
         preview={previewDoc}
-        onClose={() => setPreviewDoc(null)}
+        onClose={() =>{  setPreviewDoc(null); }}
         onDownload={() => {
           setPreviewDoc(null);
           triggerToast('Mengunduh salinan berkas resmi...');
@@ -197,7 +193,7 @@ export function AttendanceManager(props: {
 
       {/* Toast Feedback */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 rounded-xl bg-foreground px-5 py-3 text-sm font-medium text-background shadow-xl animate-in fade-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed right-6 bottom-6 z-50 flex animate-in items-center gap-2.5 rounded-xl bg-foreground px-5 py-3 text-sm font-medium text-background shadow-xl duration-200 slide-in-from-bottom-5 fade-in">
           <CheckCircle2 className="size-4 text-pastel-mint" />
           <span>{toastMessage}</span>
         </div>

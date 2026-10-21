@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-
 import { DisciplineManager } from '@/components/kedisiplinan/DisciplineManager';
 
 export type DisciplinePageProps = {

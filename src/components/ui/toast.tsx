@@ -201,8 +201,8 @@ function Toaster({ children, toastManager = toast, ...props }: ToastPrimitive.Pr
   );
 }
 
-const {createToastManager} = ToastPrimitive;
-const {useToastManager} = ToastPrimitive;
+const { createToastManager } = ToastPrimitive;
+const { useToastManager } = ToastPrimitive;
 
 export {
   Toaster,

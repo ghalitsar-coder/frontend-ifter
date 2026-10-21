@@ -3,18 +3,13 @@
 import { CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-
-import {
-  filterDisciplineIncidents,
-  mockDisciplineIncidents,
-} from '@/data/mockDiscipline';
+import { filterDisciplineIncidents, mockDisciplineIncidents } from '@/data/mockDiscipline';
 import type {
   DisciplineCategory,
   DisciplineFilterState,
   DisciplineIncident,
   NewIncidentFormData,
 } from '@/types/discipline';
-
 import { DisciplineFilterBar } from './DisciplineFilterBar';
 import { DisciplineHeader } from './DisciplineHeader';
 import { DisciplineIncidentTable } from './DisciplineIncidentTable';
@@ -131,9 +126,9 @@ export function DisciplineManager() {
   // Compute counts
   const counts = {
     all: incidents.length,
-    needAction: incidents.filter(i => i.status !== 'selesai').length,
-    resolved: incidents.filter(i => i.status === 'selesai').length,
-    highPoints: incidents.filter(i => i.studentTotalPoints >= 30).length,
+    needAction: incidents.filter((i) => i.status !== 'selesai').length,
+    resolved: incidents.filter((i) => i.status === 'selesai').length,
+    highPoints: incidents.filter((i) => i.studentTotalPoints >= 30).length,
     showing: filtered.length,
     total: incidents.length,
   };
@@ -146,14 +141,14 @@ export function DisciplineManager() {
 
     const initials = formData.studentName
       .split(' ')
-      .map(part => part[0])
+      .map((part) => part[0])
       .join('')
       .slice(0, 2)
       .toUpperCase();
 
     // Previous student incidents to calculate cumulative points
     const previousPoints = incidents
-      .filter(i => i.studentNis === formData.studentNis)
+      .filter((i) => i.studentNis === formData.studentNis)
       .reduce((sum, curr) => sum + curr.points, 0);
     const newStudentTotal = previousPoints + pointWeight;
 
@@ -187,7 +182,7 @@ export function DisciplineManager() {
     const headers = 'ID,Tanggal,Waktu,Nama,NIS,Kelas,Kategori,Poin,Deskripsi,Status\n';
     const rows = incidents
       .map(
-        i =>
+        (i) =>
           `"${i.id}","${i.date}","${i.time}","${i.studentName}","${i.studentNis}","${i.studentClass}","${i.categoryLabel}",${i.points},"${i.description}","${i.status}"`,
       )
       .join('\n');
@@ -228,14 +223,16 @@ export function DisciplineManager() {
   };
 
   const handleOpenCategoryRules = () => {
-    showToast('Buku Pedoman Tata Tertib & Sanksi: Terlambat (+2), Seragam (+3), Gadget (+5), Barang Terlarang (+25), Bullying (+50)');
+    showToast(
+      'Buku Pedoman Tata Tertib & Sanksi: Terlambat (+2), Seragam (+3), Gadget (+5), Barang Terlarang (+25), Bullying (+50)',
+    );
   };
 
   return (
     <div className="space-y-6">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-2 rounded-xl bg-pine-deep px-4 py-3 text-sm font-semibold text-white shadow-xl animate-in slide-in-from-top-4 duration-200">
+        <div className="fixed top-6 right-6 z-50 flex animate-in items-center gap-2 rounded-xl bg-pine-deep px-4 py-3 text-sm font-semibold text-white shadow-xl duration-200 slide-in-from-top-4">
           <CheckCircle2 className="size-4.5 text-amber-gold" />
           <span>{toastMessage}</span>
         </div>
@@ -243,7 +240,7 @@ export function DisciplineManager() {
 
       {/* Header with quick actions */}
       <DisciplineHeader
-        onOpenRecordModal={() => setIsRecordModalOpen(true)}
+        onOpenRecordModal={() =>{  setIsRecordModalOpen(true); }}
         onExportExcel={handleExportExcel}
         onOpenCategoryRules={handleOpenCategoryRules}
       />
@@ -263,11 +260,7 @@ export function DisciplineManager() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         {/* Left 3 Columns: Filters and Table */}
         <div className="space-y-4 lg:col-span-3">
-          <DisciplineFilterBar
-            filter={filter}
-            onFilterChange={setFilter}
-            counts={counts}
-          />
+          <DisciplineFilterBar filter={filter} onFilterChange={setFilter} counts={counts} />
 
           <DisciplineIncidentTable
             incidents={filtered}
@@ -290,7 +283,7 @@ export function DisciplineManager() {
       {/* Record Violation Modal */}
       <DisciplineRecordModal
         isOpen={isRecordModalOpen}
-        onClose={() => setIsRecordModalOpen(false)}
+        onClose={() =>{  setIsRecordModalOpen(false); }}
         onSubmit={handleCreateIncident}
       />
     </div>

@@ -32,7 +32,7 @@ export function AttendanceToolbar(props: {
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onClick={() => props.onFilterChange('all')}
+          onClick={() =>{  props.onFilterChange('all'); }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'all'
               ? 'bg-primary text-primary-foreground shadow-xs'
@@ -53,79 +53,71 @@ export function AttendanceToolbar(props: {
 
         <button
           type="button"
-          onClick={() => props.onFilterChange('hadir')}
+          onClick={() =>{  props.onFilterChange('hadir'); }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'hadir'
               ? 'bg-primary text-primary-foreground shadow-xs'
               : 'bg-surface-container-low text-foreground hover:bg-surface-container-high'
           }`}
         >
-          <span className="size-2 rounded-full bg-pastel-mint inline-block" />
+          <span className="inline-block size-2 rounded-full bg-pastel-mint" />
           <span>{t('hadir_label')}</span>
-          <span className="text-xs text-muted-foreground font-semibold">
-            {props.counts.hadir}
-          </span>
+          <span className="text-xs font-semibold text-muted-foreground">{props.counts.hadir}</span>
         </button>
 
         <button
           type="button"
-          onClick={() => props.onFilterChange('sakit')}
+          onClick={() =>{  props.onFilterChange('sakit'); }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'sakit'
               ? 'bg-primary text-primary-foreground shadow-xs'
               : 'bg-surface-container-low text-foreground hover:bg-surface-container-high'
           }`}
         >
-          <span className="size-2 rounded-full bg-pastel-yellow inline-block" />
+          <span className="inline-block size-2 rounded-full bg-pastel-yellow" />
           <span>{t('sakit_label')}</span>
-          <span className="text-xs text-muted-foreground font-semibold">
-            {props.counts.sakit}
-          </span>
+          <span className="text-xs font-semibold text-muted-foreground">{props.counts.sakit}</span>
         </button>
 
         <button
           type="button"
-          onClick={() => props.onFilterChange('izin')}
+          onClick={() =>{  props.onFilterChange('izin'); }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'izin'
               ? 'bg-primary text-primary-foreground shadow-xs'
               : 'bg-surface-container-low text-foreground hover:bg-surface-container-high'
           }`}
         >
-          <span className="size-2 rounded-full bg-pastel-blue inline-block" />
+          <span className="inline-block size-2 rounded-full bg-pastel-blue" />
           <span>{t('izin_label')}</span>
-          <span className="text-xs text-muted-foreground font-semibold">
-            {props.counts.izin}
-          </span>
+          <span className="text-xs font-semibold text-muted-foreground">{props.counts.izin}</span>
         </button>
 
         <button
           type="button"
-          onClick={() => props.onFilterChange('alpa')}
+          onClick={() =>{  props.onFilterChange('alpa'); }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'alpa'
               ? 'bg-primary text-primary-foreground shadow-xs'
               : 'bg-surface-container-low text-foreground hover:bg-surface-container-high'
           }`}
         >
-          <span className="size-2 rounded-full bg-pastel-red inline-block" />
+          <span className="inline-block size-2 rounded-full bg-pastel-red" />
           <span>{t('alpa_label')}</span>
-          <span className="text-xs text-muted-foreground font-semibold">
-            {props.counts.alpa}
-          </span>
+          <span className="text-xs font-semibold text-muted-foreground">{props.counts.alpa}</span>
         </button>
       </div>
 
       {/* Search & Bulk Actions */}
       <div className="flex flex-col items-center gap-3 sm:flex-row">
         <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+          <Search className="absolute top-2.5 left-3 size-4 text-muted-foreground" />
           <input
             type="text"
             value={props.searchQuery}
-            onChange={e => props.onSearchChange(e.target.value)}
+            onChange={(e) =>{  props.onSearchChange(e.target.value); }}
             placeholder={t('search_placeholder')}
-            className="h-10 w-full rounded-xl bg-surface-container-low pl-9 pr-3 text-sm text-foreground placeholder:text-muted-foreground border border-border/60 focus:bg-background focus:outline-none focus:ring-1 focus:ring-ring transition-all"
+            className="h-10 w-full rounded-xl border border-border/60 bg-surface-container-low pr-3 pl-9 text-sm text-foreground transition-all placeholder:text-muted-foreground focus:bg-background focus:ring-1 focus:ring-ring focus:outline-none"
           />
         </div>
 
@@ -133,7 +125,7 @@ export function AttendanceToolbar(props: {
           <button
             type="button"
             onClick={props.onMarkAllPresent}
-            className="flex h-10 items-center gap-1.5 whitespace-nowrap rounded-xl bg-surface-container-low px-4 text-sm font-medium text-foreground hover:bg-surface-container-high transition-colors border border-border/50"
+            className="flex h-10 items-center gap-1.5 rounded-xl border border-border/50 bg-surface-container-low px-4 text-sm font-medium whitespace-nowrap text-foreground transition-colors hover:bg-surface-container-high"
           >
             <CheckCheck className="size-4 text-muted-foreground" />
             <span>{t('mark_all_present')}</span>
@@ -143,7 +135,7 @@ export function AttendanceToolbar(props: {
             type="button"
             onClick={props.onDownloadPdf}
             title={t('download_pdf')}
-            className="flex size-10 items-center justify-center rounded-xl bg-surface-container-low text-foreground hover:bg-surface-container-high transition-colors border border-border/50"
+            className="flex size-10 items-center justify-center rounded-xl border border-border/50 bg-surface-container-low text-foreground transition-colors hover:bg-surface-container-high"
           >
             <Download className="size-4" />
           </button>
@@ -151,7 +143,7 @@ export function AttendanceToolbar(props: {
           <button
             type="button"
             onClick={props.onSubmit}
-            className="flex h-10 items-center gap-2 whitespace-nowrap rounded-xl bg-primary px-5 text-sm font-medium text-primary-foreground hover:opacity-90 shadow-xs transition-opacity"
+            className="flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-xs transition-opacity hover:opacity-90"
           >
             <Send className="size-4" />
             <span>{t('submit_attendance')}</span>

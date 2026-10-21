@@ -1,13 +1,5 @@
-import {
-  AlertOctagon,
-  Calendar,
-  Download,
-  Eye,
-  Headphones,
-  Mail,
-} from 'lucide-react';
+import { AlertOctagon, Calendar, Download, Eye, Headphones, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-
 import { mockDisciplineWatchlist } from '@/data/mockDiscipline';
 import type { DisciplineWatchStudent } from '@/types/discipline';
 
@@ -77,7 +69,7 @@ function WatchlistActionButton(props: {
     return (
       <button
         type="button"
-        onClick={() => props.onSendParentCall(props.student.name)}
+        onClick={() =>{  props.onSendParentCall(props.student.name); }}
         className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl bg-pine-deep px-3 py-1.5 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-pine-hover"
       >
         <Mail className="size-3.5 text-amber-gold" />
@@ -90,7 +82,7 @@ function WatchlistActionButton(props: {
     return (
       <button
         type="button"
-        onClick={() => props.onScheduleBk(props.student.name)}
+        onClick={() =>{  props.onScheduleBk(props.student.name); }}
         className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-pine-deep shadow-2xs transition-colors hover:bg-muted"
       >
         <Calendar className="size-3.5 text-pine-deep" />
@@ -102,7 +94,7 @@ function WatchlistActionButton(props: {
   return (
     <button
       type="button"
-      onClick={() => props.onReviewHistory(props.student.name)}
+      onClick={() =>{  props.onReviewHistory(props.student.name); }}
       className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-pine-deep shadow-2xs transition-colors hover:bg-muted"
     >
       <Eye className="size-3.5 text-pine-deep" />
@@ -161,10 +153,10 @@ export function DisciplineSidebar(props: {
         </p>
 
         <div className="space-y-3">
-          {mockDisciplineWatchlist.map(student => (
+          {mockDisciplineWatchlist.map((student) => (
             <div
               key={student.id}
-              className={`space-y-2 rounded-xl p-3 border ${getRiskContainerClass(student.riskLevel)}`}
+              className={`space-y-2 rounded-xl border p-3 ${getRiskContainerClass(student.riskLevel)}`}
             >
               <div className="flex items-start justify-between">
                 <div>
@@ -182,9 +174,7 @@ export function DisciplineSidebar(props: {
 
               <div className="flex items-center justify-between text-[11px] text-muted-foreground">
                 <span>Status: {student.statusLabel}</span>
-                <span
-                  className={`font-semibold capitalize ${getRiskTextClass(student.riskLevel)}`}
-                >
+                <span className={`font-semibold capitalize ${getRiskTextClass(student.riskLevel)}`}>
                   {student.riskLevel}
                 </span>
               </div>
@@ -202,24 +192,24 @@ export function DisciplineSidebar(props: {
 
       {/* Card 2: Alur Penanganan BK */}
       <div className="space-y-3 rounded-2xl border border-border bg-card p-5 shadow-xs">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-pine-deep">
+        <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-pine-deep uppercase">
           <Headphones className="size-4" />
           <span>{t('counseling_flow_title')}</span>
         </div>
 
         <ol className="relative my-2 ml-2.5 space-y-4 border-l border-border text-xs">
           <li className="ml-4">
-            <div className="absolute -left-1.5 top-1 size-2.5 rounded-full bg-pine-deep" />
+            <div className="absolute top-1 -left-1.5 size-2.5 rounded-full bg-pine-deep" />
             <p className="font-bold text-foreground">{t('flow_step_1_title')}</p>
             <p className="text-[11px] text-muted-foreground">{t('flow_step_1_desc')}</p>
           </li>
           <li className="ml-4">
-            <div className="absolute -left-1.5 top-1 size-2.5 rounded-full bg-amber-gold" />
+            <div className="absolute top-1 -left-1.5 size-2.5 rounded-full bg-amber-gold" />
             <p className="font-bold text-foreground">{t('flow_step_2_title')}</p>
             <p className="text-[11px] text-muted-foreground">{t('flow_step_2_desc')}</p>
           </li>
           <li className="ml-4">
-            <div className="absolute -left-1.5 top-1 size-2.5 rounded-full bg-pine-hover" />
+            <div className="absolute top-1 -left-1.5 size-2.5 rounded-full bg-pine-hover" />
             <p className="font-bold text-foreground">{t('flow_step_3_title')}</p>
             <p className="text-[11px] text-muted-foreground">{t('flow_step_3_desc')}</p>
           </li>
@@ -240,12 +230,12 @@ export function DisciplineSidebar(props: {
       {/* Card 3: System Status Banner */}
       <div className="space-y-2 rounded-2xl bg-pine-deep p-4 text-white shadow-xs">
         <div className="flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-amber-gold">
+          <span className="text-xs font-bold tracking-wider text-amber-gold uppercase">
             {t('sync_banner_title')}
           </span>
           <span className="inline-block size-2 rounded-full bg-amber-gold" />
         </div>
-        <p className="text-xs font-medium leading-relaxed text-emerald-100">
+        <p className="text-xs leading-relaxed font-medium text-emerald-100">
           {t('sync_banner_desc')}
         </p>
       </div>

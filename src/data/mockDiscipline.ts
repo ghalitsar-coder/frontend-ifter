@@ -104,7 +104,8 @@ export const mockDisciplineIncidents: DisciplineIncident[] = [
     categoryKey: 'bullying',
     categoryLabel: 'Perkelahian (+25)',
     points: 25,
-    description: 'Terlibat perkelahian di area kantin belakang sekolah saat pergantian jam istirahat ke-2.',
+    description:
+      'Terlibat perkelahian di area kantin belakang sekolah saat pergantian jam istirahat ke-2.',
     location: 'Kantin Belakang Gazebo',
     recorderName: 'Drs. Agus Subagyo, M.Pd.',
     recorderRole: 'Guru Piket',
@@ -124,7 +125,8 @@ export const mockDisciplineIncidents: DisciplineIncident[] = [
     categoryKey: 'tatatertib',
     categoryLabel: 'Gadget Saat KBM (+5)',
     points: 5,
-    description: 'Bermain game online di smartphone saat guru sedang menerangkan materi Matematika.',
+    description:
+      'Bermain game online di smartphone saat guru sedang menerangkan materi Matematika.',
     location: 'Ruang Kelas VIII A',
     recorderName: 'Sarah Rahma, S.Pd.',
     recorderRole: 'Wali Kelas',

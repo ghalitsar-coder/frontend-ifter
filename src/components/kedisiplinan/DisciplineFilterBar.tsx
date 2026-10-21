@@ -1,6 +1,5 @@
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-
 import type { DisciplineFilterState, DisciplineQuickTab } from '@/types/discipline';
 
 /**
@@ -41,11 +40,12 @@ export function DisciplineFilterBar(props: {
             <input
               type="text"
               value={props.filter.search}
-              onChange={e =>
+              onChange={(e) =>{ 
                 props.onFilterChange({
                   ...props.filter,
                   search: e.target.value,
-                })}
+                }); }
+              }
               placeholder={t('search_placeholder')}
               className="w-full bg-transparent p-0 text-xs text-foreground placeholder:text-muted-foreground focus:outline-hidden"
             />
@@ -56,11 +56,12 @@ export function DisciplineFilterBar(props: {
         <div className="md:col-span-2">
           <select
             value={props.filter.selectedClass}
-            onChange={e =>
+            onChange={(e) =>{ 
               props.onFilterChange({
                 ...props.filter,
                 selectedClass: e.target.value,
-              })}
+              }); }
+            }
             className="h-10 w-full rounded-xl border border-border bg-surface-container-low px-3 text-xs font-medium text-foreground focus:border-pine-deep focus:outline-hidden"
           >
             <option value="">{t('filter_class_all')}</option>
@@ -77,11 +78,12 @@ export function DisciplineFilterBar(props: {
         <div className="md:col-span-2">
           <select
             value={props.filter.selectedCategory}
-            onChange={e =>
+            onChange={(e) =>{ 
               props.onFilterChange({
                 ...props.filter,
                 selectedCategory: e.target.value,
-              })}
+              }); }
+            }
             className="h-10 w-full rounded-xl border border-border bg-surface-container-low px-3 text-xs font-medium text-foreground focus:border-pine-deep focus:outline-hidden"
           >
             <option value="">{t('filter_category_all')}</option>
@@ -97,11 +99,12 @@ export function DisciplineFilterBar(props: {
         <div className="md:col-span-2">
           <select
             value={props.filter.selectedStatus}
-            onChange={e =>
+            onChange={(e) =>{ 
               props.onFilterChange({
                 ...props.filter,
                 selectedStatus: e.target.value,
-              })}
+              }); }
+            }
             className="h-10 w-full rounded-xl border border-border bg-surface-container-low px-3 text-xs font-medium text-foreground focus:border-pine-deep focus:outline-hidden"
           >
             <option value="">{t('filter_status_all')}</option>
@@ -116,11 +119,12 @@ export function DisciplineFilterBar(props: {
         <div className="md:col-span-2">
           <select
             value={props.filter.selectedPeriod}
-            onChange={e =>
+            onChange={(e) =>{ 
               props.onFilterChange({
                 ...props.filter,
                 selectedPeriod: e.target.value,
-              })}
+              }); }
+            }
             className="h-10 w-full rounded-xl border border-border bg-surface-container-low px-3 text-xs font-medium text-foreground focus:border-pine-deep focus:outline-hidden"
           >
             <option value="bulan">{t('filter_period_month')}</option>
@@ -135,7 +139,7 @@ export function DisciplineFilterBar(props: {
         <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
-            onClick={() => handleQuickTab('all')}
+            onClick={() =>{  handleQuickTab('all'); }}
             className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
               props.filter.quickTab === 'all'
                 ? 'bg-pine-deep text-white shadow-2xs'
@@ -147,7 +151,7 @@ export function DisciplineFilterBar(props: {
 
           <button
             type="button"
-            onClick={() => handleQuickTab('need_action')}
+            onClick={() =>{  handleQuickTab('need_action'); }}
             className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
               props.filter.quickTab === 'need_action'
                 ? 'bg-pine-deep text-white shadow-2xs'
@@ -155,14 +159,14 @@ export function DisciplineFilterBar(props: {
             }`}
           >
             <span>{t('tab_need_action')}</span>
-            <span className="rounded-full border border-amber-gold/50 bg-amber-surface px-1.5 py-0.2 text-[10px] font-bold text-amber-dark">
+            <span className="py-0.2 rounded-full border border-amber-gold/50 bg-amber-surface px-1.5 text-[10px] font-bold text-amber-dark">
               {props.counts.needAction}
             </span>
           </button>
 
           <button
             type="button"
-            onClick={() => handleQuickTab('resolved')}
+            onClick={() =>{  handleQuickTab('resolved'); }}
             className={`rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
               props.filter.quickTab === 'resolved'
                 ? 'bg-pine-deep text-white shadow-2xs'
@@ -174,7 +178,7 @@ export function DisciplineFilterBar(props: {
 
           <button
             type="button"
-            onClick={() => handleQuickTab('high_points')}
+            onClick={() =>{  handleQuickTab('high_points'); }}
             className={`flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
               props.filter.quickTab === 'high_points'
                 ? 'bg-red-700 text-white shadow-2xs'

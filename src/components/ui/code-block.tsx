@@ -95,8 +95,12 @@ function CodeBlockCopyButton({
       return;
     }
 
-    const timeout = setTimeout(() =>{  setCopied(false); }, 2000);
-    return () =>{  clearTimeout(timeout); };
+    const timeout = setTimeout(() => {
+      setCopied(false);
+    }, 2000);
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [copied]);
 
   return (
@@ -112,7 +116,9 @@ function CodeBlockCopyButton({
           onClick?.(event);
           navigator.clipboard
             .writeText(value)
-            .then(() =>{  setCopied(true); })
+            .then(() => {
+              setCopied(true);
+            })
             .catch(() => {});
         }}
         {...props}

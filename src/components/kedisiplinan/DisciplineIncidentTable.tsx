@@ -11,7 +11,6 @@ import {
   Search,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-
 import type { DisciplineIncident, IncidentStatus } from '@/types/discipline';
 
 /**
@@ -96,7 +95,7 @@ function StatusBadge(props: { status: IncidentStatus }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-surface-container px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+    <span className="bg-surface-container inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
       <CheckCircle className="size-3 text-pine-deep" />
       Selesai
     </span>
@@ -122,7 +121,7 @@ export function DisciplineIncidentTable(props: {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-left text-xs">
           <thead>
-            <tr className="border-b border-border bg-surface-container-low text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <tr className="border-b border-border bg-surface-container-low text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
               <th scope="col" className="px-4 py-3.5">
                 {t('table_col_datetime')}
               </th>
@@ -163,12 +162,9 @@ export function DisciplineIncidentTable(props: {
                 const barColor = getBarColor(incident.studentTotalPoints);
 
                 return (
-                  <tr
-                    key={incident.id}
-                    className="transition-colors hover:bg-amber-surface/25"
-                  >
+                  <tr key={incident.id} className="transition-colors hover:bg-amber-surface/25">
                     {/* Tanggal & Waktu */}
-                    <td className="whitespace-nowrap px-4 py-3.5">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
                       <div className="font-bold text-foreground">{incident.date}</div>
                       <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
                         <Clock className="size-3" />
@@ -177,10 +173,7 @@ export function DisciplineIncidentTable(props: {
                     </td>
 
                     {/* Siswa & Kelas */}
-                    <td
-                      aria-label={incident.studentName}
-                      className="whitespace-nowrap px-4 py-3.5"
-                    >
+                    <td aria-label={incident.studentName} className="px-4 py-3.5 whitespace-nowrap">
                       <div className="flex items-center gap-2.5">
                         <div
                           className={`flex size-8 items-center justify-center rounded-full text-xs font-bold ${incident.studentAvatarBg}`}
@@ -190,7 +183,7 @@ export function DisciplineIncidentTable(props: {
                         <div>
                           <button
                             type="button"
-                            onClick={() => props.onViewDetail(incident)}
+                            onClick={() =>{  props.onViewDetail(incident); }}
                             aria-label={`Lihat detail ${incident.studentName}`}
                             className="text-left text-xs font-bold text-foreground transition-colors hover:text-pine-deep"
                           >
@@ -207,7 +200,7 @@ export function DisciplineIncidentTable(props: {
                     </td>
 
                     {/* Kategori & Poin */}
-                    <td className="whitespace-nowrap px-4 py-3.5">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
                       <CategoryBadge
                         categoryLabel={incident.categoryLabel}
                         points={incident.points}
@@ -216,7 +209,7 @@ export function DisciplineIncidentTable(props: {
 
                     {/* Deskripsi */}
                     <td className="px-4 py-3.5">
-                      <p className="font-medium leading-snug text-foreground">
+                      <p className="leading-snug font-medium text-foreground">
                         {incident.description}
                       </p>
                       <p className="mt-0.5 text-[11px] text-muted-foreground">
@@ -225,9 +218,9 @@ export function DisciplineIncidentTable(props: {
                     </td>
 
                     {/* Pencatat */}
-                    <td className="whitespace-nowrap px-4 py-3.5">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
                       <div className="font-medium">{incident.recorderName}</div>
-                      <span className="rounded bg-surface-container px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                      <span className="bg-surface-container rounded px-1.5 py-0.5 text-[10px] text-muted-foreground">
                         {incident.recorderRole}
                       </span>
                     </td>
@@ -235,7 +228,7 @@ export function DisciplineIncidentTable(props: {
                     {/* Total Poin Siswa */}
                     <td
                       aria-label={`${incident.studentTotalPoints} dari 100 poin`}
-                      className="whitespace-nowrap px-4 py-3.5"
+                      className="px-4 py-3.5 whitespace-nowrap"
                     >
                       <div className="w-32 space-y-1">
                         <div
@@ -246,7 +239,7 @@ export function DisciplineIncidentTable(props: {
                           <span>{incident.studentTotalPoints} / 100</span>
                           <span>{incident.studentPointStatus}</span>
                         </div>
-                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container">
+                        <div className="bg-surface-container h-1.5 w-full overflow-hidden rounded-full">
                           <div
                             className={`h-1.5 rounded-full ${barColor}`}
                             style={{
@@ -258,16 +251,16 @@ export function DisciplineIncidentTable(props: {
                     </td>
 
                     {/* Status */}
-                    <td className="whitespace-nowrap px-4 py-3.5">
+                    <td className="px-4 py-3.5 whitespace-nowrap">
                       <StatusBadge status={incident.status} />
                     </td>
 
                     {/* Aksi */}
-                    <td className="whitespace-nowrap px-4 py-3.5 text-center">
+                    <td className="px-4 py-3.5 text-center whitespace-nowrap">
                       <div className="flex items-center justify-center gap-1">
                         <button
                           type="button"
-                          onClick={() => props.onViewDetail(incident)}
+                          onClick={() =>{  props.onViewDetail(incident); }}
                           className="rounded-lg p-1.5 text-pine-deep transition-colors hover:bg-pine-light"
                           title="Lihat Detail & Tindak Lanjut"
                           aria-label="Lihat Detail & Tindak Lanjut"
@@ -277,7 +270,7 @@ export function DisciplineIncidentTable(props: {
 
                         <button
                           type="button"
-                          onClick={() => props.onEditIncident(incident)}
+                          onClick={() =>{  props.onEditIncident(incident); }}
                           className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                           title="Edit Rekam Data"
                           aria-label="Edit Rekam Data"
@@ -287,7 +280,7 @@ export function DisciplineIncidentTable(props: {
 
                         <button
                           type="button"
-                          onClick={() => props.onViewHistory(incident)}
+                          onClick={() =>{  props.onViewHistory(incident); }}
                           className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted"
                           title="Histori Audit"
                           aria-label="Histori Audit"
@@ -360,7 +353,7 @@ export function DisciplineIncidentTable(props: {
           <button
             type="button"
             aria-label="Next Page"
-            className="rounded-lg border border-border bg-card p-1 text-muted-foreground transition-colors hover:bg-muted shadow-2xs"
+            className="rounded-lg border border-border bg-card p-1 text-muted-foreground shadow-2xs transition-colors hover:bg-muted"
           >
             <ChevronRight className="size-4" />
           </button>

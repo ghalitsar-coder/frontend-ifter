@@ -26,7 +26,7 @@ export function DisciplineMetrics(props: {
       <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs transition-all hover:border-pine-light">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               {t('metric_total_title')}
             </span>
             <div className="text-3xl font-black tracking-tight text-foreground">
@@ -54,7 +54,7 @@ export function DisciplineMetrics(props: {
       <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs transition-all hover:border-amber-gold/50">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               {t('metric_points_title')}
             </span>
             <div className="text-3xl font-black tracking-tight text-foreground">
@@ -81,7 +81,7 @@ export function DisciplineMetrics(props: {
       <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs transition-all hover:border-yellow-200">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               {t('metric_followup_title')}
             </span>
             <div className="text-3xl font-black tracking-tight text-pine-deep">
@@ -108,7 +108,7 @@ export function DisciplineMetrics(props: {
       <div className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-xs transition-all hover:border-pine-light">
         <div className="flex items-start justify-between">
           <div className="space-y-1">
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <span className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
               {t('metric_resolved_title')}
             </span>
             <div className="text-3xl font-black tracking-tight text-foreground">

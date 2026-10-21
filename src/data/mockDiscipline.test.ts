@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-
 import {
   filterDisciplineIncidents,
   mockDisciplineIncidents,
@@ -15,7 +14,7 @@ describe('mockDiscipline', () => {
 
     it('contains five rule categories matching handbook points', () => {
       expect(mockDisciplineRules).toHaveLength(5);
-      const points = mockDisciplineRules.map(r => r.points);
+      const points = mockDisciplineRules.map((r) => r.points);
       expect(points).toStrictEqual([2, 3, 5, 25, 50]);
     });
 
@@ -54,7 +53,7 @@ describe('mockDiscipline', () => {
         ...baseFilter,
         quickTab: 'need_action',
       });
-      expect(result.every(item => item.status !== 'selesai')).toBeTruthy();
+      expect(result.every((item) => item.status !== 'selesai')).toBeTruthy();
       expect(result).toHaveLength(3);
     });
 
@@ -64,7 +63,7 @@ describe('mockDiscipline', () => {
         selectedClass: 'VIII A',
       });
       expect(result).toHaveLength(3);
-      expect(result.every(item => item.studentClass === 'VIII A')).toBeTruthy();
+      expect(result.every((item) => item.studentClass === 'VIII A')).toBeTruthy();
     });
 
     it('filters incidents by high points threshold', () => {
@@ -72,7 +71,7 @@ describe('mockDiscipline', () => {
         ...baseFilter,
         quickTab: 'high_points',
       });
-      expect(result.every(item => item.studentTotalPoints >= 30)).toBeTruthy();
+      expect(result.every((item) => item.studentTotalPoints >= 30)).toBeTruthy();
       expect(result).toHaveLength(3);
     });
   });

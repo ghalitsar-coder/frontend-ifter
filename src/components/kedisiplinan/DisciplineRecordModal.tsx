@@ -1,7 +1,6 @@
 import { Gavel, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-
 import type { DisciplineCategory, NewIncidentFormData } from '@/types/discipline';
 
 /**
@@ -45,8 +44,8 @@ export function DisciplineRecordModal(props: {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs animate-in fade-in duration-150">
-      <div className="w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl animate-in zoom-in-95 duration-150">
+    <div className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/50 p-4 backdrop-blur-xs duration-150 fade-in">
+      <div className="w-full max-w-xl animate-in overflow-hidden rounded-2xl border border-border bg-card shadow-2xl duration-150 zoom-in-95">
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-border bg-surface-container-low p-6">
           <div className="flex items-center gap-3">
@@ -71,12 +70,10 @@ export function DisciplineRecordModal(props: {
         <form onSubmit={handleSubmit} className="space-y-4 p-6 text-xs">
           {/* Siswa Terlapor */}
           <div className="space-y-1.5">
-            <label className="block font-bold text-foreground">
-              {t('field_student')}
-            </label>
+            <label className="block font-bold text-foreground">{t('field_student')}</label>
             <select
               value={studentChoice}
-              onChange={e => setStudentChoice(e.target.value)}
+              onChange={(e) =>{  setStudentChoice(e.target.value); }}
               className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground focus:border-pine-deep focus:outline-hidden"
             >
               <option value="Rizky Pratama|00829103|IX A">
@@ -103,12 +100,10 @@ export function DisciplineRecordModal(props: {
           {/* Kategori & Waktu */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className="block font-bold text-foreground">
-                {t('field_category')}
-              </label>
+              <label className="block font-bold text-foreground">{t('field_category')}</label>
               <select
                 value={category}
-                onChange={e => setCategory(e.target.value as DisciplineCategory)}
+                onChange={(e) =>{  setCategory(e.target.value as DisciplineCategory); }}
                 className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground focus:border-pine-deep focus:outline-hidden"
               >
                 <option value="keterlambatan">Keterlambatan (+2 Poin)</option>
@@ -120,13 +115,11 @@ export function DisciplineRecordModal(props: {
             </div>
 
             <div className="space-y-1.5">
-              <label className="block font-bold text-foreground">
-                {t('field_datetime')}
-              </label>
+              <label className="block font-bold text-foreground">{t('field_datetime')}</label>
               <input
                 type="datetime-local"
                 value={dateTime}
-                onChange={e => setDateTime(e.target.value)}
+                onChange={(e) =>{  setDateTime(e.target.value); }}
                 className="w-full rounded-xl border border-border bg-surface-container-low p-2 text-xs text-foreground focus:border-pine-deep focus:outline-hidden"
               />
             </div>
@@ -134,13 +127,11 @@ export function DisciplineRecordModal(props: {
 
           {/* Lokasi Kejadian */}
           <div className="space-y-1.5">
-            <label className="block font-bold text-foreground">
-              {t('field_location')}
-            </label>
+            <label className="block font-bold text-foreground">{t('field_location')}</label>
             <input
               type="text"
               value={location}
-              onChange={e => setLocation(e.target.value)}
+              onChange={(e) =>{  setLocation(e.target.value); }}
               placeholder={t('field_location_placeholder')}
               className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
             />
@@ -148,13 +139,11 @@ export function DisciplineRecordModal(props: {
 
           {/* Deskripsi Kronologi */}
           <div className="space-y-1.5">
-            <label className="block font-bold text-foreground">
-              {t('field_description')}
-            </label>
+            <label className="block font-bold text-foreground">{t('field_description')}</label>
             <textarea
               rows={3}
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) =>{  setDescription(e.target.value); }}
               placeholder={t('field_description_placeholder')}
               className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
             />
@@ -162,13 +151,11 @@ export function DisciplineRecordModal(props: {
 
           {/* Tindakan Langsung */}
           <div className="space-y-1.5">
-            <label className="block font-bold text-foreground">
-              {t('field_action')}
-            </label>
+            <label className="block font-bold text-foreground">{t('field_action')}</label>
             <input
               type="text"
               value={immediateAction}
-              onChange={e => setImmediateAction(e.target.value)}
+              onChange={(e) =>{  setImmediateAction(e.target.value); }}
               placeholder={t('field_action_placeholder')}
               className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
             />

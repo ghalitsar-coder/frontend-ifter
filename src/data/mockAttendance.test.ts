@@ -8,8 +8,8 @@ describe('Mock attendance roster', () => {
     });
 
     it('ensures each student has unique id and nisn', () => {
-      const ids = new Set(INITIAL_STUDENT_ROSTER.map(s => s.id));
-      const nisns = new Set(INITIAL_STUDENT_ROSTER.map(s => s.nisn));
+      const ids = new Set(INITIAL_STUDENT_ROSTER.map((s) => s.id));
+      const nisns = new Set(INITIAL_STUDENT_ROSTER.map((s) => s.nisn));
 
       expect(ids.size).toBe(INITIAL_STUDENT_ROSTER.length);
       expect(nisns.size).toBe(INITIAL_STUDENT_ROSTER.length);
@@ -19,12 +19,12 @@ describe('Mock attendance roster', () => {
       const validStatuses = new Set(['hadir', 'sakit', 'izin', 'alpa']);
 
       for (const student of INITIAL_STUDENT_ROSTER) {
-        expect(validStatuses.has(student.status)).toBe(true);
+        expect(validStatuses.has(student.status)).toBeTruthy();
       }
     });
 
     it('provides document details when student has doctor certificate', () => {
-      const alya = INITIAL_STUDENT_ROSTER.find(s => s.id === '2');
+      const alya = INITIAL_STUDENT_ROSTER.find((s) => s.id === '2');
 
       expect(alya).toBeDefined();
       expect(alya?.documentName).toBe('SKD_RSKasihIbu.pdf');

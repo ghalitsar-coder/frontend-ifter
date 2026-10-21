@@ -29,7 +29,7 @@ export function AttendanceProgressBar(props: {
       <div className="flex w-full flex-col gap-2 md:w-3/5">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="size-2.5 rounded-full bg-pastel-mint inline-block" />
+            <span className="inline-block size-2.5 rounded-full bg-pastel-mint" />
             <span className="text-sm font-semibold text-foreground">
               {t('discipline_level_label')}
             </span>
@@ -40,7 +40,7 @@ export function AttendanceProgressBar(props: {
         </div>
 
         {/* Custom Segmented Gauge Bar */}
-        <div className="flex h-3 w-full overflow-hidden rounded-full bg-surface-container-low border border-border/40">
+        <div className="flex h-3 w-full overflow-hidden rounded-full border border-border/40 bg-surface-container-low">
           <div
             className="h-full bg-pastel-mint transition-all duration-300"
             style={{ width: `${hadirPct}%` }}
@@ -64,16 +64,17 @@ export function AttendanceProgressBar(props: {
         </div>
 
         <span className="text-xs text-muted-foreground">
-          {validCount} dari {props.total} {t('verified_caption').replace(/^\d+\s*dari\s*\d+\s*/i, '')}
+          {validCount} dari {props.total}{' '}
+          {t('verified_caption').replace(/^\d+\s*dari\s*\d+\s*/i, '')}
         </span>
       </div>
 
       <div className="flex w-full items-center justify-start gap-3 md:w-auto md:justify-end">
-        <div className="flex items-center gap-1.5 rounded-xl bg-surface-container-low px-3 py-1.5 text-xs text-foreground font-medium border border-border/50">
+        <div className="flex items-center gap-1.5 rounded-xl border border-border/50 bg-surface-container-low px-3 py-1.5 text-xs font-medium text-foreground">
           <Wifi className="size-3.5 text-muted-foreground" />
           <span>{t('cloud_sync_label')}</span>
         </div>
-        <div className="flex items-center gap-1.5 rounded-xl bg-surface-container-low px-3 py-1.5 text-xs text-foreground font-medium border border-border/50">
+        <div className="flex items-center gap-1.5 rounded-xl border border-border/50 bg-surface-container-low px-3 py-1.5 text-xs font-medium text-foreground">
           <Clock className="size-3.5 text-muted-foreground" />
           <span>{t('sync_time_label')}</span>
         </div>
