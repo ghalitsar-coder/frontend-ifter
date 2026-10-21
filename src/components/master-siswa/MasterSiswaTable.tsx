@@ -1,0 +1,338 @@
+import { ChevronLeft, ChevronRight, Eye, User } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import Image from 'next/image';
+import type { StudentProfile } from '@/types/masterSiswa';
+
+/**
+ * Data table rendering student records with selection, sorting, and action triggers.
+ *
+ * @param props - Component properties.
+ * @returns Table component.
+ */
+export function MasterSiswaTable(props: {
+  students: StudentProfile[];
+  selectedStudentIds: string[];
+  onToggleSelectAll: () => void;
+  onToggleSelectStudent: (id: string) => void;
+  onViewStudent: (student: StudentProfile) => void;
+  onEditStudent: (student: StudentProfile) => void;
+  currentPage: number;
+  totalPages: number;
+  pageSize: number;
+  totalFilteredCount: number;
+  onPageChange: (page: number) => void;
+}) {
+  const t = useTranslations('MasterSiswaPage');
+
+  const isAllSelected =
+    props.students.length > 0 &&
+    props.students.every((s) => props.selectedStudentIds.includes(s.id));
+
+  const startRecord = (props.currentPage - 1) * props.pageSize + 1;
+  const endRecord = Math.min(props.currentPage * props.pageSize, props.totalFilteredCount);
+
+  return (
+    <div className="bg-surface-card w-full overflow-hidden rounded-2xl border border-border-control shadow-xs">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[900px] border-collapse text-left text-sm">
+          <thead>
+            <tr className="border-b border-border-control bg-pine-light/50 font-semibold text-pine-deep">
+              <th scope="col" className="w-12 p-4 text-center">
+                <input
+                  type="checkbox"
+                  checked={isAllSelected}
+                  onChange={props.onToggleSelectAll}
+                  aria-label={t('th_select_all')}
+                  className="size-4 cursor-pointer rounded border-border-control text-pine-deep accent-pine-deep focus:ring-pine-deep"
+                />
+              </th>
+              <th scope="col" className="p-4 whitespace-nowrap">
+                {t('th_nis_photo')}
+              </th>
+              <th scope="col" className="p-4 whitespace-nowrap">
+                {t('th_name_nisn')}
+              </th>
+              <th scope="col" className="p-4 whitespace-nowrap">
+                {t('th_class')}
+              </th>
+              <th scope="col" className="p-4 whitespace-nowrap">
+                {t('th_homeroom')}
+              </th>
+              <th scope="col" className="p-4 whitespace-nowrap">
+                {t('th_attendance')}
+              </th>
+              <th scope="col" className="p-4 whitespace-nowrap">
+                {t('th_discipline_points')}
+              </th>
+              <th scope="col" className="p-4 whitespace-nowrap">
+                {t('th_status')}
+              </th>
+              <th scope="col" className="p-4 text-center whitespace-nowrap">
+                {t('th_actions')}
+              </th>
+            </tr>
+          </thead>
+          <tbody className="text-text-primary divide-y divide-border-subtle">
+            {props.students.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="text-text-muted p-8 text-center">
+                  <div className="flex flex-col items-center justify-center gap-2">
+                    <User className="text-text-muted/60 size-8" />
+                    <p className="text-sm font-semibold">{t('empty_students_title')}</p>
+                    <p className="text-text-muted text-xs">{t('empty_students_desc')}</p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              props.students.map((student) => {
+                const isSelected = props.selectedStudentIds.includes(student.id);
+
+                return (
+                  <tr
+                    key={student.id}
+                    className={`group transition-colors hover:bg-surface-container-low/60 ${
+                      isSelected ? 'bg-amber-surface/30' : ''
+                    }`}
+                  >
+                    {/* Checkbox */}
+                    <td className="p-4 text-center">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={() => {
+                          props.onToggleSelectStudent(student.id);
+                        }}
+                        aria-label={t('aria_select_student', { name: student.name })}
+                        className="size-4 cursor-pointer rounded border-border-control text-pine-deep accent-pine-deep focus:ring-pine-deep"
+                      />
+                    </td>
+
+                    {/* NIS & Photo */}
+                    <td className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border-control bg-pine-light text-xs font-bold text-pine-deep">
+                          {student.avatarUrl ? (
+                            <Image
+                              src={student.avatarUrl}
+                              alt={student.name}
+                              width={40}
+                              height={40}
+                              unoptimized
+                              className="size-full object-cover"
+                            />
+                          ) : (
+                            <span>
+                              {student.name
+                                .split(' ')
+                                .slice(0, 2)
+                                .map((w) => w[0])
+                                .join('')}
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-text-muted block font-mono text-[11px] font-semibold">
+                            NIS
+                          </span>
+                          <span className="text-text-primary font-mono text-sm font-semibold">
+                            {student.nis}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Name & NISN */}
+                    <td className="p-4">
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            props.onViewStudent(student);
+                          }}
+                          className="block cursor-pointer text-left font-bold text-pine-deep hover:underline"
+                        >
+                          {student.name}
+                        </button>
+                        <p className="text-text-muted font-mono text-xs">NISN: {student.nisn}</p>
+                      </div>
+                    </td>
+
+                    {/* Class */}
+                    <td className="p-4">
+                      <span className="inline-flex items-center rounded-lg border border-pine-deep/10 bg-pine-light px-2.5 py-1 text-xs font-bold text-pine-deep">
+                        {student.className}
+                      </span>
+                    </td>
+
+                    {/* Homeroom */}
+                    <td className="text-text-muted p-4 text-sm font-medium">
+                      {student.homeroomTeacher}
+                    </td>
+
+                    {/* Attendance */}
+                    <td className="p-4">
+                      <div className="flex w-32 flex-col gap-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-pine-deep">
+                            {student.semesterAttendanceRate}%
+                          </span>
+                          <span
+                            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                              student.semesterAttendanceRate >= 95
+                                ? 'bg-emerald-100 text-emerald-800'
+                                : (student.semesterAttendanceRate >= 90
+                                  ? 'bg-amber-100 text-amber-800'
+                                  : 'bg-rose-100 text-rose-800')
+                            }`}
+                          >
+                            {student.attendanceCategory}
+                          </span>
+                        </div>
+                        <div className="bg-surface-container h-1.5 w-full overflow-hidden rounded-full">
+                          <div
+                            className={`h-1.5 rounded-full ${
+                              student.semesterAttendanceRate >= 95
+                                ? 'bg-pine-deep'
+                                : (student.semesterAttendanceRate >= 90
+                                  ? 'bg-amber-gold'
+                                  : 'bg-rose-600')
+                            }`}
+                            style={{ width: `${student.semesterAttendanceRate}%` }}
+                          />
+                        </div>
+                      </div>
+                    </td>
+
+                    {/* Discipline points */}
+                    <td className="p-4">
+                      {student.disciplinePoints === 0 ? (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+                          <span className="size-1.5 rounded-full bg-emerald-600" />0{' '}
+                          {t('unit_points')}
+                        </span>
+                      ) : (student.disciplinePoints > 40 ? (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700">
+                          <span className="size-1.5 rounded-full bg-rose-600" />
+                          {student.disciplinePoints} {t('unit_points')}{' '}
+                          {student.disciplineStage ? `(${student.disciplineStage})` : ''}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
+                          <span className="size-1.5 rounded-full bg-amber-600" />
+                          {student.disciplinePoints} {t('unit_points')}{' '}
+                          {student.disciplineStage ? `(${student.disciplineStage})` : ''}
+                        </span>
+                      ))}
+                    </td>
+
+                    {/* Status */}
+                    <td className="p-4">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                          student.status === 'active'
+                            ? 'border border-emerald-300 bg-emerald-100 text-emerald-900'
+                            : (student.status === 'mutation'
+                              ? 'border border-amber-300 bg-amber-100 text-amber-900'
+                              : 'border border-gray-300 bg-gray-100 text-gray-800')
+                        }`}
+                      >
+                        {student.status === 'active'
+                          ? t('status_badge_active')
+                          : (student.status === 'mutation'
+                            ? t('status_badge_mutation')
+                            : t('status_badge_alumni'))}
+                      </span>
+                    </td>
+
+                    {/* Actions */}
+                    <td className="p-4 text-center">
+                      <div className="inline-flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            props.onViewStudent(student);
+                          }}
+                          className="inline-flex cursor-pointer items-center gap-1 rounded-md border border-pine-deep/20 px-2.5 py-1.5 text-xs font-semibold text-pine-deep transition-colors hover:bg-pine-light"
+                          title={t('btn_view_profile')}
+                        >
+                          <Eye className="size-3" />
+                          <span>{t('btn_profile')}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            props.onEditStudent(student);
+                          }}
+                          className="text-text-muted hover:text-text-primary hover:bg-surface-container cursor-pointer rounded-md border border-border-control px-2.5 py-1.5 text-xs font-semibold transition-colors"
+                          title={t('btn_edit_data')}
+                        >
+                          {t('btn_edit')}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Pagination Footer */}
+      <div className="bg-canvas-base/50 flex flex-col items-center justify-between gap-4 border-t border-border-control px-6 py-4 sm:flex-row">
+        <p className="text-text-muted text-sm">
+          {t('pagination_showing', {
+            start: startRecord,
+            end: endRecord,
+            total: props.totalFilteredCount,
+          })}
+        </p>
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            disabled={props.currentPage <= 1}
+            onClick={() => {
+              props.onPageChange(props.currentPage - 1);
+            }}
+            aria-label={t('pagination_prev')}
+            className="text-text-muted hover:bg-surface-container flex size-8 cursor-pointer items-center justify-center rounded-lg border border-border-control transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronLeft className="size-4" />
+          </button>
+
+          {Array.from({ length: props.totalPages }, (_, i) => i + 1).map((p) => {
+            const isActive = p === props.currentPage;
+            return (
+              <button
+                key={p}
+                type="button"
+                onClick={() => {
+                  props.onPageChange(p);
+                }}
+                className={`flex size-8 cursor-pointer items-center justify-center rounded-lg text-xs font-bold transition-colors ${
+                  isActive
+                    ? 'bg-pine-deep text-white shadow-xs'
+                    : 'text-text-primary hover:bg-surface-container border border-border-control'
+                }`}
+              >
+                {p}
+              </button>
+            );
+          })}
+
+          <button
+            type="button"
+            disabled={props.currentPage >= props.totalPages}
+            onClick={() => {
+              props.onPageChange(props.currentPage + 1);
+            }}
+            aria-label={t('pagination_next')}
+            className="text-text-primary hover:bg-surface-container flex size-8 cursor-pointer items-center justify-center rounded-lg border border-border-control transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronRight className="size-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
