@@ -13,6 +13,7 @@ import {
   Nfc,
   School,
   Scale,
+  Settings2,
   ShieldAlert,
   User,
   UserCheck,
@@ -99,6 +100,12 @@ export function AttendlyShell(props: { children: React.ReactNode; userEmail?: st
     {
       title: 'Konfigurasi Sistem',
       items: [
+        {
+          label: t('pengaturan_link'),
+          href: '/dashboard/pengaturan',
+          icon: Settings2,
+          badge: 'FR-A06',
+        },
         {
           label: t('user_profile_link'),
           href: '/dashboard/user-profile',
