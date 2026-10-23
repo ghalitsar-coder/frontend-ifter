@@ -5,6 +5,7 @@ import {
   Bell,
   Calendar,
   CheckCircle2,
+  GraduationCap,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -60,6 +61,12 @@ export function AttendlyShell(props: { children: React.ReactNode; userEmail?: st
     {
       title: 'Master Data & Penugasan',
       items: [
+        {
+          label: t('master_siswa_link'),
+          href: '/dashboard/master-siswa',
+          icon: GraduationCap,
+          badge: 'FR-A02',
+        },
         {
           label: t('master_guru_link'),
           href: '/dashboard/master-guru',
