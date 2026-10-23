@@ -13,6 +13,7 @@ import {
   Nfc,
   School,
   Scale,
+  ScanFace,
   Settings2,
   ShieldAlert,
   User,
@@ -53,6 +54,12 @@ export function AttendlyShell(props: { children: React.ReactNode; userEmail?: st
           href: '/dashboard/presensi',
           icon: UserCheck,
           badge: 'Sesi Aktif',
+        },
+        {
+          label: t('presensi_guru_link'),
+          href: '/dashboard/presensi-guru',
+          icon: ScanFace,
+          badge: null,
         },
         {
           label: t('piket_link'),
