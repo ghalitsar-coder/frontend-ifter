@@ -1,4 +1,4 @@
-import { BellRing, DoorClosed, DoorOpen, ShieldCheck } from 'lucide-react';
+import { ArrowLeftRight, BellRing, DoorClosed, DoorOpen, ShieldCheck } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { GateShiftInfo } from '@/types/piket';
 
@@ -11,6 +11,7 @@ export function PiketHeader(props: {
   shiftInfo: GateShiftInfo;
   onToggleGate: () => void;
   onRingBell: () => void;
+  onOpenRotation: () => void;
 }) {
   const t = useTranslations('PiketPage');
 
@@ -47,6 +48,16 @@ export function PiketHeader(props: {
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-3">
+          <button
+            className="flex h-11 items-center gap-2 rounded-xl border border-white/15 bg-white/10 px-5 text-sm font-semibold text-white shadow-xs transition-all duration-150 hover:bg-white/20"
+            id="btn-open-rotation"
+            type="button"
+            onClick={props.onOpenRotation}
+          >
+            <ArrowLeftRight className="size-5 text-amber-gold" />
+            <span>{t('rotation_btn')}</span>
+          </button>
+
           <button
             className={`flex h-11 items-center gap-2 rounded-xl px-5 text-sm font-semibold shadow-xs transition-all duration-150 ${
               props.shiftInfo.isGateOpen

@@ -8,6 +8,7 @@ import { PiketHeader } from '@/components/piket/PiketHeader';
 import { PiketLiveTapStream } from '@/components/piket/PiketLiveTapStream';
 import { PiketManualTapModal } from '@/components/piket/PiketManualTapModal';
 import { PiketMetrics } from '@/components/piket/PiketMetrics';
+import { PiketRotationModal } from '@/components/piket/PiketRotationModal';
 import { PiketUniformForm } from '@/components/piket/PiketUniformForm';
 import {
   filterTapLogs,
@@ -24,6 +25,7 @@ import type {
   RfidTapLog,
   TapStatus,
 } from '@/types/piket';
+import type { RotationSubmission } from '@/types/teacherRotation';
 
 /**
  * Gate Duty & RFID Attendance Main Manager Component.
@@ -44,6 +46,7 @@ export function PiketManager() {
     statusFilter: 'all',
   });
   const [isManualTapOpen, setIsManualTapOpen] = useState(false);
+  const [isRotationOpen, setIsRotationOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState('07:07:42 WIB');
   const [toast, setToast] = useState<{ title: string; desc: string } | null>(null);
 
@@ -167,6 +170,14 @@ export function PiketManager() {
     );
   };
 
+  const handleRotationConfirm = (submission: RotationSubmission) => {
+    setIsRotationOpen(false);
+    showToast(
+      t('toast_rotation_title'),
+      t('toast_rotation_desc', { name: submission.teacher.name }),
+    );
+  };
+
   const filteredLogs = filterTapLogs(logs, filterOptions);
 
   return (
@@ -174,6 +185,9 @@ export function PiketManager() {
       {/* Shift Header */}
       <PiketHeader
         shiftInfo={shiftInfo}
+        onOpenRotation={() => {
+          setIsRotationOpen(true);
+        }}
         onRingBell={handleRingBell}
         onToggleGate={handleToggleGate}
       />
@@ -223,6 +237,15 @@ export function PiketManager() {
         }}
         onSimulateTap={handleSimulateTap}
       />
+
+      {isRotationOpen && (
+        <PiketRotationModal
+          onClose={() => {
+            setIsRotationOpen(false);
+          }}
+          onConfirm={handleRotationConfirm}
+        />
+      )}
 
       {/* Floating Interactive Toast */}
       {toast && (
