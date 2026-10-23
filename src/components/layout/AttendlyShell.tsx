@@ -6,6 +6,7 @@ import {
   Calendar,
   ChartColumn,
   CheckCircle2,
+  FilePenLine,
   GraduationCap,
   LayoutDashboard,
   LogOut,
@@ -60,6 +61,12 @@ export function AttendlyShell(props: { children: React.ReactNode; userEmail?: st
           href: '/dashboard/presensi-guru',
           icon: ScanFace,
           badge: null,
+        },
+        {
+          label: t('koreksi_link'),
+          href: '/dashboard/koreksi-absensi',
+          icon: FilePenLine,
+          badge: 'FR-E05',
         },
         {
           label: t('piket_link'),
