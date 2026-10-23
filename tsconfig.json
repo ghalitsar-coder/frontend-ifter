@@ -71,10 +71,5 @@
   },
   // Files to include/exclude from the project
   "exclude": ["node_modules", ".next"],
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".storybook/**/*.ts"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".storybook/**/*.ts"]
 }
