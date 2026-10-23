@@ -1,13 +1,19 @@
 import { setRequestLocale } from 'next-intl/server';
-import { Hello } from '@/components/Hello';
+import { AttendlyDashboardOverview } from '@/components/dashboard/AttendlyDashboardOverview';
 
-export default async function DashboardPage(props: { params: Promise<{ locale: string }> }) {
+export type DashboardPageProps = {
+  params: Promise<{ locale: string }>;
+};
+
+/**
+ * Main dashboard executive summary overview page.
+ *
+ * @param props - Page route params.
+ * @returns Rendered dashboard overview.
+ */
+export default async function DashboardPage(props: DashboardPageProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
 
-  return (
-    <div className="py-5 [&_p]:my-6">
-      <Hello />
-    </div>
-  );
+  return <AttendlyDashboardOverview />;
 }
