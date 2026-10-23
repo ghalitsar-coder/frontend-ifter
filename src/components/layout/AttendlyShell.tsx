@@ -4,6 +4,7 @@ import { SignOutButton } from '@clerk/nextjs';
 import {
   Bell,
   Calendar,
+  ChartColumn,
   CheckCircle2,
   GraduationCap,
   LayoutDashboard,
@@ -54,6 +55,12 @@ export function AttendlyShell(props: { children: React.ReactNode; userEmail?: st
           label: t('kedisiplinan_link'),
           href: '/dashboard/kedisiplinan',
           icon: ShieldAlert,
+          badge: null,
+        },
+        {
+          label: t('rekap_link'),
+          href: '/dashboard/rekap',
+          icon: ChartColumn,
           badge: null,
         },
       ],
