@@ -10,6 +10,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  Nfc,
   School,
   ShieldAlert,
   User,
@@ -50,6 +51,12 @@ export function AttendlyShell(props: { children: React.ReactNode; userEmail?: st
           href: '/dashboard/presensi',
           icon: UserCheck,
           badge: 'Sesi Aktif',
+        },
+        {
+          label: t('piket_link'),
+          href: '/dashboard/piket',
+          icon: Nfc,
+          badge: 'RFID',
         },
         {
           label: t('kedisiplinan_link'),
