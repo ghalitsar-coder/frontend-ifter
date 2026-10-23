@@ -30,7 +30,9 @@ export function AttendanceTeacherJournal(props: {
         <textarea
           rows={4}
           value={props.notes}
-          onChange={(e) =>{  props.onNotesChange(e.target.value); }}
+          onChange={(e) => {
+            props.onNotesChange(e.target.value);
+          }}
           placeholder={t('journal_placeholder')}
           className="w-full resize-none rounded-xl border border-border/60 bg-surface-container-low p-3 text-sm text-foreground transition-all placeholder:text-muted-foreground focus:bg-background focus:ring-1 focus:ring-ring focus:outline-none"
         />

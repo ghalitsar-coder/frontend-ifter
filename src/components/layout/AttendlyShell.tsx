@@ -27,10 +27,7 @@ import { Link, usePathname } from '@/libs/I18nNavigation';
  * @param props - Layout properties containing page children.
  * @returns Shell JSX layout.
  */
-export function AttendlyShell(props: {
-  children: React.ReactNode;
-  userEmail?: string;
-}) {
+export function AttendlyShell(props: { children: React.ReactNode; userEmail?: string }) {
   const t = useTranslations('DashboardLayout');
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -85,9 +82,9 @@ export function AttendlyShell(props: {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8F9F8] text-[#111816] flex flex-col selection:bg-[#F2C96C] selection:text-[#173F36]">
+    <div className="flex min-h-screen flex-col bg-[#F8F9F8] text-[#111816] selection:bg-[#F2C96C] selection:text-[#173F36]">
       {/* Top Header Bar */}
-      <header className="sticky top-0 z-40 h-16 w-full border-b border-[#E4E8E6] bg-white/95 backdrop-blur-md px-4 sm:px-6 lg:px-8 flex items-center justify-between shadow-xs">
+      <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-[#E4E8E6] bg-white/95 px-4 shadow-xs backdrop-blur-md sm:px-6 lg:px-8">
         {/* Left: Mobile Toggle & Brand */}
         <div className="flex items-center gap-3">
           <button
@@ -95,21 +92,21 @@ export function AttendlyShell(props: {
             onClick={() => {
               setIsMobileMenuOpen(!isMobileMenuOpen);
             }}
-            className="lg:hidden p-2 rounded-xl text-[#6E7A76] hover:text-[#173F36] hover:bg-[#E9F0EE] transition-colors cursor-pointer"
+            className="cursor-pointer rounded-xl p-2 text-[#6E7A76] transition-colors hover:bg-[#E9F0EE] hover:text-[#173F36] lg:hidden"
             aria-label="Toggle navigasi mobile"
           >
             {isMobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
 
           <Link href="/dashboard" className="flex items-center gap-2.5">
-            <div className="size-9 rounded-xl bg-[#173F36] text-white flex items-center justify-center font-bold shadow-xs">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-[#173F36] font-bold text-white shadow-xs">
               <School className="size-5 text-[#F2C96C]" />
             </div>
             <div className="flex flex-col">
-              <span className="text-base font-extrabold text-[#173F36] tracking-tight leading-none">
+              <span className="text-base leading-none font-extrabold tracking-tight text-[#173F36]">
                 Attendly
               </span>
-              <span className="text-[10px] text-[#6E7A76] font-medium tracking-tight">
+              <span className="text-[10px] font-medium tracking-tight text-[#6E7A76]">
                 Sistem Presensi & Akademik
               </span>
             </div>
@@ -117,8 +114,8 @@ export function AttendlyShell(props: {
         </div>
 
         {/* Center: Academic Period & Date Pill (Desktop) */}
-        <div className="hidden md:flex items-center gap-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#E9F0EE] border border-[#D4DAD7] text-xs font-semibold text-[#173F36]">
+        <div className="hidden items-center gap-3 md:flex">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#D4DAD7] bg-[#E9F0EE] px-3 py-1 text-xs font-semibold text-[#173F36]">
             <Calendar className="size-3.5 text-[#173F36]" />
             <span>T.A. 2026/2027 Ganjil</span>
             <span className="size-1.5 rounded-full bg-[#173F36]" />
@@ -131,7 +128,7 @@ export function AttendlyShell(props: {
           {/* Notification Button */}
           <button
             type="button"
-            className="relative p-2 rounded-xl text-[#6E7A76] hover:text-[#173F36] hover:bg-[#E9F0EE] transition-colors cursor-pointer"
+            className="relative cursor-pointer rounded-xl p-2 text-[#6E7A76] transition-colors hover:bg-[#E9F0EE] hover:text-[#173F36]"
             aria-label="Pemberitahuan sistem"
           >
             <Bell className="size-4 sm:size-5" />
@@ -149,7 +146,7 @@ export function AttendlyShell(props: {
           <SignOutButton>
             <button
               type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#6E7A76] hover:text-red-700 hover:bg-red-50 border border-transparent hover:border-red-200 transition-colors cursor-pointer"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-transparent px-3 py-1.5 text-xs font-semibold text-[#6E7A76] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
               title={t('sign_out')}
             >
               <LogOut className="size-3.5" />
@@ -160,24 +157,22 @@ export function AttendlyShell(props: {
       </header>
 
       {/* Main Body with Sidebar + Content */}
-      <div className="flex-1 flex w-full">
+      <div className="flex w-full flex-1">
         {/* Desktop Fixed Sidebar */}
-        <aside className="hidden lg:flex w-64 xl:w-72 flex-col justify-between border-r border-[#E4E8E6] bg-white p-4 shrink-0">
+        <aside className="hidden w-64 shrink-0 flex-col justify-between border-r border-[#E4E8E6] bg-white p-4 lg:flex xl:w-72">
           <div className="space-y-6">
             {/* Academic Cycle Status Card */}
             <div className="rounded-xl border border-[#F2C96C]/40 bg-[#FDF8ED] p-3 shadow-xs">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="size-4 text-[#785a00]" />
-                  <span className="text-xs font-bold text-[#785a00]">
-                    2026/2027 Ganjil
-                  </span>
+                  <span className="text-xs font-bold text-[#785a00]">2026/2027 Ganjil</span>
                 </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-[#F2C96C] text-[#173F36]">
+                <span className="rounded-full bg-[#F2C96C] px-2 py-0.5 text-[10px] font-extrabold text-[#173F36]">
                   Aktif
                 </span>
               </div>
-              <p className="text-[11px] text-[#6E7A76] mt-1 leading-snug">
+              <p className="mt-1 text-[11px] leading-snug text-[#6E7A76]">
                 Semester gasal aktif • 18 Rombongan belajar
               </p>
             </div>
@@ -185,7 +180,7 @@ export function AttendlyShell(props: {
             {/* Navigation Menus */}
             {navSections.map((section) => (
               <div key={section.title} className="space-y-1">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#6E7A76] px-3 block">
+                <span className="block px-3 text-[10px] font-bold tracking-wider text-[#6E7A76] uppercase">
                   {section.title}
                 </span>
                 <div className="space-y-0.5">
@@ -200,7 +195,7 @@ export function AttendlyShell(props: {
                       <Link
                         key={item.href}
                         href={item.href}
-                        className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                        className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold transition-all sm:text-sm ${
                           isActive
                             ? 'bg-[#173F36] text-white shadow-xs'
                             : 'text-[#414846] hover:bg-[#E9F0EE] hover:text-[#173F36]'
@@ -216,10 +211,8 @@ export function AttendlyShell(props: {
                         </div>
                         {item.badge && (
                           <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                              isActive
-                                ? 'bg-white/20 text-white'
-                                : 'bg-[#E9F0EE] text-[#173F36]'
+                            className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                              isActive ? 'bg-white/20 text-white' : 'bg-[#E9F0EE] text-[#173F36]'
                             }`}
                           >
                             {item.badge}
@@ -234,30 +227,28 @@ export function AttendlyShell(props: {
           </div>
 
           {/* Bottom System Health Status */}
-          <div className="pt-4 border-t border-[#E4E8E6] space-y-2">
-            <div className="rounded-xl bg-[#E9F0EE] p-3 flex items-center justify-between">
+          <div className="space-y-2 border-t border-[#E4E8E6] pt-4">
+            <div className="flex items-center justify-between rounded-xl bg-[#E9F0EE] p-3">
               <div className="flex flex-col">
-                <span className="text-[10px] text-[#6E7A76] font-medium">
+                <span className="text-[10px] font-medium text-[#6E7A76]">
                   Attendly Gateway v2.4
                 </span>
-                <span className="text-xs font-bold text-[#173F36] flex items-center gap-1.5">
-                  <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="flex items-center gap-1.5 text-xs font-bold text-[#173F36]">
+                  <span className="size-2 animate-pulse rounded-full bg-emerald-500" />
                   Sistem Normal
                 </span>
               </div>
               <CheckCircle2 className="size-4 text-[#173F36]" />
             </div>
             {props.userEmail && (
-              <p className="text-[10px] text-[#6E7A76] truncate px-1">
-                Akun: {props.userEmail}
-              </p>
+              <p className="truncate px-1 text-[10px] text-[#6E7A76]">Akun: {props.userEmail}</p>
             )}
           </div>
         </aside>
 
         {/* Mobile Navigation Drawer Backdrop & Modal */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden fixed inset-0 z-50 flex">
+          <div className="fixed inset-0 z-50 flex lg:hidden">
             <div
               className="fixed inset-0 bg-black/50 backdrop-blur-xs"
               onClick={() => {
@@ -265,11 +256,11 @@ export function AttendlyShell(props: {
               }}
               aria-hidden="true"
             />
-            <div className="relative w-72 max-w-[85vw] bg-white h-full p-4 flex flex-col justify-between shadow-2xl z-10 animate-in slide-in-from-left duration-200">
+            <div className="relative z-10 flex h-full w-72 max-w-[85vw] animate-in flex-col justify-between bg-white p-4 shadow-2xl duration-200 slide-in-from-left">
               <div className="space-y-6">
-                <div className="flex items-center justify-between pb-3 border-b border-[#E4E8E6]">
+                <div className="flex items-center justify-between border-b border-[#E4E8E6] pb-3">
                   <div className="flex items-center gap-2">
-                    <div className="size-8 rounded-lg bg-[#173F36] text-white flex items-center justify-center font-bold">
+                    <div className="flex size-8 items-center justify-center rounded-lg bg-[#173F36] font-bold text-white">
                       <School className="size-4 text-[#F2C96C]" />
                     </div>
                     <span className="text-base font-bold text-[#173F36]">Attendly</span>
@@ -279,7 +270,7 @@ export function AttendlyShell(props: {
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                     }}
-                    className="p-1 rounded-lg text-[#6E7A76] hover:bg-[#E9F0EE]"
+                    className="rounded-lg p-1 text-[#6E7A76] hover:bg-[#E9F0EE]"
                     aria-label="Tutup menu"
                   >
                     <X className="size-5" />
@@ -288,7 +279,7 @@ export function AttendlyShell(props: {
 
                 {navSections.map((section) => (
                   <div key={section.title} className="space-y-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#6E7A76] px-3 block">
+                    <span className="block px-3 text-[10px] font-bold tracking-wider text-[#6E7A76] uppercase">
                       {section.title}
                     </span>
                     <div className="space-y-0.5">
@@ -306,7 +297,7 @@ export function AttendlyShell(props: {
                             onClick={() => {
                               setIsMobileMenuOpen(false);
                             }}
-                            className={`flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                            className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold transition-all ${
                               isActive
                                 ? 'bg-[#173F36] text-white shadow-xs'
                                 : 'text-[#414846] hover:bg-[#E9F0EE] hover:text-[#173F36]'
@@ -322,7 +313,7 @@ export function AttendlyShell(props: {
                             </div>
                             {item.badge && (
                               <span
-                                className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
+                                className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
                                   isActive
                                     ? 'bg-white/20 text-white'
                                     : 'bg-[#E9F0EE] text-[#173F36]'
@@ -339,11 +330,11 @@ export function AttendlyShell(props: {
                 ))}
               </div>
 
-              <div className="pt-3 border-t border-[#E4E8E6]">
+              <div className="border-t border-[#E4E8E6] pt-3">
                 <SignOutButton>
                   <button
                     type="button"
-                    className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition-colors hover:bg-red-100"
                   >
                     <LogOut className="size-4" />
                     <span>{t('sign_out')}</span>
@@ -355,10 +346,8 @@ export function AttendlyShell(props: {
         )}
 
         {/* Main Content Workspace Container */}
-        <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          <div className="max-w-7xl mx-auto w-full">
-            {props.children}
-          </div>
+        <main className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-7xl">{props.children}</div>
         </main>
       </div>
     </div>

@@ -31,7 +31,9 @@ export function AttendanceNotificationDispatch(props: {
             <input
               type="checkbox"
               checked={props.sendWhatsApp}
-              onChange={(e) =>{  props.onSendWhatsAppChange(e.target.checked); }}
+              onChange={(e) => {
+                props.onSendWhatsAppChange(e.target.checked);
+              }}
               className="mt-1 size-4 cursor-pointer rounded text-primary accent-primary"
             />
             <div className="flex flex-col">
@@ -47,7 +49,9 @@ export function AttendanceNotificationDispatch(props: {
             <input
               type="checkbox"
               checked={props.escalateBk}
-              onChange={(e) =>{  props.onEscalateBkChange(e.target.checked); }}
+              onChange={(e) => {
+                props.onEscalateBkChange(e.target.checked);
+              }}
               className="mt-1 size-4 cursor-pointer rounded text-primary accent-primary"
             />
             <div className="flex flex-col">
@@ -61,7 +65,9 @@ export function AttendanceNotificationDispatch(props: {
             <input
               type="checkbox"
               checked={props.syncDapodik}
-              onChange={(e) =>{  props.onSyncDapodikChange(e.target.checked); }}
+              onChange={(e) => {
+                props.onSyncDapodikChange(e.target.checked);
+              }}
               className="mt-1 size-4 cursor-pointer rounded text-primary accent-primary"
             />
             <div className="flex flex-col">

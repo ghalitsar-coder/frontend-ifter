@@ -30,24 +30,24 @@ export function MasterGuruHeader(props: {
   const t = useTranslations('MasterGuruPage');
 
   return (
-    <div className="flex flex-col gap-6 mb-8">
+    <div className="mb-8 flex flex-col gap-6">
       {/* Editorial Title & Actions Bar */}
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-4">
-        <div className="flex flex-col gap-1 max-w-2xl">
+      <div className="flex flex-col justify-between gap-4 xl:flex-row xl:items-end">
+        <div className="flex max-w-2xl flex-col gap-1">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-amber-700">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" />
+            <span className="text-[11px] font-bold tracking-wider text-amber-700 uppercase">
               {t('academic_cycle_badge')}
             </span>
             <span className="text-text-muted text-xs">/</span>
-            <span className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">
+            <span className="text-text-muted text-[11px] font-semibold tracking-wider uppercase">
               {t('module_code_badge')}
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-pine-deep tracking-tight">
+          <h1 className="text-2xl font-extrabold tracking-tight text-pine-deep sm:text-3xl lg:text-4xl">
             {t('page_title')}
           </h1>
-          <p className="text-sm text-text-muted leading-relaxed">
+          <p className="text-text-muted text-sm leading-relaxed">
             {t('page_subtitle', { total: props.totalCount })}
           </p>
         </div>
@@ -57,10 +57,10 @@ export function MasterGuruHeader(props: {
           <button
             type="button"
             onClick={props.onTogglePiketDrawer}
-            className={`inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all border cursor-pointer ${
+            className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition-all sm:text-sm ${
               props.isPiketDrawerOpen
-                ? 'bg-pine-deep text-white border-pine-deep shadow-sm'
-                : 'bg-surface-card text-pine-deep border-border-control hover:bg-pine-light'
+                ? 'border-pine-deep bg-pine-deep text-white shadow-sm'
+                : 'bg-surface-card border-border-control text-pine-deep hover:bg-pine-light'
             }`}
           >
             <CalendarDays className="size-4" />
@@ -70,7 +70,7 @@ export function MasterGuruHeader(props: {
           <button
             type="button"
             onClick={props.onOpenImportModal}
-            className="inline-flex items-center gap-2 bg-surface-card text-pine-deep border border-border-control px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-pine-light transition-all cursor-pointer shadow-xs"
+            className="bg-surface-card inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2.5 text-xs font-semibold text-pine-deep shadow-xs transition-all hover:bg-pine-light sm:text-sm"
           >
             <Upload className="size-4 text-pine-deep" />
             <span>{t('btn_import_excel')}</span>
@@ -79,7 +79,7 @@ export function MasterGuruHeader(props: {
           <button
             type="button"
             onClick={props.onExport}
-            className="inline-flex items-center gap-2 bg-surface-card text-pine-deep border border-border-control px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-pine-light transition-all cursor-pointer shadow-xs"
+            className="bg-surface-card inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2.5 text-xs font-semibold text-pine-deep shadow-xs transition-all hover:bg-pine-light sm:text-sm"
           >
             <Download className="size-4" />
             <span>{t('btn_export_excel')}</span>
@@ -88,7 +88,7 @@ export function MasterGuruHeader(props: {
           <button
             type="button"
             onClick={props.onOpenAddModal}
-            className="inline-flex items-center gap-2 bg-pine-deep text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold hover:bg-pine-hover transition-all cursor-pointer shadow-md"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-pine-deep px-4 py-2.5 text-xs font-semibold text-white shadow-md transition-all hover:bg-pine-hover sm:text-sm"
           >
             <Plus className="size-4 text-amber-400" />
             <span>{t('btn_add_teacher')}</span>
@@ -97,107 +97,103 @@ export function MasterGuruHeader(props: {
       </div>
 
       {/* Bento Overview Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-12">
         {/* Bento 1: Total PTK */}
-        <div className="md:col-span-4 bg-pine-deep rounded-2xl p-5 text-white shadow-md flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute -right-8 -bottom-8 w-40 h-40 rounded-full bg-white/5 blur-2xl group-hover:bg-amber-400/10 transition-all duration-700 pointer-events-none" />
+        <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-pine-deep p-5 text-white shadow-md md:col-span-4">
+          <div className="pointer-events-none absolute -right-8 -bottom-8 h-40 w-40 rounded-full bg-white/5 blur-2xl transition-all duration-700 group-hover:bg-amber-400/10" />
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold tracking-wider uppercase text-amber-300">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-[11px] font-bold tracking-wider text-amber-300 uppercase">
                 {t('metric_total_ptk_title')}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-[11px] font-semibold text-pine-light">
+              <span className="rounded-full bg-white/10 px-2.5 py-0.5 text-[11px] font-semibold text-pine-light">
                 {t('metric_status_all_active')}
               </span>
             </div>
-            <div className="flex items-baseline gap-2 mb-1.5">
-              <span className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+            <div className="mb-1.5 flex items-baseline gap-2">
+              <span className="text-3xl font-extrabold tracking-tight sm:text-4xl">
                 {props.totalCount}
               </span>
-              <span className="text-sm font-medium text-emerald-100">
-                {t('unit_ptk')}
-              </span>
+              <span className="text-sm font-medium text-emerald-100">{t('unit_ptk')}</span>
             </div>
-            <p className="text-xs text-emerald-100/90 leading-relaxed">
+            <p className="text-xs leading-relaxed text-emerald-100/90">
               {t('metric_total_ptk_desc')}
             </p>
           </div>
-          <div className="mt-4 pt-3 border-t border-white/10 flex items-center gap-2 text-xs text-amber-200">
-            <ShieldCheck className="size-4 text-amber-300 shrink-0" />
+          <div className="mt-4 flex items-center gap-2 border-t border-white/10 pt-3 text-xs text-amber-200">
+            <ShieldCheck className="size-4 shrink-0 text-amber-300" />
             <span>{t('metric_dapodik_synced_hint')}</span>
           </div>
         </div>
 
         {/* Bento 2: Homeroom Class Distribution */}
-        <div className="md:col-span-4 bg-surface-card rounded-2xl p-5 border border-border-control shadow-xs flex flex-col justify-between">
+        <div className="bg-surface-card flex flex-col justify-between rounded-2xl border border-border-control p-5 shadow-xs md:col-span-4">
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold tracking-wider uppercase text-text-muted">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-text-muted text-[11px] font-bold tracking-wider uppercase">
                 {t('metric_homeroom_distribution_title')}
               </span>
-              <div className="size-7 rounded-lg bg-pine-light text-pine-deep flex items-center justify-center">
+              <div className="flex size-7 items-center justify-center rounded-lg bg-pine-light text-pine-deep">
                 <GraduationCap className="size-4" />
               </div>
             </div>
-            <div className="flex items-baseline gap-2 mb-1.5">
-              <span className="text-3xl sm:text-4xl font-extrabold text-pine-deep tracking-tight">
+            <div className="mb-1.5 flex items-baseline gap-2">
+              <span className="text-3xl font-extrabold tracking-tight text-pine-deep sm:text-4xl">
                 {props.homeroomCount} / {props.totalRombels}
               </span>
-              <span className="text-sm font-medium text-text-muted">
-                {t('unit_rombel')}
-              </span>
+              <span className="text-text-muted text-sm font-medium">{t('unit_rombel')}</span>
             </div>
-            <p className="text-xs text-text-muted leading-relaxed">
+            <p className="text-text-muted text-xs leading-relaxed">
               {t('metric_homeroom_distribution_desc')}
             </p>
           </div>
-          <div className="mt-4 pt-3 border-t border-border-subtle flex items-center justify-between">
+          <div className="mt-4 flex items-center justify-between border-t border-border-subtle pt-3">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
               <CheckCircle2 className="size-3.5" />
               <span>{t('metric_all_rombels_filled')}</span>
             </div>
-            <span className="text-xs font-semibold text-pine-deep hover:underline cursor-pointer flex items-center">
+            <span className="flex cursor-pointer items-center text-xs font-semibold text-pine-deep hover:underline">
               {t('btn_view_plotting')}
-              <ChevronRight className="size-3 ml-0.5" />
+              <ChevronRight className="ml-0.5 size-3" />
             </span>
           </div>
         </div>
 
         {/* Bento 3: Today's Gate Picket Duty */}
-        <div className="md:col-span-4 bg-amber-50 rounded-2xl p-5 border border-amber-200/80 shadow-xs flex flex-col justify-between">
+        <div className="flex flex-col justify-between rounded-2xl border border-amber-200/80 bg-amber-50 p-5 shadow-xs md:col-span-4">
           <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold tracking-wider uppercase text-amber-800">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-[11px] font-bold tracking-wider text-amber-800 uppercase">
                 {t('metric_picket_duty_title')}
               </span>
-              <span className="px-2.5 py-0.5 rounded-full bg-amber-200/80 text-[11px] font-bold text-amber-900">
+              <span className="rounded-full bg-amber-200/80 px-2.5 py-0.5 text-[11px] font-bold text-amber-900">
                 {t('metric_today_monday')}
               </span>
             </div>
-            <div className="flex items-baseline gap-2 mb-1.5">
-              <span className="text-3xl sm:text-4xl font-extrabold text-amber-950 tracking-tight">
+            <div className="mb-1.5 flex items-baseline gap-2">
+              <span className="text-3xl font-extrabold tracking-tight text-amber-950 sm:text-4xl">
                 {props.activePicketCount}
               </span>
               <span className="text-sm font-medium text-amber-800">
                 {t('unit_teachers_active')}
               </span>
             </div>
-            <p className="text-xs text-amber-800/90 leading-relaxed">
+            <p className="text-xs leading-relaxed text-amber-800/90">
               {t('metric_picket_duty_desc')}
             </p>
           </div>
-          <div className="mt-4 pt-3 border-t border-amber-200/60 flex items-center justify-between">
+          <div className="mt-4 flex items-center justify-between border-t border-amber-200/60 pt-3">
             <div className="flex -space-x-1.5 overflow-hidden">
-              <span className="inline-flex size-6 rounded-full bg-pine-deep text-white text-[10px] font-bold items-center justify-center ring-2 ring-amber-50">
+              <span className="inline-flex size-6 items-center justify-center rounded-full bg-pine-deep text-[10px] font-bold text-white ring-2 ring-amber-50">
                 AS
               </span>
-              <span className="inline-flex size-6 rounded-full bg-pine-hover text-white text-[10px] font-bold items-center justify-center ring-2 ring-amber-50">
+              <span className="inline-flex size-6 items-center justify-center rounded-full bg-pine-hover text-[10px] font-bold text-white ring-2 ring-amber-50">
                 BS
               </span>
-              <span className="inline-flex size-6 rounded-full bg-emerald-700 text-white text-[10px] font-bold items-center justify-center ring-2 ring-amber-50">
+              <span className="inline-flex size-6 items-center justify-center rounded-full bg-emerald-700 text-[10px] font-bold text-white ring-2 ring-amber-50">
                 RS
               </span>
-              <span className="inline-flex size-6 rounded-full bg-amber-600 text-white text-[10px] font-bold items-center justify-center ring-2 ring-amber-50">
+              <span className="inline-flex size-6 items-center justify-center rounded-full bg-amber-600 text-[10px] font-bold text-white ring-2 ring-amber-50">
                 +2
               </span>
             </div>

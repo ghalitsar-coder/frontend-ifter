@@ -15,9 +15,7 @@ describe('mockMasterGuru', () => {
   });
 
   it('verifies homeroom teachers have assigned classes', () => {
-    const homeroomTeachers = initialMockTeachers.filter((t) =>
-      t.roles.includes('Wali Kelas'),
-    );
+    const homeroomTeachers = initialMockTeachers.filter((t) => t.roles.includes('Wali Kelas'));
     expect(homeroomTeachers.length).toBeGreaterThanOrEqual(4);
     for (const teacher of homeroomTeachers) {
       expect(teacher.homeroomClass).toBeDefined();
@@ -27,20 +25,20 @@ describe('mockMasterGuru', () => {
   });
 
   it('verifies picket posts have assigned active duty officers', () => {
-    expect(mockPicketPosts.length).toBe(3);
+    expect(mockPicketPosts).toHaveLength(3);
     for (const post of mockPicketPosts) {
       expect(post.postNumber).toMatch(/^Pos 0[1-3]/);
       expect(post.officerName.length).toBeGreaterThan(0);
-      expect(post.officerInitial.length).toBe(2);
+      expect(post.officerInitial).toHaveLength(2);
       expect(post.checkInTime).toMatch(/WIB$/);
-      expect(post.isCheckedIn).toBe(true);
+      expect(post.isCheckedIn).toBeTruthy();
     }
   });
 
   it('validates employment status and access level integrity', () => {
     const statuses = new Set(initialMockTeachers.map((t) => t.employmentStatus));
-    expect(statuses.has('PNS')).toBe(true);
-    expect(statuses.has('PPPK')).toBe(true);
+    expect(statuses.has('PNS')).toBeTruthy();
+    expect(statuses.has('PPPK')).toBeTruthy();
 
     const admins = initialMockTeachers.filter((t) => t.accessLevel === 'admin');
     expect(admins.length).toBeGreaterThanOrEqual(1);

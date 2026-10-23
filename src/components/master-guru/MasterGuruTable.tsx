@@ -26,33 +26,29 @@ export function MasterGuruTable(props: {
 
   if (props.teachers.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-border-control bg-surface-card p-12 text-center">
-        <div className="mx-auto size-12 rounded-full bg-slate-100 flex items-center justify-center text-text-muted mb-3">
+      <div className="bg-surface-card rounded-2xl border border-dashed border-border-control p-12 text-center">
+        <div className="text-text-muted mx-auto mb-3 flex size-12 items-center justify-center rounded-full bg-slate-100">
           <GraduationCap className="size-6" />
         </div>
-        <h3 className="text-base font-bold text-pine-deep mb-1">
-          {t('empty_teachers_title')}
-        </h3>
-        <p className="text-xs text-text-muted max-w-sm mx-auto">
-          {t('empty_teachers_desc')}
-        </p>
+        <h3 className="mb-1 text-base font-bold text-pine-deep">{t('empty_teachers_title')}</h3>
+        <p className="text-text-muted mx-auto max-w-sm text-xs">{t('empty_teachers_desc')}</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-2xl border border-border-control bg-surface-card shadow-xs overflow-hidden">
+    <div className="bg-surface-card overflow-hidden rounded-2xl border border-border-control shadow-xs">
       <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse text-xs sm:text-sm">
+        <table className="w-full border-collapse text-left text-xs sm:text-sm">
           <thead>
-            <tr className="bg-canvas-base border-b border-border-subtle text-text-muted font-semibold text-[11px] uppercase tracking-wider">
-              <th className="py-3.5 px-4 sm:px-6">{t('th_educator_name')}</th>
-              <th className="py-3.5 px-4">{t('th_contacts')}</th>
-              <th className="py-3.5 px-4">{t('th_system_roles')}</th>
-              <th className="py-3.5 px-4">{t('th_homeroom_assignment')}</th>
-              <th className="py-3.5 px-4">{t('th_picket_schedule')}</th>
-              <th className="py-3.5 px-4">{t('th_status')}</th>
-              <th className="py-3.5 px-4 sm:px-6 text-right">{t('th_actions')}</th>
+            <tr className="bg-canvas-base text-text-muted border-b border-border-subtle text-[11px] font-semibold tracking-wider uppercase">
+              <th className="px-4 py-3.5 sm:px-6">{t('th_educator_name')}</th>
+              <th className="px-4 py-3.5">{t('th_contacts')}</th>
+              <th className="px-4 py-3.5">{t('th_system_roles')}</th>
+              <th className="px-4 py-3.5">{t('th_homeroom_assignment')}</th>
+              <th className="px-4 py-3.5">{t('th_picket_schedule')}</th>
+              <th className="px-4 py-3.5">{t('th_status')}</th>
+              <th className="px-4 py-3.5 text-right sm:px-6">{t('th_actions')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-subtle">
@@ -66,24 +62,21 @@ export function MasterGuruTable(props: {
                 .toUpperCase();
 
               return (
-                <tr
-                  key={teacher.id}
-                  className="hover:bg-slate-50/80 transition-colors group"
-                >
+                <tr key={teacher.id} className="group transition-colors hover:bg-slate-50/80">
                   {/* Name & NIP */}
-                  <td className="py-4 px-4 sm:px-6">
+                  <td className="px-4 py-4 sm:px-6">
                     <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-xl bg-pine-deep text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-xs ring-1 ring-border-subtle">
+                      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-pine-deep text-xs font-bold text-white shadow-xs ring-1 ring-border-subtle">
                         {initials}
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-bold text-text-primary group-hover:text-pine-deep transition-colors leading-tight">
+                        <span className="text-text-primary leading-tight font-bold transition-colors group-hover:text-pine-deep">
                           {teacher.name}
                         </span>
-                        <span className="text-[11px] text-text-muted mt-0.5">
+                        <span className="text-text-muted mt-0.5 text-[11px]">
                           {t('label_nip')}: {teacher.nip}
                         </span>
-                        <span className="text-[10px] text-amber-800 font-medium">
+                        <span className="text-[10px] font-medium text-amber-800">
                           {teacher.subject}
                         </span>
                       </div>
@@ -91,30 +84,30 @@ export function MasterGuruTable(props: {
                   </td>
 
                   {/* Contacts */}
-                  <td className="py-4 px-4">
+                  <td className="px-4 py-4">
                     <div className="flex flex-col gap-1 text-xs">
                       <a
                         href={`mailto:${teacher.email}`}
-                        className="text-text-muted hover:text-pine-deep flex items-center gap-1.5 transition-colors"
+                        className="text-text-muted flex items-center gap-1.5 transition-colors hover:text-pine-deep"
                       >
-                        <Mail className="size-3 text-text-muted shrink-0" />
-                        <span className="truncate max-w-[150px]">{teacher.email}</span>
+                        <Mail className="text-text-muted size-3 shrink-0" />
+                        <span className="max-w-[150px] truncate">{teacher.email}</span>
                       </a>
                       <a
-                        href={`https://wa.me/${teacher.phone.replace(/[^0-9]/g, '')}`}
+                        href={`https://wa.me/${teacher.phone.replaceAll(/[^0-9]/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-emerald-700 hover:text-emerald-800 font-medium flex items-center gap-1.5 transition-colors"
+                        className="flex items-center gap-1.5 font-medium text-emerald-700 transition-colors hover:text-emerald-800"
                       >
-                        <Phone className="size-3 text-emerald-600 shrink-0" />
+                        <Phone className="size-3 shrink-0 text-emerald-600" />
                         <span>{teacher.phone}</span>
                       </a>
                     </div>
                   </td>
 
                   {/* Roles */}
-                  <td className="py-4 px-4">
-                    <div className="flex flex-wrap gap-1 max-w-[170px]">
+                  <td className="px-4 py-4">
+                    <div className="flex max-w-[170px] flex-wrap gap-1">
                       {teacher.roles.map((role) => {
                         const isHomeroom = role.includes('Wali');
                         const isPiket = role.includes('Piket');
@@ -123,13 +116,13 @@ export function MasterGuruTable(props: {
                         return (
                           <span
                             key={role}
-                            className={`px-2 py-0.5 rounded-md text-[10px] font-bold tracking-tight whitespace-nowrap ${
+                            className={`rounded-md px-2 py-0.5 text-[10px] font-bold tracking-tight whitespace-nowrap ${
                               isAdmin
-                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                ? 'border border-amber-300 bg-amber-100 text-amber-900'
                                 : isHomeroom
-                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                  ? 'border border-emerald-200 bg-emerald-50 text-emerald-800'
                                   : isPiket
-                                    ? 'bg-sky-50 text-sky-800 border border-sky-200'
+                                    ? 'border border-sky-200 bg-sky-50 text-sky-800'
                                     : 'bg-slate-100 text-slate-700'
                             }`}
                           >
@@ -141,55 +134,55 @@ export function MasterGuruTable(props: {
                   </td>
 
                   {/* Homeroom Assignment */}
-                  <td className="py-4 px-4">
+                  <td className="px-4 py-4">
                     {teacher.homeroomClass ? (
                       <div className="flex flex-col">
-                        <span className="font-bold text-pine-deep flex items-center gap-1 text-xs sm:text-sm">
-                          <GraduationCap className="size-3.5 text-pine-deep shrink-0" />
+                        <span className="flex items-center gap-1 text-xs font-bold text-pine-deep sm:text-sm">
+                          <GraduationCap className="size-3.5 shrink-0 text-pine-deep" />
                           {teacher.homeroomClass.className}
                         </span>
-                        <span className="text-[11px] text-text-muted mt-0.5">
+                        <span className="text-text-muted mt-0.5 text-[11px]">
                           ({teacher.homeroomClass.studentCount} {t('unit_students')})
                         </span>
                       </div>
                     ) : (
-                      <span className="text-xs text-text-muted italic">
+                      <span className="text-text-muted text-xs italic">
                         {t('label_unassigned_homeroom')}
                       </span>
                     )}
                   </td>
 
                   {/* Picket Duty */}
-                  <td className="py-4 px-4">
+                  <td className="px-4 py-4">
                     {teacher.picketDuty ? (
                       <div className="flex flex-col text-xs">
-                        <span className="font-semibold text-text-primary flex items-center gap-1">
-                          <CalendarDays className="size-3 text-amber-600 shrink-0" />
+                        <span className="text-text-primary flex items-center gap-1 font-semibold">
+                          <CalendarDays className="size-3 shrink-0 text-amber-600" />
                           {teacher.picketDuty.day}
                         </span>
-                        <span className="text-[11px] text-text-muted flex items-center gap-1 mt-0.5">
-                          <MapPin className="size-3 text-text-muted shrink-0" />
-                          <span className="truncate max-w-[130px]">
+                        <span className="text-text-muted mt-0.5 flex items-center gap-1 text-[11px]">
+                          <MapPin className="text-text-muted size-3 shrink-0" />
+                          <span className="max-w-[130px] truncate">
                             {teacher.picketDuty.postLocation}
                           </span>
                         </span>
                       </div>
                     ) : (
-                      <span className="text-xs text-text-muted italic">
+                      <span className="text-text-muted text-xs italic">
                         {t('label_no_piket_schedule')}
                       </span>
                     )}
                   </td>
 
                   {/* Status */}
-                  <td className="py-4 px-4">
+                  <td className="px-4 py-4">
                     {teacher.status === 'active' ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100/70 text-emerald-800">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100/70 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
                         <span className="size-1.5 rounded-full bg-emerald-600" />
                         {t('status_badge_active')}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-800">
                         <span className="size-1.5 rounded-full bg-amber-600" />
                         {t('status_badge_leave')}
                       </span>
@@ -197,14 +190,14 @@ export function MasterGuruTable(props: {
                   </td>
 
                   {/* Actions */}
-                  <td className="py-4 px-4 sm:px-6 text-right">
+                  <td className="px-4 py-4 text-right sm:px-6">
                     <div className="inline-flex items-center gap-1">
                       <button
                         type="button"
                         onClick={() => {
                           props.onAssignHomeroom(teacher);
                         }}
-                        className="p-1.5 rounded-lg text-pine-deep hover:bg-pine-light transition-colors cursor-pointer"
+                        className="cursor-pointer rounded-lg p-1.5 text-pine-deep transition-colors hover:bg-pine-light"
                         title={t('btn_manage_assignment')}
                         aria-label={t('btn_manage_assignment')}
                       >
@@ -215,17 +208,17 @@ export function MasterGuruTable(props: {
                         onClick={() => {
                           props.onEditTeacher(teacher);
                         }}
-                        className="p-1.5 rounded-lg text-text-muted hover:text-pine-deep hover:bg-slate-100 transition-colors cursor-pointer"
+                        className="text-text-muted cursor-pointer rounded-lg p-1.5 transition-colors hover:bg-slate-100 hover:text-pine-deep"
                         title={t('btn_edit_teacher')}
                         aria-label={t('btn_edit_teacher')}
                       >
                         <Edit2 className="size-4" />
                       </button>
                       <a
-                        href={`https://wa.me/${teacher.phone.replace(/[^0-9]/g, '')}`}
+                        href={`https://wa.me/${teacher.phone.replaceAll(/[^0-9]/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors"
+                        className="rounded-lg p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50 hover:text-emerald-700"
                         title={t('btn_chat_whatsapp')}
                         aria-label={t('btn_chat_whatsapp')}
                       >

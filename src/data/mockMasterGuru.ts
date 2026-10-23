@@ -1,7 +1,4 @@
-import type {
-  PicketPostSummary,
-  TeacherProfile,
-} from '@/types/masterGuru';
+import type { PicketPostSummary, TeacherProfile } from '@/types/masterGuru';
 
 /**
  * Initial teacher records matching the Attendly Stitch design specifications.

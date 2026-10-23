@@ -41,7 +41,9 @@ export function MasterGuruAddModal(props: {
   const [isHomeroom, setIsHomeroom] = useState(false);
   const [selectedClass, setSelectedClass] = useState(props.availableClasses[0] || 'Kelas VII A');
   const [isPicket, setIsPicket] = useState(false);
-  const [picketDay, setPicketDay] = useState<'Senin' | 'Selasa' | 'Rabu' | 'Kamis' | 'Jumat' | 'Sabtu'>('Senin');
+  const [picketDay, setPicketDay] = useState<
+    'Senin' | 'Selasa' | 'Rabu' | 'Kamis' | 'Jumat' | 'Sabtu'
+  >('Senin');
   const [accessLevel, setAccessLevel] = useState<AccessLevel>('teacher');
 
   const [rfidUid, setRfidUid] = useState('');
@@ -58,10 +60,18 @@ export function MasterGuruAddModal(props: {
     }
 
     const roles: string[] = [];
-    if (isHomeroom) roles.push('Wali Kelas');
-    if (isPicket) roles.push('Guru Piket');
-    if (accessLevel === 'admin') roles.push('Administrator');
-    if (roles.length === 0) roles.push('Guru Pengampu');
+    if (isHomeroom) {
+      roles.push('Wali Kelas');
+    }
+    if (isPicket) {
+      roles.push('Guru Piket');
+    }
+    if (accessLevel === 'admin') {
+      roles.push('Administrator');
+    }
+    if (roles.length === 0) {
+      roles.push('Guru Pengampu');
+    }
 
     const teacherData: Omit<TeacherProfile, 'id'> = {
       name: name.trim(),
@@ -102,28 +112,26 @@ export function MasterGuruAddModal(props: {
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-add-guru-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/60 p-3 backdrop-blur-xs sm:p-4"
     >
-      <div className="relative w-full max-w-3xl rounded-2xl bg-surface-card border border-border-control shadow-2xl overflow-hidden my-6">
+      <div className="bg-surface-card relative my-6 w-full max-w-3xl overflow-hidden rounded-2xl border border-border-control shadow-2xl">
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-6 py-4.5 bg-pine-deep text-white">
+        <div className="flex items-center justify-between bg-pine-deep px-6 py-4.5 text-white">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-300">
+            <div className="flex size-10 items-center justify-center rounded-xl bg-white/10 text-amber-300">
               <UserPlus className="size-5" />
             </div>
             <div>
-              <h2 id="modal-add-guru-title" className="text-base sm:text-lg font-bold">
+              <h2 id="modal-add-guru-title" className="text-base font-bold sm:text-lg">
                 {t('add_guru_modal_title')}
               </h2>
-              <p className="text-xs text-emerald-100">
-                {t('add_guru_modal_subtitle')}
-              </p>
+              <p className="text-xs text-emerald-100">{t('add_guru_modal_subtitle')}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={props.onClose}
-            className="p-1.5 rounded-lg text-emerald-200 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+            className="cursor-pointer rounded-lg p-1.5 text-emerald-200 transition-colors hover:bg-white/10 hover:text-white"
             aria-label={t('btn_close')}
           >
             <X className="size-5" />
@@ -131,21 +139,19 @@ export function MasterGuruAddModal(props: {
         </div>
 
         {/* Modal Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+        <form onSubmit={handleSubmit} className="max-h-[80vh] space-y-6 overflow-y-auto p-6">
           {/* Section 1: Identitas Personal & NIP */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-border-subtle">
-              <span className="size-6 rounded-full bg-pine-deep text-white text-xs font-bold flex items-center justify-center">
+            <div className="flex items-center gap-2 border-b border-border-subtle pb-2">
+              <span className="flex size-6 items-center justify-center rounded-full bg-pine-deep text-xs font-bold text-white">
                 1
               </span>
-              <h3 className="text-sm font-bold text-pine-deep">
-                {t('section_personal_identity')}
-              </h3>
+              <h3 className="text-sm font-bold text-pine-deep">{t('section_personal_identity')}</h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_full_name_degree_label')} *
                 </label>
                 <input
@@ -156,12 +162,12 @@ export function MasterGuruAddModal(props: {
                     setName(e.target.value);
                   }}
                   placeholder="Contoh: Drs. Agus Subagyo, M.Pd."
-                  className="w-full h-10 px-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_nip_label')}
                 </label>
                 <input
@@ -171,12 +177,12 @@ export function MasterGuruAddModal(props: {
                     setNip(e.target.value);
                   }}
                   placeholder="19780412 200501 1 003"
-                  className="w-full h-10 px-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_nuptk_label')}
                 </label>
                 <input
@@ -186,12 +192,12 @@ export function MasterGuruAddModal(props: {
                     setNuptk(e.target.value);
                   }}
                   placeholder="16 digit NUPTK resmi"
-                  className="w-full h-10 px-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_nik_ktp_label')}
                 </label>
                 <input
@@ -201,16 +207,16 @@ export function MasterGuruAddModal(props: {
                     setNik(e.target.value);
                   }}
                   placeholder="320101XXXXXXXXXX"
-                  className="w-full h-10 px-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_gender_label')}
                 </label>
-                <div className="flex gap-4 h-10 items-center">
-                  <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                <div className="flex h-10 items-center gap-4">
+                  <label className="flex cursor-pointer items-center gap-2 text-xs font-medium">
                     <input
                       type="radio"
                       name="gender"
@@ -222,7 +228,7 @@ export function MasterGuruAddModal(props: {
                     />
                     <span>{t('gender_male')}</span>
                   </label>
-                  <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                  <label className="flex cursor-pointer items-center gap-2 text-xs font-medium">
                     <input
                       type="radio"
                       name="gender"
@@ -238,7 +244,7 @@ export function MasterGuruAddModal(props: {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_email_workspace_label')} *
                 </label>
                 <input
@@ -249,12 +255,12 @@ export function MasterGuruAddModal(props: {
                     setEmail(e.target.value);
                   }}
                   placeholder="nama.guru@sekolah.sch.id"
-                  className="w-full h-10 px-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_phone_whatsapp_label')} *
                 </label>
                 <input
@@ -265,7 +271,7 @@ export function MasterGuruAddModal(props: {
                     setPhone(e.target.value);
                   }}
                   placeholder="+62 812-XXXX-XXXX"
-                  className="w-full h-10 px-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
             </div>
@@ -273,8 +279,8 @@ export function MasterGuruAddModal(props: {
 
           {/* Section 2: Jabatan & Status Kepegawaian */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-border-subtle">
-              <span className="size-6 rounded-full bg-pine-deep text-white text-xs font-bold flex items-center justify-center">
+            <div className="flex items-center gap-2 border-b border-border-subtle pb-2">
+              <span className="flex size-6 items-center justify-center rounded-full bg-pine-deep text-xs font-bold text-white">
                 2
               </span>
               <h3 className="text-sm font-bold text-pine-deep">
@@ -282,9 +288,9 @@ export function MasterGuruAddModal(props: {
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_employment_status_label')} *
                 </label>
                 <select
@@ -292,7 +298,7 @@ export function MasterGuruAddModal(props: {
                   onChange={(e) => {
                     setEmploymentStatus(e.target.value as EmploymentStatus);
                   }}
-                  className="w-full h-10 px-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 >
                   <option value="PNS">PNS</option>
                   <option value="PPPK">PPPK</option>
@@ -302,7 +308,7 @@ export function MasterGuruAddModal(props: {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_main_subject_label')} *
                 </label>
                 <input
@@ -313,12 +319,12 @@ export function MasterGuruAddModal(props: {
                     setSubject(e.target.value);
                   }}
                   placeholder="Contoh: Matematika / IPA"
-                  className="w-full h-10 px-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_teaching_hours_label')}
                 </label>
                 <input
@@ -329,7 +335,7 @@ export function MasterGuruAddModal(props: {
                   onChange={(e) => {
                     setTeachingHours(Number(e.target.value));
                   }}
-                  className="w-full h-10 px-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
             </div>
@@ -337,18 +343,16 @@ export function MasterGuruAddModal(props: {
 
           {/* Section 3: Penugasan Peran & Aksesibilitas */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-border-subtle">
-              <span className="size-6 rounded-full bg-pine-deep text-white text-xs font-bold flex items-center justify-center">
+            <div className="flex items-center gap-2 border-b border-border-subtle pb-2">
+              <span className="flex size-6 items-center justify-center rounded-full bg-pine-deep text-xs font-bold text-white">
                 3
               </span>
-              <h3 className="text-sm font-bold text-pine-deep">
-                {t('section_roles_and_access')}
-              </h3>
+              <h3 className="text-sm font-bold text-pine-deep">{t('section_roles_and_access')}</h3>
             </div>
 
             <div className="space-y-3">
               {/* Homeroom Assignment Toggle */}
-              <div className="p-3.5 rounded-xl border border-border-control bg-canvas-base flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="bg-canvas-base flex flex-col justify-between gap-3 rounded-xl border border-border-control p-3.5 sm:flex-row sm:items-center">
                 <div className="flex items-start gap-3">
                   <input
                     type="checkbox"
@@ -357,21 +361,22 @@ export function MasterGuruAddModal(props: {
                     onChange={(e) => {
                       setIsHomeroom(e.target.checked);
                     }}
-                    className="mt-1 size-4 rounded-md text-pine-deep cursor-pointer"
+                    className="mt-1 size-4 cursor-pointer rounded-md text-pine-deep"
                   />
                   <div>
-                    <label htmlFor="homeroom-toggle" className="text-xs sm:text-sm font-bold text-pine-deep cursor-pointer">
+                    <label
+                      htmlFor="homeroom-toggle"
+                      className="cursor-pointer text-xs font-bold text-pine-deep sm:text-sm"
+                    >
                       {t('role_homeroom_toggle_title')}
                     </label>
-                    <p className="text-[11px] text-text-muted">
-                      {t('role_homeroom_toggle_desc')}
-                    </p>
+                    <p className="text-text-muted text-[11px]">{t('role_homeroom_toggle_desc')}</p>
                   </div>
                 </div>
 
                 {isHomeroom && (
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-semibold text-text-muted">
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-text-muted text-xs font-semibold">
                       {t('label_target_rombel')}:
                     </span>
                     <select
@@ -379,7 +384,7 @@ export function MasterGuruAddModal(props: {
                       onChange={(e) => {
                         setSelectedClass(e.target.value);
                       }}
-                      className="h-8 px-2.5 rounded-lg border border-border-control bg-white text-xs font-bold text-pine-deep"
+                      className="h-8 rounded-lg border border-border-control bg-white px-2.5 text-xs font-bold text-pine-deep"
                     >
                       {props.availableClasses.map((cls) => (
                         <option key={cls} value={cls}>
@@ -392,7 +397,7 @@ export function MasterGuruAddModal(props: {
               </div>
 
               {/* Picket Duty Toggle */}
-              <div className="p-3.5 rounded-xl border border-border-control bg-canvas-base flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="bg-canvas-base flex flex-col justify-between gap-3 rounded-xl border border-border-control p-3.5 sm:flex-row sm:items-center">
                 <div className="flex items-start gap-3">
                   <input
                     type="checkbox"
@@ -401,29 +406,38 @@ export function MasterGuruAddModal(props: {
                     onChange={(e) => {
                       setIsPicket(e.target.checked);
                     }}
-                    className="mt-1 size-4 rounded-md text-pine-deep cursor-pointer"
+                    className="mt-1 size-4 cursor-pointer rounded-md text-pine-deep"
                   />
                   <div>
-                    <label htmlFor="picket-toggle" className="text-xs sm:text-sm font-bold text-pine-deep cursor-pointer">
+                    <label
+                      htmlFor="picket-toggle"
+                      className="cursor-pointer text-xs font-bold text-pine-deep sm:text-sm"
+                    >
                       {t('role_piket_toggle_title')}
                     </label>
-                    <p className="text-[11px] text-text-muted">
-                      {t('role_piket_toggle_desc')}
-                    </p>
+                    <p className="text-text-muted text-[11px]">{t('role_piket_toggle_desc')}</p>
                   </div>
                 </div>
 
                 {isPicket && (
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-semibold text-text-muted">
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-text-muted text-xs font-semibold">
                       {t('label_duty_day')}:
                     </span>
                     <select
                       value={picketDay}
                       onChange={(e) => {
-                        setPicketDay(e.target.value as 'Senin' | 'Selasa' | 'Rabu' | 'Kamis' | 'Jumat' | 'Sabtu');
+                        setPicketDay(
+                          e.target.value as
+                            | 'Senin'
+                            | 'Selasa'
+                            | 'Rabu'
+                            | 'Kamis'
+                            | 'Jumat'
+                            | 'Sabtu',
+                        );
                       }}
-                      className="h-8 px-2.5 rounded-lg border border-border-control bg-white text-xs font-bold text-pine-deep"
+                      className="h-8 rounded-lg border border-border-control bg-white px-2.5 text-xs font-bold text-pine-deep"
                     >
                       <option value="Senin">Senin</option>
                       <option value="Selasa">Selasa</option>
@@ -438,26 +452,26 @@ export function MasterGuruAddModal(props: {
 
               {/* Access Level Selector */}
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-2">
+                <label className="text-text-primary mb-2 block text-xs font-semibold">
                   {t('label_access_level_title')}
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
                   <button
                     type="button"
                     onClick={() => {
                       setAccessLevel('teacher');
                     }}
-                    className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                    className={`cursor-pointer rounded-xl border p-3 text-left transition-all ${
                       accessLevel === 'teacher'
                         ? 'border-pine-deep bg-pine-light ring-2 ring-pine-deep/10'
-                        : 'border-border-control bg-canvas-base hover:bg-slate-100'
+                        : 'bg-canvas-base border-border-control hover:bg-slate-100'
                     }`}
                   >
-                    <UserCheck className="size-4 text-pine-deep mb-1" />
+                    <UserCheck className="mb-1 size-4 text-pine-deep" />
                     <span className="block text-xs font-bold text-pine-deep">
                       {t('access_level_teacher')}
                     </span>
-                    <span className="block text-[10px] text-text-muted">
+                    <span className="text-text-muted block text-[10px]">
                       {t('access_level_teacher_desc')}
                     </span>
                   </button>
@@ -467,17 +481,17 @@ export function MasterGuruAddModal(props: {
                     onClick={() => {
                       setAccessLevel('homeroom');
                     }}
-                    className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                    className={`cursor-pointer rounded-xl border p-3 text-left transition-all ${
                       accessLevel === 'homeroom'
                         ? 'border-pine-deep bg-pine-light ring-2 ring-pine-deep/10'
-                        : 'border-border-control bg-canvas-base hover:bg-slate-100'
+                        : 'bg-canvas-base border-border-control hover:bg-slate-100'
                     }`}
                   >
-                    <GraduationCap className="size-4 text-pine-deep mb-1" />
+                    <GraduationCap className="mb-1 size-4 text-pine-deep" />
                     <span className="block text-xs font-bold text-pine-deep">
                       {t('access_level_homeroom')}
                     </span>
-                    <span className="block text-[10px] text-text-muted">
+                    <span className="text-text-muted block text-[10px]">
                       {t('access_level_homeroom_desc')}
                     </span>
                   </button>
@@ -487,17 +501,17 @@ export function MasterGuruAddModal(props: {
                     onClick={() => {
                       setAccessLevel('admin');
                     }}
-                    className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                    className={`cursor-pointer rounded-xl border p-3 text-left transition-all ${
                       accessLevel === 'admin'
                         ? 'border-pine-deep bg-pine-light ring-2 ring-pine-deep/10'
-                        : 'border-border-control bg-canvas-base hover:bg-slate-100'
+                        : 'bg-canvas-base border-border-control hover:bg-slate-100'
                     }`}
                   >
-                    <Shield className="size-4 text-pine-deep mb-1" />
+                    <Shield className="mb-1 size-4 text-pine-deep" />
                     <span className="block text-xs font-bold text-pine-deep">
                       {t('access_level_admin')}
                     </span>
-                    <span className="block text-[10px] text-text-muted">
+                    <span className="text-text-muted block text-[10px]">
                       {t('access_level_admin_desc')}
                     </span>
                   </button>
@@ -508,8 +522,8 @@ export function MasterGuruAddModal(props: {
 
           {/* Section 4: RFID & Kredensial */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b border-border-subtle">
-              <span className="size-6 rounded-full bg-pine-deep text-white text-xs font-bold flex items-center justify-center">
+            <div className="flex items-center gap-2 border-b border-border-subtle pb-2">
+              <span className="flex size-6 items-center justify-center rounded-full bg-pine-deep text-xs font-bold text-white">
                 4
               </span>
               <h3 className="text-sm font-bold text-pine-deep">
@@ -517,13 +531,13 @@ export function MasterGuruAddModal(props: {
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="block text-xs font-semibold text-text-primary mb-1">
+                <label className="text-text-primary mb-1 block text-xs font-semibold">
                   {t('field_rfid_card_uid_label')}
                 </label>
                 <div className="relative">
-                  <CreditCard className="size-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
+                  <CreditCard className="text-text-muted absolute top-1/2 left-3 size-4 -translate-y-1/2" />
                   <input
                     type="text"
                     value={rfidUid}
@@ -531,13 +545,13 @@ export function MasterGuruAddModal(props: {
                       setRfidUid(e.target.value);
                     }}
                     placeholder="Contoh: A4:9F:32:8B"
-                    className="w-full h-10 pl-9 pr-3 rounded-xl border border-border-control bg-canvas-base text-xs sm:text-sm font-mono focus:outline-none focus:ring-2 focus:ring-pine-deep/20"
+                    className="bg-canvas-base h-10 w-full rounded-xl border border-border-control pr-3 pl-9 font-mono text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                   />
                 </div>
               </div>
 
               <div className="flex items-center">
-                <label className="flex items-start gap-2.5 cursor-pointer mt-4">
+                <label className="mt-4 flex cursor-pointer items-start gap-2.5">
                   <input
                     type="checkbox"
                     checked={notifyWhatsApp}
@@ -546,7 +560,7 @@ export function MasterGuruAddModal(props: {
                     }}
                     className="mt-0.5 size-4 rounded-md text-pine-deep"
                   />
-                  <span className="text-xs text-text-muted leading-relaxed">
+                  <span className="text-text-muted text-xs leading-relaxed">
                     {t('label_notify_whatsapp_credentials')}
                   </span>
                 </label>
@@ -555,17 +569,17 @@ export function MasterGuruAddModal(props: {
           </div>
 
           {/* Modal Footer Actions */}
-          <div className="pt-4 border-t border-border-subtle flex flex-col-reverse sm:flex-row sm:items-center justify-end gap-3">
+          <div className="flex flex-col-reverse justify-end gap-3 border-t border-border-subtle pt-4 sm:flex-row sm:items-center">
             <button
               type="button"
               onClick={props.onClose}
-              className="px-4 py-2.5 rounded-xl border border-border-control text-xs sm:text-sm font-semibold text-text-muted hover:bg-slate-100 transition-colors cursor-pointer"
+              className="text-text-muted cursor-pointer rounded-xl border border-border-control px-4 py-2.5 text-xs font-semibold transition-colors hover:bg-slate-100 sm:text-sm"
             >
               {t('btn_cancel')}
             </button>
             <button
               type="submit"
-              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-pine-deep text-white text-xs sm:text-sm font-semibold hover:bg-pine-hover transition-colors cursor-pointer shadow-md"
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-pine-deep px-5 py-2.5 text-xs font-semibold text-white shadow-md transition-colors hover:bg-pine-hover sm:text-sm"
             >
               <CheckCircle2 className="size-4 text-amber-300" />
               <span>{t('btn_save_teacher_and_account')}</span>

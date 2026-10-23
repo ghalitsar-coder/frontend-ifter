@@ -76,7 +76,7 @@ export function MasterGuruManager() {
     if (searchQuery.trim() !== '') {
       const q = searchQuery.toLowerCase();
       const matchName = teacher.name.toLowerCase().includes(q);
-      const matchNip = teacher.nip.replace(/\s+/g, '').includes(q.replace(/\s+/g, ''));
+      const matchNip = teacher.nip.replaceAll(/\s+/g, '').includes(q.replaceAll(/\s+/g, ''));
       const matchNuptk = teacher.nuptk?.includes(q) ?? false;
       const matchSubject = teacher.subject.toLowerCase().includes(q);
       if (!matchName && !matchNip && !matchNuptk && !matchSubject) {
@@ -113,15 +113,15 @@ export function MasterGuruManager() {
     <div className="w-full">
       {/* Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-xl bg-pine-deep px-4 py-3 text-white shadow-xl border border-pine-hover animate-in fade-in slide-in-from-bottom-3">
-          <CheckCircle2 className="size-5 text-emerald-400 shrink-0" />
-          <span className="text-xs sm:text-sm font-medium">{toastMessage}</span>
+        <div className="fixed right-6 bottom-6 z-50 flex animate-in items-center gap-3 rounded-xl border border-pine-hover bg-pine-deep px-4 py-3 text-white shadow-xl fade-in slide-in-from-bottom-3">
+          <CheckCircle2 className="size-5 shrink-0 text-emerald-400" />
+          <span className="text-xs font-medium sm:text-sm">{toastMessage}</span>
           <button
             type="button"
             onClick={() => {
               setToastMessage(null);
             }}
-            className="ml-2 text-white/60 hover:text-white cursor-pointer"
+            className="ml-2 cursor-pointer text-white/60 hover:text-white"
             aria-label="Tutup notifikasi"
           >
             <X className="size-4" />

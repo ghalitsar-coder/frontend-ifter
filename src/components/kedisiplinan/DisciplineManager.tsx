@@ -240,7 +240,9 @@ export function DisciplineManager() {
 
       {/* Header with quick actions */}
       <DisciplineHeader
-        onOpenRecordModal={() =>{  setIsRecordModalOpen(true); }}
+        onOpenRecordModal={() => {
+          setIsRecordModalOpen(true);
+        }}
         onExportExcel={handleExportExcel}
         onOpenCategoryRules={handleOpenCategoryRules}
       />
@@ -283,7 +285,9 @@ export function DisciplineManager() {
       {/* Record Violation Modal */}
       <DisciplineRecordModal
         isOpen={isRecordModalOpen}
-        onClose={() =>{  setIsRecordModalOpen(false); }}
+        onClose={() => {
+          setIsRecordModalOpen(false);
+        }}
         onSubmit={handleCreateIncident}
       />
     </div>

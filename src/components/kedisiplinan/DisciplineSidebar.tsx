@@ -69,7 +69,9 @@ function WatchlistActionButton(props: {
     return (
       <button
         type="button"
-        onClick={() =>{  props.onSendParentCall(props.student.name); }}
+        onClick={() => {
+          props.onSendParentCall(props.student.name);
+        }}
         className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl bg-pine-deep px-3 py-1.5 text-xs font-semibold text-white shadow-2xs transition-colors hover:bg-pine-hover"
       >
         <Mail className="size-3.5 text-amber-gold" />
@@ -82,7 +84,9 @@ function WatchlistActionButton(props: {
     return (
       <button
         type="button"
-        onClick={() =>{  props.onScheduleBk(props.student.name); }}
+        onClick={() => {
+          props.onScheduleBk(props.student.name);
+        }}
         className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-pine-deep shadow-2xs transition-colors hover:bg-muted"
       >
         <Calendar className="size-3.5 text-pine-deep" />
@@ -94,7 +98,9 @@ function WatchlistActionButton(props: {
   return (
     <button
       type="button"
-      onClick={() =>{  props.onReviewHistory(props.student.name); }}
+      onClick={() => {
+        props.onReviewHistory(props.student.name);
+      }}
       className="mt-1 flex w-full items-center justify-center gap-1.5 rounded-xl border border-border bg-card px-3 py-1.5 text-xs font-semibold text-pine-deep shadow-2xs transition-colors hover:bg-muted"
     >
       <Eye className="size-3.5 text-pine-deep" />

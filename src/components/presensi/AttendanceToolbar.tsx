@@ -32,7 +32,9 @@ export function AttendanceToolbar(props: {
       <div className="flex flex-wrap items-center gap-2">
         <button
           type="button"
-          onClick={() =>{  props.onFilterChange('all'); }}
+          onClick={() => {
+            props.onFilterChange('all');
+          }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'all'
               ? 'bg-primary text-primary-foreground shadow-xs'
@@ -53,7 +55,9 @@ export function AttendanceToolbar(props: {
 
         <button
           type="button"
-          onClick={() =>{  props.onFilterChange('hadir'); }}
+          onClick={() => {
+            props.onFilterChange('hadir');
+          }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'hadir'
               ? 'bg-primary text-primary-foreground shadow-xs'
@@ -67,7 +71,9 @@ export function AttendanceToolbar(props: {
 
         <button
           type="button"
-          onClick={() =>{  props.onFilterChange('sakit'); }}
+          onClick={() => {
+            props.onFilterChange('sakit');
+          }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'sakit'
               ? 'bg-primary text-primary-foreground shadow-xs'
@@ -81,7 +87,9 @@ export function AttendanceToolbar(props: {
 
         <button
           type="button"
-          onClick={() =>{  props.onFilterChange('izin'); }}
+          onClick={() => {
+            props.onFilterChange('izin');
+          }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'izin'
               ? 'bg-primary text-primary-foreground shadow-xs'
@@ -95,7 +103,9 @@ export function AttendanceToolbar(props: {
 
         <button
           type="button"
-          onClick={() =>{  props.onFilterChange('alpa'); }}
+          onClick={() => {
+            props.onFilterChange('alpa');
+          }}
           className={`flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all ${
             props.activeFilter === 'alpa'
               ? 'bg-primary text-primary-foreground shadow-xs'
@@ -115,7 +125,9 @@ export function AttendanceToolbar(props: {
           <input
             type="text"
             value={props.searchQuery}
-            onChange={(e) =>{  props.onSearchChange(e.target.value); }}
+            onChange={(e) => {
+              props.onSearchChange(e.target.value);
+            }}
             placeholder={t('search_placeholder')}
             className="h-10 w-full rounded-xl border border-border/60 bg-surface-container-low pr-3 pl-9 text-sm text-foreground transition-all placeholder:text-muted-foreground focus:bg-background focus:ring-1 focus:ring-ring focus:outline-none"
           />

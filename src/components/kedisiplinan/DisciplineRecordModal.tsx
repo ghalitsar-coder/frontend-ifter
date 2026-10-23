@@ -73,7 +73,9 @@ export function DisciplineRecordModal(props: {
             <label className="block font-bold text-foreground">{t('field_student')}</label>
             <select
               value={studentChoice}
-              onChange={(e) =>{  setStudentChoice(e.target.value); }}
+              onChange={(e) => {
+                setStudentChoice(e.target.value);
+              }}
               className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground focus:border-pine-deep focus:outline-hidden"
             >
               <option value="Rizky Pratama|00829103|IX A">
@@ -103,7 +105,9 @@ export function DisciplineRecordModal(props: {
               <label className="block font-bold text-foreground">{t('field_category')}</label>
               <select
                 value={category}
-                onChange={(e) =>{  setCategory(e.target.value as DisciplineCategory); }}
+                onChange={(e) => {
+                  setCategory(e.target.value as DisciplineCategory);
+                }}
                 className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground focus:border-pine-deep focus:outline-hidden"
               >
                 <option value="keterlambatan">Keterlambatan (+2 Poin)</option>
@@ -119,7 +123,9 @@ export function DisciplineRecordModal(props: {
               <input
                 type="datetime-local"
                 value={dateTime}
-                onChange={(e) =>{  setDateTime(e.target.value); }}
+                onChange={(e) => {
+                  setDateTime(e.target.value);
+                }}
                 className="w-full rounded-xl border border-border bg-surface-container-low p-2 text-xs text-foreground focus:border-pine-deep focus:outline-hidden"
               />
             </div>
@@ -131,7 +137,9 @@ export function DisciplineRecordModal(props: {
             <input
               type="text"
               value={location}
-              onChange={(e) =>{  setLocation(e.target.value); }}
+              onChange={(e) => {
+                setLocation(e.target.value);
+              }}
               placeholder={t('field_location_placeholder')}
               className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
             />
@@ -143,7 +151,9 @@ export function DisciplineRecordModal(props: {
             <textarea
               rows={3}
               value={description}
-              onChange={(e) =>{  setDescription(e.target.value); }}
+              onChange={(e) => {
+                setDescription(e.target.value);
+              }}
               placeholder={t('field_description_placeholder')}
               className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
             />
@@ -155,7 +165,9 @@ export function DisciplineRecordModal(props: {
             <input
               type="text"
               value={immediateAction}
-              onChange={(e) =>{  setImmediateAction(e.target.value); }}
+              onChange={(e) => {
+                setImmediateAction(e.target.value);
+              }}
               placeholder={t('field_action_placeholder')}
               className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
             />

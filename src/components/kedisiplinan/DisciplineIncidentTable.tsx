@@ -183,7 +183,9 @@ export function DisciplineIncidentTable(props: {
                         <div>
                           <button
                             type="button"
-                            onClick={() =>{  props.onViewDetail(incident); }}
+                            onClick={() => {
+                              props.onViewDetail(incident);
+                            }}
                             aria-label={`Lihat detail ${incident.studentName}`}
                             className="text-left text-xs font-bold text-foreground transition-colors hover:text-pine-deep"
                           >
@@ -260,7 +262,9 @@ export function DisciplineIncidentTable(props: {
                       <div className="flex items-center justify-center gap-1">
                         <button
                           type="button"
-                          onClick={() =>{  props.onViewDetail(incident); }}
+                          onClick={() => {
+                            props.onViewDetail(incident);
+                          }}
                           className="rounded-lg p-1.5 text-pine-deep transition-colors hover:bg-pine-light"
                           title="Lihat Detail & Tindak Lanjut"
                           aria-label="Lihat Detail & Tindak Lanjut"
@@ -270,7 +274,9 @@ export function DisciplineIncidentTable(props: {
 
                         <button
                           type="button"
-                          onClick={() =>{  props.onEditIncident(incident); }}
+                          onClick={() => {
+                            props.onEditIncident(incident);
+                          }}
                           className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
                           title="Edit Rekam Data"
                           aria-label="Edit Rekam Data"
@@ -280,7 +286,9 @@ export function DisciplineIncidentTable(props: {
 
                         <button
                           type="button"
-                          onClick={() =>{  props.onViewHistory(incident); }}
+                          onClick={() => {
+                            props.onViewHistory(incident);
+                          }}
                           className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted"
                           title="Histori Audit"
                           aria-label="Histori Audit"

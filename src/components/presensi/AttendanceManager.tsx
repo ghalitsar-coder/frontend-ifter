@@ -54,7 +54,9 @@ export function AttendanceManager(props: { initialStudents?: StudentAttendanceRe
   const handleStatusChange = (id: string, newStatus: AttendanceStatus) => {
     setStudents((prev) =>
       prev.map((s) => {
-        if (s.id !== id) {return s;}
+        if (s.id !== id) {
+          return s;
+        }
         return {
           ...s,
           status: newStatus,
@@ -97,10 +99,15 @@ export function AttendanceManager(props: { initialStudents?: StudentAttendanceRe
   let alpaCount = 0;
 
   for (const s of students) {
-    if (s.status === 'hadir') {hadirCount++;}
-    else if (s.status === 'sakit') {sakitCount++;}
-    else if (s.status === 'izin') {izinCount++;}
-    else if (s.status === 'alpa') {alpaCount++;}
+    if (s.status === 'hadir') {
+      hadirCount++;
+    } else if (s.status === 'sakit') {
+      sakitCount++;
+    } else if (s.status === 'izin') {
+      izinCount++;
+    } else if (s.status === 'alpa') {
+      alpaCount++;
+    }
   }
 
   const query = searchQuery.trim().toLowerCase();
@@ -184,7 +191,9 @@ export function AttendanceManager(props: { initialStudents?: StudentAttendanceRe
       {/* Document Preview Modal */}
       <AttendanceDocumentModal
         preview={previewDoc}
-        onClose={() =>{  setPreviewDoc(null); }}
+        onClose={() => {
+          setPreviewDoc(null);
+        }}
         onDownload={() => {
           setPreviewDoc(null);
           triggerToast('Mengunduh salinan berkas resmi...');

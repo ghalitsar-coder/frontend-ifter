@@ -25,18 +25,18 @@ export function MasterGuruToolbar(props: {
   const t = useTranslations('MasterGuruPage');
 
   return (
-    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+    <div className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
       {/* Role Filter Tabs */}
-      <div className="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 scrollbar-none">
+      <div className="flex scrollbar-none items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0">
         <button
           type="button"
           onClick={() => {
             props.onRoleChange('all');
           }}
-          className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+          className={`cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all sm:text-sm ${
             props.selectedRole === 'all'
               ? 'bg-pine-deep text-white shadow-xs'
-              : 'bg-surface-card text-text-muted hover:text-text-primary hover:bg-slate-100 border border-border-control'
+              : 'bg-surface-card text-text-muted hover:text-text-primary border border-border-control hover:bg-slate-100'
           }`}
         >
           {t('role_tab_all', { count: props.totalTeachers })}
@@ -47,10 +47,10 @@ export function MasterGuruToolbar(props: {
           onClick={() => {
             props.onRoleChange('homeroom');
           }}
-          className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+          className={`cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all sm:text-sm ${
             props.selectedRole === 'homeroom'
               ? 'bg-pine-deep text-white shadow-xs'
-              : 'bg-surface-card text-text-muted hover:text-text-primary hover:bg-slate-100 border border-border-control'
+              : 'bg-surface-card text-text-muted hover:text-text-primary border border-border-control hover:bg-slate-100'
           }`}
         >
           {t('role_tab_homeroom', { count: props.homeroomCount })}
@@ -61,10 +61,10 @@ export function MasterGuruToolbar(props: {
           onClick={() => {
             props.onRoleChange('picket');
           }}
-          className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+          className={`cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all sm:text-sm ${
             props.selectedRole === 'picket'
               ? 'bg-pine-deep text-white shadow-xs'
-              : 'bg-surface-card text-text-muted hover:text-text-primary hover:bg-slate-100 border border-border-control'
+              : 'bg-surface-card text-text-muted hover:text-text-primary border border-border-control hover:bg-slate-100'
           }`}
         >
           {t('role_tab_picket', { count: props.picketCount })}
@@ -75,10 +75,10 @@ export function MasterGuruToolbar(props: {
           onClick={() => {
             props.onRoleChange('admin');
           }}
-          className={`px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all whitespace-nowrap cursor-pointer ${
+          className={`cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all sm:text-sm ${
             props.selectedRole === 'admin'
               ? 'bg-pine-deep text-white shadow-xs'
-              : 'bg-surface-card text-text-muted hover:text-text-primary hover:bg-slate-100 border border-border-control'
+              : 'bg-surface-card text-text-muted hover:text-text-primary border border-border-control hover:bg-slate-100'
           }`}
         >
           {t('role_tab_admin', { count: props.adminCount })}
@@ -97,7 +97,7 @@ export function MasterGuruToolbar(props: {
               props.onSearchChange(e.target.value);
             }}
             placeholder={t('search_placeholder')}
-            className="bg-surface-card text-text-primary placeholder:text-text-muted h-10 w-full rounded-xl border border-border-control pr-10 pl-10 text-xs sm:text-sm shadow-xs transition-all focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+            className="bg-surface-card text-text-primary placeholder:text-text-muted h-10 w-full rounded-xl border border-border-control pr-10 pl-10 text-xs shadow-xs transition-all focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           />
           {props.searchQuery && (
             <button
@@ -120,7 +120,7 @@ export function MasterGuruToolbar(props: {
             onChange={(e) => {
               props.onStatusChange(e.target.value as 'all' | EmploymentStatus);
             }}
-            className="bg-surface-card text-text-primary h-10 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs sm:text-sm font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+            className="bg-surface-card text-text-primary h-10 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           >
             <option value="all">{t('status_filter_all')}</option>
             <option value="PNS">{t('status_filter_pns')}</option>

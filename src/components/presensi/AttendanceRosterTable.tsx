@@ -107,7 +107,7 @@ export function AttendanceRosterTable(props: {
                     {student.documentName ? (
                       <button
                         type="button"
-                        onClick={() =>{ 
+                        onClick={() => {
                           props.onPreviewDoc({
                             title:
                               student.documentTitle || student.documentName || 'Dokumen Terlampir',
@@ -116,8 +116,8 @@ export function AttendanceRosterTable(props: {
                             clinic: student.documentClinic,
                             doctor: student.documentDoctor,
                             date: student.documentDate,
-                          }); }
-                        }
+                          });
+                        }}
                         className="inline-flex max-w-[200px] items-center gap-1.5 rounded-lg border border-border/50 bg-surface-container-low px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-surface-container-high"
                       >
                         <FileText className="size-3.5 shrink-0 text-primary" />
@@ -142,7 +142,9 @@ export function AttendanceRosterTable(props: {
                       <button
                         type="button"
                         title={t('hadir_label')}
-                        onClick={() =>{  props.onStatusChange(student.id, 'hadir'); }}
+                        onClick={() => {
+                          props.onStatusChange(student.id, 'hadir');
+                        }}
                         className={`size-7 rounded-lg text-xs font-semibold transition-all ${
                           student.status === 'hadir'
                             ? 'bg-card text-foreground shadow-xs'
@@ -154,7 +156,9 @@ export function AttendanceRosterTable(props: {
                       <button
                         type="button"
                         title={t('sakit_label')}
-                        onClick={() =>{  props.onStatusChange(student.id, 'sakit'); }}
+                        onClick={() => {
+                          props.onStatusChange(student.id, 'sakit');
+                        }}
                         className={`size-7 rounded-lg text-xs font-semibold transition-all ${
                           student.status === 'sakit'
                             ? 'bg-card text-foreground shadow-xs'
@@ -166,7 +170,9 @@ export function AttendanceRosterTable(props: {
                       <button
                         type="button"
                         title={t('izin_label')}
-                        onClick={() =>{  props.onStatusChange(student.id, 'izin'); }}
+                        onClick={() => {
+                          props.onStatusChange(student.id, 'izin');
+                        }}
                         className={`size-7 rounded-lg text-xs font-semibold transition-all ${
                           student.status === 'izin'
                             ? 'bg-card text-foreground shadow-xs'
@@ -178,7 +184,9 @@ export function AttendanceRosterTable(props: {
                       <button
                         type="button"
                         title={t('alpa_label')}
-                        onClick={() =>{  props.onStatusChange(student.id, 'alpa'); }}
+                        onClick={() => {
+                          props.onStatusChange(student.id, 'alpa');
+                        }}
                         className={`size-7 rounded-lg text-xs font-semibold transition-all ${
                           student.status === 'alpa'
                             ? 'bg-card text-foreground shadow-xs'
