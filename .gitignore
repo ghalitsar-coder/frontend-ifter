@@ -60,3 +60,8 @@ build-archive.log
 /test-results/
 /playwright-report/
 /playwright/.cache/
+.stitch-src/
+
+# local scratch/debug scripts (not part of the app)
+*-scratch.mjs
+*-scratch.config.ts
