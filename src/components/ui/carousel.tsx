@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable eslint/no-shadow, react/react-compiler, react/jsx-no-constructed-context-values, jsx-a11y/prefer-tag-over-role, typescript/consistent-return -- vendored shadcn/ui component, generated embla-carousel wrapper kept verbatim from upstream shadcn/ui; do not hand-edit */
 import { cn } from 'cn';
 import useEmblaCarousel from 'embla-carousel-react';
 import type { UseEmblaCarouselType } from 'embla-carousel-react';

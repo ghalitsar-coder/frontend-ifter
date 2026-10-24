@@ -1,68 +1,128 @@
 'use client';
 
-import { CheckCircle2, FileCheck2, LockKeyhole, X } from 'lucide-react';
+import { CheckCircle2, FileCheck2, LockKeyhole, TriangleAlert, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { mockCorrectionStats } from '@/data/mockAttendanceCorrection';
+import { ApiError } from '@/lib/api/client';
+import type { CorrectionHistoryFilters, CorrectionRow } from '@/lib/api/koreksi-absensi';
 import {
-  filterCorrectionLogs,
-  mockCorrectionLogs,
-  mockCorrectionStats,
-  paginateCorrectionLogs,
-} from '@/data/mockAttendanceCorrection';
-import type { CorrectionFilterState, CorrectionLog } from '@/types/attendanceCorrection';
+  defaultHistoryRange,
+  exportAttendanceAudit,
+  filterRowsBySearch,
+  historyQueryFor,
+  pageMeta,
+  toCorrectionRow,
+  useAttendanceHistory,
+  useSubmitCorrection,
+} from '@/lib/api/koreksi-absensi';
 import { CorrectionAuditTable } from './CorrectionAuditTable';
 import { CorrectionEvidenceModal } from './CorrectionEvidenceModal';
 import { CorrectionHashModal } from './CorrectionHashModal';
 import { CorrectionHero } from './CorrectionHero';
+import type { CorrectionRequestPayload } from './CorrectionRequestModal';
 import { CorrectionRequestModal } from './CorrectionRequestModal';
 import { CorrectionStats } from './CorrectionStats';
 import { CorrectionToolbar } from './CorrectionToolbar';
 
-const defaultFilters: CorrectionFilterState = {
+const defaultFilters: CorrectionHistoryFilters = {
   search: '',
   change: 'all',
-  className: 'all',
+  classId: 'all',
+  ...defaultHistoryRange(),
 };
+
+type RequestPrefill = { studentId: string; studentName: string; nis: string; date: string };
+
+const errorMessage = (error: unknown) =>
+  error instanceof ApiError ? error.message : 'Terjadi kesalahan, coba lagi.';
 
 /**
  * Coordinator for the attendance correction audit workspace and modals.
  *
- * @returns Correction audit workspace.
+ * @returns Correction audit workspace backed by GET /attendance/history.
  */
 export function CorrectionManager() {
   const t = useTranslations('AttendanceCorrectionPage');
-  const [filters, setFilters] = useState<CorrectionFilterState>(defaultFilters);
+  const [filters, setFilters] = useState<CorrectionHistoryFilters>(defaultFilters);
   const [page, setPage] = useState(1);
   const [isRequestOpen, setIsRequestOpen] = useState(false);
-  const [evidenceLog, setEvidenceLog] = useState<CorrectionLog | null>(null);
-  const [hashLog, setHashLog] = useState<CorrectionLog | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [requestPrefill, setRequestPrefill] = useState<RequestPrefill | null>(null);
+  const [evidenceRow, setEvidenceRow] = useState<CorrectionRow | null>(null);
+  const [ledgerRow, setLedgerRow] = useState<CorrectionRow | null>(null);
+  const [toast, setToast] = useState<{ message: string; tone: 'success' | 'error' } | null>(null);
 
-  const showToast = (message: string) => {
-    setToastMessage(message);
+  const historyQuery = useAttendanceHistory(historyQueryFor(filters, page));
+  const submitCorrection = useSubmitCorrection();
+
+  const showToast = (message: string, tone: 'success' | 'error' = 'success') => {
+    setToast({ message, tone });
     setTimeout(() => {
-      setToastMessage(null);
+      setToast(null);
     }, 4000);
   };
 
-  const filteredLogs = filterCorrectionLogs(mockCorrectionLogs, filters);
-  const pagination = paginateCorrectionLogs(filteredLogs, page);
+  // shortcut: history endpoint has no text-search param; the toolbar search
+  // filters the currently loaded page client-side.
+  const rows = filterRowsBySearch(
+    (historyQuery.data?.data ?? []).map(toCorrectionRow),
+    filters.search,
+  );
+  const pagination = pageMeta(historyQuery.data?.total ?? 0, page, rows.length);
 
-  const updateFilters = (next: Partial<CorrectionFilterState>) => {
+  const updateFilters = (next: Partial<CorrectionHistoryFilters>) => {
     setFilters((current) => ({ ...current, ...next }));
     setPage(1);
   };
 
+  const handleRequestSubmit = (payload: CorrectionRequestPayload) => {
+    submitCorrection.mutate(payload, {
+      onSuccess: () => {
+        setIsRequestOpen(false);
+        setRequestPrefill(null);
+        showToast(t('toast_request_sent', { student: payload.studentLabel }));
+      },
+      onError: (error) => {
+        showToast(errorMessage(error), 'error');
+      },
+    });
+  };
+
+  const handleExport = async () => {
+    try {
+      // GET /exports/attendance is an admin endpoint; staff receive the backend
+      // permission error message through the error toast.
+      const { blob, filename } = await exportAttendanceAudit(filters);
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = filename ?? 'rekap-absensi.xlsx';
+      anchor.click();
+      URL.revokeObjectURL(url);
+      showToast(t('toast_export'));
+    } catch (error) {
+      showToast(errorMessage(error), 'error');
+    }
+  };
+
   return (
     <div className="w-full">
-      {toastMessage && (
-        <div className="fixed right-6 bottom-6 z-50 flex animate-in items-center gap-3 rounded-xl border border-pine-hover bg-pine-deep px-4 py-3 text-white shadow-xl fade-in slide-in-from-bottom-3">
-          <CheckCircle2 className="size-5 shrink-0 text-amber-gold" />
-          <span className="text-xs font-medium sm:text-sm">{toastMessage}</span>
+      {toast && (
+        <div
+          className={`fixed right-6 bottom-6 z-50 flex animate-in items-center gap-3 rounded-xl border px-4 py-3 text-white shadow-xl fade-in slide-in-from-bottom-3 ${
+            toast.tone === 'error' ? 'border-red-500 bg-red-700' : 'border-pine-hover bg-pine-deep'
+          }`}
+        >
+          {toast.tone === 'error' ? (
+            <TriangleAlert className="size-5 shrink-0" />
+          ) : (
+            <CheckCircle2 className="size-5 shrink-0 text-amber-gold" />
+          )}
+          <span className="text-xs font-medium sm:text-sm">{toast.message}</span>
           <button
             type="button"
             onClick={() => {
-              setToastMessage(null);
+              setToast(null);
             }}
             className="ml-2 cursor-pointer text-white/60 hover:text-white"
             aria-label={t('btn_close_notification')}
@@ -74,14 +134,16 @@ export function CorrectionManager() {
 
       <CorrectionHero
         onDownload={() => {
-          showToast(t('toast_export'));
+          void handleExport();
         }}
         onRequest={() => {
+          setRequestPrefill(null);
           setIsRequestOpen(true);
         }}
       />
 
       <div className="mt-4">
+        {/* shortcut: no backend endpoint for the monthly correction recap counters, keep mock */}
         <CorrectionStats stats={mockCorrectionStats} />
       </div>
 
@@ -94,8 +156,14 @@ export function CorrectionManager() {
           onChangeFilterChange={(change) => {
             updateFilters({ change });
           }}
-          onClassChange={(className) => {
-            updateFilters({ className });
+          onClassChange={(classId) => {
+            updateFilters({ classId });
+          }}
+          onFromChange={(from) => {
+            updateFilters({ from });
+          }}
+          onToChange={(to) => {
+            updateFilters({ to });
           }}
           onReset={() => {
             setFilters(defaultFilters);
@@ -106,11 +174,22 @@ export function CorrectionManager() {
 
       <div className="mt-4">
         <CorrectionAuditTable
-          logs={filteredLogs}
+          rows={rows}
           pagination={pagination}
+          loading={historyQuery.isPending}
+          error={historyQuery.isError ? errorMessage(historyQuery.error) : null}
           onPageChange={setPage}
-          onOpenEvidence={setEvidenceLog}
-          onOpenHash={setHashLog}
+          onOpenEvidence={setEvidenceRow}
+          onOpenLedger={setLedgerRow}
+          onCorrect={(row) => {
+            setRequestPrefill({
+              studentId: row.studentId,
+              studentName: row.student.name,
+              nis: row.student.nis,
+              date: row.sessionIso,
+            });
+            setIsRequestOpen(true);
+          }}
         />
       </div>
 
@@ -132,34 +211,30 @@ export function CorrectionManager() {
 
       {isRequestOpen && (
         <CorrectionRequestModal
+          initial={requestPrefill}
+          submitting={submitCorrection.isPending}
           onClose={() => {
             setIsRequestOpen(false);
+            setRequestPrefill(null);
           }}
-          onSubmit={(payload) => {
-            setIsRequestOpen(false);
-            showToast(t('toast_request_sent', { student: payload.student }));
-          }}
+          onSubmit={handleRequestSubmit}
         />
       )}
 
-      {evidenceLog && (
+      {evidenceRow && (
         <CorrectionEvidenceModal
-          log={evidenceLog}
+          row={evidenceRow}
           onClose={() => {
-            setEvidenceLog(null);
-          }}
-          onDownload={() => {
-            setEvidenceLog(null);
-            showToast(t('toast_evidence_downloaded'));
+            setEvidenceRow(null);
           }}
         />
       )}
 
-      {hashLog && (
+      {ledgerRow && (
         <CorrectionHashModal
-          log={hashLog}
+          row={ledgerRow}
           onClose={() => {
-            setHashLog(null);
+            setLedgerRow(null);
           }}
         />
       )}

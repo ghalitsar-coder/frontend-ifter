@@ -1,18 +1,16 @@
-import { BadgeCheck, Download, FileText, ShieldCheck, X } from 'lucide-react';
+import { BadgeCheck, ShieldCheck, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import type { CorrectionLog } from '@/types/attendanceCorrection';
+import type { CorrectionRow } from '@/lib/api/koreksi-absensi';
 
 /**
- * Evidence preview modal for an audit entry attachment.
+ * Evidence/reason modal for an audit row.
+ * shortcut: the backend stores no attachment metadata for attendance
+ * corrections, so the modal shows the recorded reason/notes only.
  *
- * @param props - Audit entry and handlers.
+ * @param props - Audit row and close handler.
  * @returns Evidence modal.
  */
-export function CorrectionEvidenceModal(props: {
-  log: CorrectionLog;
-  onClose: () => void;
-  onDownload: () => void;
-}) {
+export function CorrectionEvidenceModal(props: { row: CorrectionRow; onClose: () => void }) {
   const t = useTranslations('AttendanceCorrectionPage');
 
   return (
@@ -42,31 +40,15 @@ export function CorrectionEvidenceModal(props: {
         </div>
 
         <div className="space-y-3 px-5 py-5">
-          {props.log.attachment ? (
-            <div className="flex items-center gap-3 rounded-2xl border border-border-subtle bg-surface-container-low p-3.5">
-              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-pine-light text-pine-deep">
-                <FileText className="size-5" />
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-xs font-bold text-foreground">
-                  {props.log.attachment.fileName}
-                </p>
-                <p className="text-[10px] text-muted-foreground">
-                  {props.log.attachment.fileSize} • PDF
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-2xl border border-border-subtle bg-surface-container-low p-3.5">
-              <p className="flex items-center gap-1.5 text-[11px] font-bold text-pine-deep">
-                <BadgeCheck className="size-3.5" />
-                {props.log.confirmationNote ?? t('evidence_confirmed')}
-              </p>
-              <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
-                {props.log.reason}
-              </p>
-            </div>
-          )}
+          <div className="rounded-2xl border border-border-subtle bg-surface-container-low p-3.5">
+            <p className="flex items-center gap-1.5 text-[11px] font-bold text-pine-deep">
+              <BadgeCheck className="size-3.5" />
+              {props.row.student.name} • {props.row.sessionDate}
+            </p>
+            <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
+              {props.row.reason}
+            </p>
+          </div>
 
           <div className="rounded-2xl border border-amber-gold/40 bg-amber-surface p-3.5">
             <p className="flex items-center gap-1.5 text-[11px] font-bold text-amber-dark">
@@ -79,7 +61,7 @@ export function CorrectionEvidenceModal(props: {
           </div>
         </div>
 
-        <div className="flex flex-col-reverse gap-2 border-t border-border-subtle px-5 py-4 sm:flex-row sm:justify-end">
+        <div className="flex justify-end border-t border-border-subtle px-5 py-4">
           <button
             type="button"
             onClick={props.onClose}
@@ -87,16 +69,6 @@ export function CorrectionEvidenceModal(props: {
           >
             {t('btn_close')}
           </button>
-          {props.log.attachment && (
-            <button
-              type="button"
-              onClick={props.onDownload}
-              className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-pine-hover"
-            >
-              <Download className="size-3.5 text-amber-gold" />
-              {t('btn_download_original')}
-            </button>
-          )}
         </div>
       </div>
     </div>

@@ -1,7 +1,8 @@
-import { Gavel, X } from 'lucide-react';
+import { Gavel, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import type { DisciplineCategory, NewIncidentFormData } from '@/types/discipline';
+import type { NewIncidentFormData } from '@/lib/api/kedisiplinan';
+import { useDisciplineCategories, useStudentSearch } from '@/lib/api/queries';
 
 /**
  * Modal form for recording a new disciplinary violation for a student.
@@ -16,26 +17,31 @@ export function DisciplineRecordModal(props: {
 }) {
   const t = useTranslations('DisciplinePage');
 
-  const [studentChoice, setStudentChoice] = useState('Rizky Pratama|00829103|IX A');
-  const [category, setCategory] = useState<DisciplineCategory>('keterlambatan');
+  const [studentSearchTerm, setStudentSearchTerm] = useState('');
+  const [studentId, setStudentId] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const [dateTime, setDateTime] = useState('2026-10-05T08:00');
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
   const [immediateAction, setImmediateAction] = useState('');
 
+  // Real pickers: GET /students (search) + GET /discipline/categories (active).
+  const students = useStudentSearch({
+    search: studentSearchTerm.trim() === '' ? undefined : studentSearchTerm.trim(),
+    limit: 50,
+  });
+  const categories = useDisciplineCategories();
+
   if (!props.isOpen) {
     return null;
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const [name, nis, className] = studentChoice.split('|');
 
     props.onSubmit({
-      studentName: name || 'Rizky Pratama',
-      studentNis: nis || '00829103',
-      studentClass: className || 'IX A',
-      categoryKey: category,
+      studentId,
+      categoryId,
       dateTime,
       location: location.trim() || 'Lingkungan Sekolah',
       description: description.trim() || 'Pelanggaran tata tertib sekolah.',
@@ -70,57 +76,70 @@ export function DisciplineRecordModal(props: {
         <form onSubmit={handleSubmit} className="space-y-4 p-6 text-xs">
           {/* Siswa Terlapor */}
           <div className="space-y-1.5">
-            <label className="block font-bold text-foreground">{t('field_student')}</label>
+            <label className="block font-bold text-foreground" htmlFor="incident-student-search">
+              {t('field_student')}
+            </label>
+            <div className="flex h-10 w-full items-center rounded-xl border border-border bg-surface-container-low px-3 transition-colors focus-within:border-pine-deep">
+              <Search className="mr-2 size-4 text-muted-foreground" />
+              <input
+                id="incident-student-search"
+                type="text"
+                value={studentSearchTerm}
+                onChange={(e) => {
+                  setStudentSearchTerm(e.target.value);
+                }}
+                placeholder={t('search_placeholder')}
+                className="w-full bg-transparent p-0 text-xs text-foreground placeholder:text-muted-foreground focus:outline-hidden"
+              />
+            </div>
             <select
-              value={studentChoice}
+              required
+              value={studentId}
               onChange={(e) => {
-                setStudentChoice(e.target.value);
+                setStudentId(e.target.value);
               }}
               className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground focus:border-pine-deep focus:outline-hidden"
             >
-              <option value="Rizky Pratama|00829103|IX A">
-                Rizky Pratama - IX A (NIS: 00829103)
-              </option>
-              <option value="Fajar Maulana|00829311|VIII A">
-                Fajar Maulana - VIII A (NIS: 00829311)
-              </option>
-              <option value="Dimas Saputra|00829103|VIII A">
-                Dimas Saputra - VIII A (NIS: 00829103)
-              </option>
-              <option value="Aldo Firmansyah|00829440|VIII B">
-                Aldo Firmansyah - VIII B (NIS: 00829440)
-              </option>
-              <option value="Nabila Aulia|00829801|VII C">
-                Nabila Aulia - VII C (NIS: 00829801)
-              </option>
-              <option value="Bagus Pamungkas|00829562|VIII A">
-                Bagus Pamungkas - VIII A (NIS: 00829562)
-              </option>
+              <option value="">— Pilih siswa —</option>
+              {(students.data ?? []).map((student) => (
+                <option key={student.id} value={student.id}>
+                  {student.full_name} - {student.current_class?.name ?? '-'} (NIS:{' '}
+                  {student.student_number})
+                </option>
+              ))}
             </select>
           </div>
 
           {/* Kategori & Waktu */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
-              <label className="block font-bold text-foreground">{t('field_category')}</label>
+              <label className="block font-bold text-foreground" htmlFor="incident-category">
+                {t('field_category')}
+              </label>
               <select
-                value={category}
+                id="incident-category"
+                required
+                value={categoryId}
                 onChange={(e) => {
-                  setCategory(e.target.value as DisciplineCategory);
+                  setCategoryId(e.target.value);
                 }}
                 className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground focus:border-pine-deep focus:outline-hidden"
               >
-                <option value="keterlambatan">Keterlambatan (+2 Poin)</option>
-                <option value="seragam">Atribut Seragam (+3 Poin)</option>
-                <option value="tatatertib">Tata Tertib Kelas (+5 Poin)</option>
-                <option value="barang_terlarang">Barang Terlarang (+25 Poin)</option>
-                <option value="bullying">Etika & Bullying (+50 Poin)</option>
+                <option value="">— Pilih kategori —</option>
+                {(categories.data ?? []).map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name} (+{category.default_points ?? 0} Poin)
+                  </option>
+                ))}
               </select>
             </div>
 
             <div className="space-y-1.5">
-              <label className="block font-bold text-foreground">{t('field_datetime')}</label>
+              <label className="block font-bold text-foreground" htmlFor="incident-datetime">
+                {t('field_datetime')}
+              </label>
               <input
+                id="incident-datetime"
                 type="datetime-local"
                 value={dateTime}
                 onChange={(e) => {
@@ -133,8 +152,11 @@ export function DisciplineRecordModal(props: {
 
           {/* Lokasi Kejadian */}
           <div className="space-y-1.5">
-            <label className="block font-bold text-foreground">{t('field_location')}</label>
+            <label className="block font-bold text-foreground" htmlFor="incident-location">
+              {t('field_location')}
+            </label>
             <input
+              id="incident-location"
               type="text"
               value={location}
               onChange={(e) => {
@@ -147,8 +169,11 @@ export function DisciplineRecordModal(props: {
 
           {/* Deskripsi Kronologi */}
           <div className="space-y-1.5">
-            <label className="block font-bold text-foreground">{t('field_description')}</label>
+            <label className="block font-bold text-foreground" htmlFor="incident-description">
+              {t('field_description')}
+            </label>
             <textarea
+              id="incident-description"
               rows={3}
               value={description}
               onChange={(e) => {
@@ -161,8 +186,11 @@ export function DisciplineRecordModal(props: {
 
           {/* Tindakan Langsung */}
           <div className="space-y-1.5">
-            <label className="block font-bold text-foreground">{t('field_action')}</label>
+            <label className="block font-bold text-foreground" htmlFor="incident-action">
+              {t('field_action')}
+            </label>
             <input
+              id="incident-action"
               type="text"
               value={immediateAction}
               onChange={(e) => {

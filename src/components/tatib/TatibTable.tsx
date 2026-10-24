@@ -1,8 +1,7 @@
 import { BookX, PencilLine } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { getRuleSeverity } from '@/data/mockTatib';
 import type { TatibRule } from '@/types/tatib';
-import { SEVERITY_STYLES } from './severityStyles';
+import { getRuleSeverity, SEVERITY_STYLES } from './severityStyles';
 
 /**
  * Catalog table of conduct articles with weight, procedure, and status.
@@ -10,7 +9,11 @@ import { SEVERITY_STYLES } from './severityStyles';
  * @param props - Component properties.
  * @returns Table JSX element.
  */
-export function TatibTable(props: { rules: TatibRule[]; onEditRule: (rule: TatibRule) => void }) {
+export function TatibTable(props: {
+  rules: TatibRule[];
+  onEditRule: (rule: TatibRule) => void;
+  onToggleStatus: (rule: TatibRule) => void;
+}) {
   const t = useTranslations('TatibPage');
 
   if (props.rules.length === 0) {
@@ -81,17 +84,28 @@ export function TatibTable(props: { rules: TatibRule[]; onEditRule: (rule: Tatib
                   </td>
 
                   <td className="px-4 py-4 align-top">
-                    {rule.isActive ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
-                        <span className="size-1.5 rounded-full bg-emerald-600" />
-                        {t('status_active')}
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-surface-container-low px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
-                        <span className="size-1.5 rounded-full bg-muted-foreground" />
-                        {t('status_inactive')}
-                      </span>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        props.onToggleStatus(rule);
+                      }}
+                      className="cursor-pointer"
+                      // shortcut: no TatibPage locale key for the toggle action label
+                      title={rule.isActive ? 'Nonaktifkan pasal' : 'Aktifkan pasal'}
+                      aria-label={rule.isActive ? 'Nonaktifkan pasal' : 'Aktifkan pasal'}
+                    >
+                      {rule.isActive ? (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
+                          <span className="size-1.5 rounded-full bg-emerald-600" />
+                          {t('status_active')}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 rounded-full bg-surface-container-low px-2.5 py-1 text-[11px] font-bold text-muted-foreground">
+                          <span className="size-1.5 rounded-full bg-muted-foreground" />
+                          {t('status_inactive')}
+                        </span>
+                      )}
+                    </button>
                   </td>
 
                   <td className="px-4 py-4 text-right align-top sm:px-6">

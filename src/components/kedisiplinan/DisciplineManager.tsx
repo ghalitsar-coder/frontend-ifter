@@ -1,66 +1,41 @@
 'use client';
 
+import { useQueries } from '@tanstack/react-query';
 import { CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { filterDisciplineIncidents, mockDisciplineIncidents } from '@/data/mockDiscipline';
+import { ApiError, downloadFile } from '@/lib/api/client';
+import type { DisciplineRecord } from '@/lib/api/dto';
+import {
+  composeIncidentDescription,
+  displayStatusToRecordParam,
+  filterIncidentRows,
+  periodRange,
+  reportMetrics,
+  studentDisciplineProfileOptions,
+  toIncidentRow,
+  toWatchlist,
+  todayInJakarta,
+  useCreateDisciplineRecord,
+  useDisciplineRecords,
+  useDisciplineReport,
+} from '@/lib/api/kedisiplinan';
 import type {
-  DisciplineCategory,
-  DisciplineFilterState,
-  DisciplineIncident,
+  CreateDisciplineRecordInput,
+  DisciplineIncidentRow,
+  DisciplineRecordsQuery,
   NewIncidentFormData,
-} from '@/types/discipline';
+} from '@/lib/api/kedisiplinan';
+import { useAcademicYears, useDisciplineCategories } from '@/lib/api/queries';
+import type { DisciplineFilterState } from '@/types/discipline';
 import { DisciplineFilterBar } from './DisciplineFilterBar';
 import { DisciplineHeader } from './DisciplineHeader';
 import { DisciplineIncidentTable } from './DisciplineIncidentTable';
 import { DisciplineMetrics } from './DisciplineMetrics';
+import { DisciplineRecordDetailModal } from './DisciplineRecordDetailModal';
 import { DisciplineRecordModal } from './DisciplineRecordModal';
 import { DisciplineRuleCatalog } from './DisciplineRuleCatalog';
 import { DisciplineSidebar } from './DisciplineSidebar';
-
-/**
- * Calculate point weight based on violation category.
- *
- * @param category - Category key.
- * @returns Numerical point penalty.
- */
-function getViolationPointWeight(category: DisciplineCategory): number {
-  if (category === 'bullying') {
-    return 50;
-  }
-  if (category === 'barang_terlarang') {
-    return 25;
-  }
-  if (category === 'tatatertib') {
-    return 5;
-  }
-  if (category === 'seragam') {
-    return 3;
-  }
-  return 2;
-}
-
-/**
- * Get category display label with point weight suffix.
- *
- * @param category - Category key.
- * @returns Formatted label string.
- */
-function getViolationLabel(category: DisciplineCategory): string {
-  if (category === 'bullying') {
-    return 'Perkelahian (+50)';
-  }
-  if (category === 'barang_terlarang') {
-    return 'Barang Terlarang (+25)';
-  }
-  if (category === 'tatatertib') {
-    return 'Tata Tertib (+5)';
-  }
-  if (category === 'seragam') {
-    return 'Atribut Seragam (+3)';
-  }
-  return 'Keterlambatan (+2)';
-}
 
 /**
  * Get student avatar background class depending on points.
@@ -68,7 +43,7 @@ function getViolationLabel(category: DisciplineCategory): string {
  * @param totalPoints - Cumulative violation points.
  * @returns CSS class string.
  */
-function getStudentAvatarBg(totalPoints: number): string {
+export function getStudentAvatarBg(totalPoints: number): string {
   if (totalPoints >= 50) {
     return 'bg-red-100 text-red-700 border border-red-200';
   }
@@ -84,7 +59,7 @@ function getStudentAvatarBg(totalPoints: number): string {
  * @param totalPoints - Cumulative violation points.
  * @returns Status string.
  */
-function getStudentPointStatus(totalPoints: number): string {
+export function getStudentPointStatus(totalPoints: number): string {
   if (totalPoints >= 50) {
     return 'SP1 Waspada';
   }
@@ -95,6 +70,99 @@ function getStudentPointStatus(totalPoints: number): string {
 }
 
 /**
+ * Map a page of backend records to decorated table rows (adds the styling-only
+ * avatar background and guidance status label on top of the DTO mapper).
+ *
+ * @param pageRecords - Records of the current page, undefined while loading.
+ * @param totalsById - Cumulative points per student from GET /discipline/students/:id.
+ * @returns Rows for the incident table.
+ */
+function buildIncidentRows(
+  pageRecords: DisciplineRecord[] | undefined,
+  totalsById: Map<string, number>,
+): DisciplineIncidentRow[] {
+  return (pageRecords ?? []).map((record) => {
+    const base = toIncidentRow(record, totalsById.get(record.student_id) ?? 0);
+
+    return {
+      ...base,
+      studentAvatarBg: getStudentAvatarBg(base.studentTotalPoints),
+      studentPointStatus: getStudentPointStatus(base.studentTotalPoints),
+    };
+  });
+}
+
+/**
+ * Quick-tab counters: server totals/KPIs when the report query resolved,
+ * otherwise a best-effort count over the fetched page.
+ *
+ * @param rows - Decorated rows of the current page.
+ * @param filteredCount - Rows visible after client-side search/tab filtering.
+ * @param total - Server total for the current filter set.
+ * @param metrics - Report KPI metrics, undefined while loading.
+ * @returns Counts object for the filter bar.
+ */
+function buildCounts(
+  rows: DisciplineIncidentRow[],
+  filteredCount: number,
+  total: number,
+  metrics: ReturnType<typeof reportMetrics> | undefined,
+): {
+  all: number;
+  needAction: number;
+  resolved: number;
+  highPoints: number;
+  showing: number;
+  total: number;
+} {
+  const openCount = rows.filter(
+    (row) => row.status !== 'selesai' && row.status !== 'dibatalkan',
+  ).length;
+  const resolvedCount = rows.filter((row) => row.status === 'selesai').length;
+
+  return {
+    all: total,
+    needAction: metrics?.needActionCount ?? openCount,
+    resolved: metrics?.resolvedCount ?? resolvedCount,
+    highPoints: rows.filter((row) => row.studentTotalPoints >= 30).length,
+    showing: filteredCount,
+    total,
+  };
+}
+
+/**
+ * Extract a display message from a failed API call.
+ *
+ * @param error - Caught error (usually `ApiError`).
+ * @param fallback - Indonesian fallback text for non-API errors.
+ * @returns Message string for the toast.
+ */
+function apiErrorMessage(error: unknown, fallback: string): string {
+  return error instanceof ApiError ? error.message : fallback;
+}
+
+/**
+ * Translate the filter bar state into GET /discipline/records query params
+ * (empty selectors become undefined so the server ignores them).
+ *
+ * @param filter - Current filter bar state.
+ * @param range - Resolved from/to period range.
+ * @returns Query params for the records list (and the matching export).
+ */
+function buildServerFilters(
+  filter: DisciplineFilterState,
+  range: { from: string; to: string },
+): DisciplineRecordsQuery {
+  return {
+    from: range.from,
+    to: range.to,
+    class_id: filter.selectedClass === '' ? undefined : filter.selectedClass,
+    category_id: filter.selectedCategory === '' ? undefined : filter.selectedCategory,
+    status: displayStatusToRecordParam(filter.selectedStatus),
+  };
+}
+
+/**
  * Interactive coordinator container for Discipline and Student Points management.
  *
  * @returns Rendered discipline management workspace.
@@ -102,7 +170,6 @@ function getStudentPointStatus(totalPoints: number): string {
 export function DisciplineManager() {
   const t = useTranslations('DisciplinePage');
 
-  const [incidents, setIncidents] = useState<DisciplineIncident[]>(mockDisciplineIncidents);
   const [filter, setFilter] = useState<DisciplineFilterState>({
     search: '',
     selectedClass: '',
@@ -111,7 +178,10 @@ export function DisciplineManager() {
     selectedPeriod: 'bulan',
     quickTab: 'all',
   });
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
+  const [selectedRecordId, setSelectedRecordId] = useState('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -121,83 +191,101 @@ export function DisciplineManager() {
     }, 3500);
   };
 
-  const filtered = filterDisciplineIncidents(incidents, filter);
-
-  // Compute counts
-  const counts = {
-    all: incidents.length,
-    needAction: incidents.filter((i) => i.status !== 'selesai').length,
-    resolved: incidents.filter((i) => i.status === 'selesai').length,
-    highPoints: incidents.filter((i) => i.studentTotalPoints >= 30).length,
-    showing: filtered.length,
-    total: incidents.length,
+  const handleFilterChange = (next: DisciplineFilterState) => {
+    setFilter(next);
+    setPage(1);
   };
 
-  const totalPoints = incidents.reduce((sum, item) => sum + item.points, 0);
+  const handlePageSizeChange = (size: number) => {
+    setPageSize(size);
+    setPage(1);
+  };
+
+  // Server-side period range: 'semester' anchors on the active academic year start.
+  const academicYears = useAcademicYears();
+  const activeYearStart = academicYears.data?.find((year) => year.is_active)?.start_date;
+  const range = periodRange(filter.selectedPeriod, todayInJakarta(), activeYearStart);
+
+  // Category catalog (shared cache with the modal + rule strip) for the rules toast.
+  const categories = useDisciplineCategories();
+
+  const serverFilters = buildServerFilters(filter, range);
+
+  const records = useDisciplineRecords({
+    ...serverFilters,
+    limit: pageSize,
+    offset: (page - 1) * pageSize,
+  });
+
+  // Per-student cumulative points: GET /discipline/students/:id fan-out for the
+  // unique students on the current page.
+  const studentIds = [...new Set((records.data?.data ?? []).map((record) => record.student_id))];
+  const studentProfiles = useQueries({
+    queries: studentIds.map((id) => studentDisciplineProfileOptions(id)),
+  });
+  const totalsById = new Map<string, number>();
+  for (const [index, id] of studentIds.entries()) {
+    totalsById.set(id, studentProfiles[index]?.data?.total_points ?? 0);
+  }
+
+  const rows = buildIncidentRows(records.data?.data, totalsById);
+
+  const filtered = filterIncidentRows(rows, filter);
+  const total = records.data?.total ?? 0;
+
+  // KPI cards come from GET /reports/discipline for the selected period.
+  const report = useDisciplineReport({ from: range.from, to: range.to });
+  const metrics = report.data === undefined ? undefined : reportMetrics(report.data);
+
+  const counts = buildCounts(rows, filtered.length, total, metrics);
+
+  const watchlist = toWatchlist(rows);
+
+  const createRecord = useCreateDisciplineRecord();
 
   const handleCreateIncident = (formData: NewIncidentFormData) => {
-    const pointWeight = getViolationPointWeight(formData.categoryKey);
-    const label = getViolationLabel(formData.categoryKey);
-
-    const initials = formData.studentName
-      .split(' ')
-      .map((part) => part[0])
-      .join('')
-      .slice(0, 2)
-      .toUpperCase();
-
-    // Previous student incidents to calculate cumulative points
-    const previousPoints = incidents
-      .filter((i) => i.studentNis === formData.studentNis)
-      .reduce((sum, curr) => sum + curr.points, 0);
-    const newStudentTotal = previousPoints + pointWeight;
-
-    const newRecord: DisciplineIncident = {
-      id: `inc-${Date.now()}`,
-      date: '05 Okt 2026',
-      time: '10:00 WIB',
-      studentName: formData.studentName,
-      studentNis: formData.studentNis,
-      studentClass: formData.studentClass,
-      studentInitials: initials || 'ST',
-      studentAvatarBg: getStudentAvatarBg(newStudentTotal),
-      categoryKey: formData.categoryKey,
-      categoryLabel: label,
-      points: pointWeight,
-      description: formData.description,
-      location: formData.location,
-      recorderName: 'Drs. H. Mulyono',
-      recorderRole: 'Kesiswaan & BK',
-      studentTotalPoints: newStudentTotal,
-      studentPointStatus: getStudentPointStatus(newStudentTotal),
-      status: 'baru',
+    const payload: CreateDisciplineRecordInput = {
+      student_id: formData.studentId,
+      category_id: formData.categoryId,
+      occurred_at: formData.dateTime,
+      description: composeIncidentDescription(
+        formData.description,
+        formData.location,
+        formData.immediateAction,
+      ),
     };
 
-    setIncidents([newRecord, ...incidents]);
-    setIsRecordModalOpen(false);
-    showToast(t('toast_incident_saved'));
+    createRecord.mutate(payload, {
+      onSuccess: () => {
+        setIsRecordModalOpen(false);
+        setPage(1);
+        showToast(t('toast_incident_saved'));
+      },
+      onError: (error) => {
+        showToast(apiErrorMessage(error, 'Gagal menyimpan pelanggaran.'));
+      },
+    });
   };
 
-  const handleExportExcel = () => {
-    const headers = 'ID,Tanggal,Waktu,Nama,NIS,Kelas,Kategori,Poin,Deskripsi,Status\n';
-    const rows = incidents
-      .map(
-        (i) =>
-          `"${i.id}","${i.date}","${i.time}","${i.studentName}","${i.studentNis}","${i.studentClass}","${i.categoryLabel}",${i.points},"${i.description}","${i.status}"`,
-      )
-      .join('\n');
-    const blob = new Blob([headers + rows], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `Rekap_Kedisiplinan_SMPN1_${Date.now()}.csv`);
-    document.body.append(link);
-    link.click();
-    link.remove();
+  const handleExportExcel = async () => {
+    try {
+      const { blob, filename } = await downloadFile('/exports/discipline', serverFilters);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename ?? `Rekap_Kedisiplinan_${Date.now()}.xlsx`);
+      document.body.append(link);
+      link.click();
+      link.remove();
 
-    showToast(t('toast_exported'));
+      showToast(t('toast_exported'));
+    } catch (error) {
+      showToast(apiErrorMessage(error, 'Gagal mengekspor laporan.'));
+    }
   };
 
+  // shortcut: no backend endpoint for parent-call letters or BK appointment
+  // scheduling, keep the mock confirmation toasts.
   const handleSendParentCall = (studentName: string) => {
     showToast(`${t('toast_parent_sent')}: ${studentName}`);
   };
@@ -206,26 +294,34 @@ export function DisciplineManager() {
     showToast(`${t('toast_bk_scheduled')}: ${studentName}`);
   };
 
+  // shortcut: no backend "student dossier page" route; the summary numbers
+  // already come from GET /discipline/students/:id via the watchlist data.
   const handleReviewHistory = (studentName: string) => {
-    showToast(`Membuka berkas rekam pembinaan untuk: ${studentName}`);
+    showToast(`Berkas rekam pembinaan (poin terkini): ${studentName}`);
   };
 
-  const handleViewDetail = (incident: DisciplineIncident) => {
-    showToast(`Detail Pelanggaran: ${incident.studentName} (${incident.categoryLabel})`);
+  // Record detail + followups live in DisciplineRecordDetailModal
+  // (GET /discipline/records/:id, POST /:id/followups).
+  const handleViewDetail = (incident: DisciplineIncidentRow) => {
+    setSelectedRecordId(incident.id);
   };
 
-  const handleEditIncident = (incident: DisciplineIncident) => {
-    showToast(`Membuka dialog penyuntingan insiden: ${incident.id}`);
+  const handleEditIncident = (incident: DisciplineIncidentRow) => {
+    setSelectedRecordId(incident.id);
   };
 
-  const handleViewHistory = (incident: DisciplineIncident) => {
+  // shortcut: audit trail is admin-only GET /audit-logs, outside this module's
+  // wiring scope, keep the placeholder toast.
+  const handleViewHistory = (incident: DisciplineIncidentRow) => {
     showToast(`Melihat audit trail untuk insiden: ${incident.studentName}`);
   };
 
   const handleOpenCategoryRules = () => {
-    showToast(
-      'Buku Pedoman Tata Tertib & Sanksi: Terlambat (+2), Seragam (+3), Gadget (+5), Barang Terlarang (+25), Bullying (+50)',
-    );
+    const rules = (categories.data ?? [])
+      .map((category) => `${category.name} (+${category.default_points ?? 0})`)
+      .join(', ');
+
+    showToast(`Buku Pedoman Tata Tertib & Sanksi: ${rules}`);
   };
 
   return (
@@ -249,10 +345,10 @@ export function DisciplineManager() {
 
       {/* KPI 4 Bento Summary Cards */}
       <DisciplineMetrics
-        totalIncidents={counts.all}
-        accumulatedPoints={totalPoints}
-        needActionCount={counts.needAction}
-        resolvedCount={counts.resolved}
+        totalIncidents={metrics?.totalIncidents}
+        accumulatedPoints={metrics?.accumulatedPoints}
+        needActionCount={metrics?.needActionCount}
+        resolvedCount={metrics?.resolvedCount}
       />
 
       {/* Handbook Point Weights Strip */}
@@ -262,10 +358,18 @@ export function DisciplineManager() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-4">
         {/* Left 3 Columns: Filters and Table */}
         <div className="space-y-4 lg:col-span-3">
-          <DisciplineFilterBar filter={filter} onFilterChange={setFilter} counts={counts} />
+          <DisciplineFilterBar
+            filter={filter}
+            onFilterChange={handleFilterChange}
+            counts={counts}
+          />
 
           <DisciplineIncidentTable
             incidents={filtered}
+            isLoading={records.isPending}
+            pagination={{ page, pageSize, total }}
+            onPageChange={setPage}
+            onPageSizeChange={handlePageSizeChange}
             onViewDetail={handleViewDetail}
             onEditIncident={handleEditIncident}
             onViewHistory={handleViewHistory}
@@ -275,6 +379,7 @@ export function DisciplineManager() {
         {/* Right 1 Column: Parent Call Watchlist, Counseling Workflow, Sync Banner */}
         <div className="lg:col-span-1">
           <DisciplineSidebar
+            watchlist={watchlist}
             onSendParentCall={handleSendParentCall}
             onScheduleBk={handleScheduleBk}
             onReviewHistory={handleReviewHistory}
@@ -290,6 +395,17 @@ export function DisciplineManager() {
         }}
         onSubmit={handleCreateIncident}
       />
+
+      {/* Record Detail & Follow-up Modal */}
+      {selectedRecordId !== '' && (
+        <DisciplineRecordDetailModal
+          recordId={selectedRecordId}
+          onClose={() => {
+            setSelectedRecordId('');
+          }}
+          onToast={showToast}
+        />
+      )}
     </div>
   );
 }

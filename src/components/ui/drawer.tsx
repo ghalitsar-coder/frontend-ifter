@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable eslint/eqeqeq, eslint/no-eq-null -- vendored shadcn/ui component, `== null` check intentionally covers both null and undefined upstream; do not hand-edit */
 import { Drawer as DrawerPrimitive } from '@base-ui/react/drawer';
 import { cn } from 'cn';
 import * as React from 'react';

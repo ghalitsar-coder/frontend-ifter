@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable jsx-a11y/prefer-tag-over-role, jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions, typescript/no-unsafe-type-assertion -- vendored shadcn/ui component, decorative group roles and click-to-focus behavior upstream of shadcn/ui input group; do not hand-edit */
 import { cva } from 'class-variance-authority';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from 'cn';

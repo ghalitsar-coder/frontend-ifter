@@ -1,5 +1,6 @@
 import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useDisciplineCategories, useClassList } from '@/lib/api/queries';
 import type { DisciplineFilterState, DisciplineQuickTab } from '@/types/discipline';
 
 /**
@@ -21,6 +22,10 @@ export function DisciplineFilterBar(props: {
   };
 }) {
   const t = useTranslations('DisciplinePage');
+
+  // Real masterdata option sources (values are backend ids used in API filters).
+  const classes = useClassList();
+  const categories = useDisciplineCategories();
 
   const handleQuickTab = (tab: DisciplineQuickTab) => {
     props.onFilterChange({
@@ -65,12 +70,11 @@ export function DisciplineFilterBar(props: {
             className="h-10 w-full rounded-xl border border-border bg-surface-container-low px-3 text-xs font-medium text-foreground focus:border-pine-deep focus:outline-hidden"
           >
             <option value="">{t('filter_class_all')}</option>
-            <option value="VII A">VII A</option>
-            <option value="VII B">VII B</option>
-            <option value="VII C">VII C</option>
-            <option value="VIII A">VIII A</option>
-            <option value="VIII B">VIII B</option>
-            <option value="IX A">IX A</option>
+            {(classes.data ?? []).map((classItem) => (
+              <option key={classItem.id} value={classItem.id}>
+                {classItem.name}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -87,11 +91,11 @@ export function DisciplineFilterBar(props: {
             className="h-10 w-full rounded-xl border border-border bg-surface-container-low px-3 text-xs font-medium text-foreground focus:border-pine-deep focus:outline-hidden"
           >
             <option value="">{t('filter_category_all')}</option>
-            <option value="keterlambatan">Keterlambatan (+2)</option>
-            <option value="seragam">Atribut Seragam (+3)</option>
-            <option value="tatatertib">Tata Tertib Kelas (+5)</option>
-            <option value="barang_terlarang">Barang Terlarang (+25)</option>
-            <option value="bullying">Etika & Bullying (+50)</option>
+            {(categories.data ?? []).map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name} (+{category.default_points ?? 0})
+              </option>
+            ))}
           </select>
         </div>
 
@@ -112,6 +116,7 @@ export function DisciplineFilterBar(props: {
             <option value="tinjau">Dalam Peninjauan</option>
             <option value="tindak">Tindak Lanjut BK</option>
             <option value="selesai">Selesai</option>
+            <option value="dibatalkan">Dibatalkan</option>
           </select>
         </div>
 

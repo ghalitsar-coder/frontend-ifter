@@ -1,5 +1,6 @@
 import { MessageCircle, Send, Smartphone } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+// shortcut: no backend endpoint for the WhatsApp gateway/templates, keep mock
 import type { NotificationPolicy } from '@/types/settings';
 
 const SAMPLE_VALUES: Record<string, string> = {

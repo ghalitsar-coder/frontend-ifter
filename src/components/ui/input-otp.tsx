@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable jsx-a11y/prefer-tag-over-role -- vendored shadcn/ui component, role=group markup mirrors upstream shadcn/ui input-otp; do not hand-edit */
 import { cn } from 'cn';
 import { OTPInput, OTPInputContext } from 'input-otp';
 import { MinusIcon } from 'lucide-react';

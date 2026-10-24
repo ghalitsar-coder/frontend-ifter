@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable eslint/no-use-before-define -- vendored shadcn/ui component, generated shadcn/ui select composition ordering from upstream; do not hand-edit */
 import { Select as SelectPrimitive } from '@base-ui/react/select';
 import { cn } from 'cn';
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from 'lucide-react';

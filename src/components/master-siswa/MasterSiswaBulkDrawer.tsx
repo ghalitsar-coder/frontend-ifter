@@ -9,6 +9,7 @@ import { useTranslations } from 'next-intl';
  */
 export function MasterSiswaBulkDrawer(props: {
   selectedCount: number;
+  isStatusPending?: boolean;
   onClearSelection: () => void;
   onOpenMutationModal: () => void;
   onBroadcastCall: () => void;
@@ -23,6 +24,7 @@ export function MasterSiswaBulkDrawer(props: {
 
   return (
     <div
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- drawer landmark region needs explicit role for the labelled panel
       role="region"
       aria-live="polite"
       aria-label={t('bulk_drawer_aria')}
@@ -76,10 +78,14 @@ export function MasterSiswaBulkDrawer(props: {
           <button
             type="button"
             onClick={props.onChangeStatus}
-            className="hover:bg-amber-hover flex cursor-pointer items-center gap-1.5 rounded-xl bg-amber-gold px-3 py-2 text-xs font-bold text-pine-deep transition-colors"
+            disabled={props.isStatusPending === true}
+            className="hover:bg-amber-hover flex cursor-pointer items-center gap-1.5 rounded-xl bg-amber-gold px-3 py-2 text-xs font-bold text-pine-deep transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Edit3 className="size-3.5" />
-            <span>{t('btn_bulk_change_status')}</span>
+            {/* shortcut: no busy locale key; hard-coded Indonesian action feedback */}
+            <span>
+              {props.isStatusPending === true ? 'Menyimpan...' : t('btn_bulk_change_status')}
+            </span>
           </button>
 
           <button

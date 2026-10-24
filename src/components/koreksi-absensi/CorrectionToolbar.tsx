@@ -1,7 +1,8 @@
-import { CalendarDays, ChevronDown, RefreshCw, Search } from 'lucide-react';
+import { CalendarDays, RefreshCw, Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { mockCorrectionClasses } from '@/data/mockAttendanceCorrection';
-import type { CorrectionChangeFilter, CorrectionFilterState } from '@/types/attendanceCorrection';
+import type { CorrectionHistoryFilters } from '@/lib/api/koreksi-absensi';
+import { useClassList } from '@/lib/api/queries';
+import type { CorrectionChangeFilter } from '@/types/attendanceCorrection';
 
 const changeFilters: CorrectionChangeFilter[] = [
   'all',
@@ -13,18 +14,23 @@ const changeFilters: CorrectionChangeFilter[] = [
 
 /**
  * Search, change type, class, and period filters for the audit log.
+ * Class options come from GET /classes; the period drives the history
+ * from/to query parameters.
  *
  * @param props - Active filters and change handlers.
  * @returns Filter toolbar.
  */
 export function CorrectionToolbar(props: {
-  filters: CorrectionFilterState;
+  filters: CorrectionHistoryFilters;
   onSearchChange: (value: string) => void;
   onChangeFilterChange: (value: CorrectionChangeFilter) => void;
   onClassChange: (value: string) => void;
+  onFromChange: (value: string) => void;
+  onToChange: (value: string) => void;
   onReset: () => void;
 }) {
   const t = useTranslations('AttendanceCorrectionPage');
+  const classQuery = useClassList();
 
   const selectClassName =
     'h-10 cursor-pointer rounded-xl border border-border-control bg-card px-3 text-[11px] font-semibold text-foreground focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-xs';
@@ -48,6 +54,7 @@ export function CorrectionToolbar(props: {
       <select
         value={props.filters.change}
         onChange={(event) => {
+          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
           props.onChangeFilterChange(event.target.value as CorrectionChangeFilter);
         }}
         aria-label={t('filter_change_label')}
@@ -61,7 +68,7 @@ export function CorrectionToolbar(props: {
       </select>
 
       <select
-        value={props.filters.className}
+        value={props.filters.classId}
         onChange={(event) => {
           props.onClassChange(event.target.value);
         }}
@@ -69,17 +76,34 @@ export function CorrectionToolbar(props: {
         className={selectClassName}
       >
         <option value="all">{t('filter_all_classes')}</option>
-        {mockCorrectionClasses.map((className) => (
-          <option key={className} value={className}>
-            {t('class_option', { className })}
+        {(classQuery.data ?? []).map((cls) => (
+          <option key={cls.id} value={cls.id}>
+            {t('class_option', { className: cls.name })}
           </option>
         ))}
       </select>
 
       <div className="flex h-10 items-center gap-1.5 rounded-xl border border-border-control bg-card px-3 text-[11px] font-semibold text-foreground">
-        <CalendarDays className="size-3.5 text-muted-foreground" />
-        {t('date_range')}
-        <ChevronDown className="size-3.5 text-muted-foreground" />
+        <CalendarDays className="size-3.5 shrink-0 text-muted-foreground" />
+        <input
+          type="date"
+          value={props.filters.from}
+          onChange={(event) => {
+            props.onFromChange(event.target.value);
+          }}
+          aria-label="Dari tanggal"
+          className="w-[7.5rem] cursor-pointer bg-transparent text-[11px] font-semibold text-foreground focus:outline-none"
+        />
+        <span aria-hidden="true">–</span>
+        <input
+          type="date"
+          value={props.filters.to}
+          onChange={(event) => {
+            props.onToChange(event.target.value);
+          }}
+          aria-label="Sampai tanggal"
+          className="w-[7.5rem] cursor-pointer bg-transparent text-[11px] font-semibold text-foreground focus:outline-none"
+        />
       </div>
 
       <button

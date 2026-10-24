@@ -2,8 +2,22 @@
 
 import { CheckCircle2, X } from 'lucide-react';
 import { useState } from 'react';
-import { initialMockTeachers, mockPicketPosts } from '@/data/mockMasterGuru';
-import type { EmploymentStatus, RoleFilter, TeacherProfile } from '@/types/masterGuru';
+import { mockPicketPosts } from '@/data/mockMasterGuru';
+import type { Teacher } from '@/lib/api/dto';
+import {
+  apiErrorMessage,
+  buildTeacherProfiles,
+  downloadTeacherExport,
+  saveBlob,
+  useCreateTeacher,
+  useDutyAssignments,
+  useMasterGuruTeachers,
+  useTeacherAccounts,
+  useUpdateTeacherStatus,
+} from '@/lib/api/master-guru';
+import type { NewTeacherDraft, TeacherAccount } from '@/lib/api/master-guru';
+import { useClassList } from '@/lib/api/queries';
+import type { EmploymentStatus, RoleFilter } from '@/types/masterGuru';
 import { MasterGuruAddModal } from './MasterGuruAddModal';
 import { MasterGuruHeader } from './MasterGuruHeader';
 import { MasterGuruImportModal } from './MasterGuruImportModal';
@@ -11,26 +25,36 @@ import { MasterGuruPiketDrawer } from './MasterGuruPiketDrawer';
 import { MasterGuruTable } from './MasterGuruTable';
 import { MasterGuruToolbar } from './MasterGuruToolbar';
 
-const AVAILABLE_ROMBELS = [
-  'Kelas VII A',
-  'Kelas VII B',
-  'Kelas VIII A',
-  'Kelas VIII B',
-  'Kelas IX A',
-  'Kelas IX B',
-  'Kelas X MIPA 1',
-  'Kelas XI MIPA 2',
-  'Kelas XII MIPA 1',
-];
+/**
+ * Index linked system accounts by teacher id for table badges.
+ * @param teachers - Raw teachers from GET /teachers.
+ * @param accounts - Accounts keyed by user id from GET /users.
+ * @returns Teacher id to account lookup.
+ */
+function buildAccountsByTeacher(
+  teachers: Teacher[],
+  accounts: Record<string, TeacherAccount>,
+): Record<string, TeacherAccount> {
+  const byTeacher: Record<string, TeacherAccount> = {};
+  for (const teacher of teachers) {
+    if (teacher.user_id !== undefined) {
+      const account = accounts[teacher.user_id];
+      if (account !== undefined) {
+        byTeacher[teacher.id] = account;
+      }
+    }
+  }
+  return byTeacher;
+}
 
 /**
- * Coordinator component orchestrating Master Data Guru & Penugasan state, filtering, and modals.
+ * Coordinator component orchestrating Master Data Guru & Penugasan state,
+ * filtering, and modals. Teacher records come from GET /teachers and are
+ * enriched with /classes (homeroom) and /duty-assignments (picket) joins.
  *
  * @returns Master guru workspace.
  */
 export function MasterGuruManager() {
-  const [teachers, setTeachers] = useState<TeacherProfile[]>(initialMockTeachers);
-  const [picketPosts] = useState(mockPicketPosts);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<RoleFilter>('all');
   const [selectedStatus, setSelectedStatus] = useState<'all' | EmploymentStatus>('all');
@@ -38,6 +62,33 @@ export function MasterGuruManager() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const trimmedSearch = searchQuery.trim();
+  const teachersQuery = useMasterGuruTeachers(
+    trimmedSearch === '' ? { limit: 100 } : { search: trimmedSearch, limit: 100 },
+  );
+  const classesQuery = useClassList({ status: 'active' });
+  const dutiesQuery = useDutyAssignments();
+
+  const teachers = teachersQuery.data?.data ?? [];
+  const linkedUserIds = teachers
+    .map((teacher) => teacher.user_id)
+    .filter((id): id is string => id !== undefined);
+  const accountsQuery = useTeacherAccounts(linkedUserIds);
+
+  const profiles = buildTeacherProfiles(
+    teachers,
+    classesQuery.data ?? [],
+    dutiesQuery.data ?? [],
+    accountsQuery.data ?? {},
+  );
+  const accountsByTeacher = buildAccountsByTeacher(teachers, accountsQuery.data ?? {});
+
+  // shortcut: gate posts + morning check-in status have no backend endpoint, keep mock
+  const picketPosts = mockPicketPosts;
+
+  const createTeacher = useCreateTeacher();
+  const updateStatus = useUpdateTeacherStatus();
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -52,14 +103,37 @@ export function MasterGuruManager() {
     setSelectedStatus('all');
   };
 
-  const handleAddTeacher = (newTeacherData: Omit<TeacherProfile, 'id'>) => {
-    const newRecord: TeacherProfile = {
-      ...newTeacherData,
-      id: `ptk-${Date.now()}`,
-    };
-    setTeachers([newRecord, ...teachers]);
-    setIsAddModalOpen(false);
-    showToast(`Guru ${newRecord.name} berhasil didaftarkan ke sistem.`);
+  const handleAddTeacher = (draft: NewTeacherDraft) => {
+    createTeacher.mutate(draft, {
+      onSuccess: (result) => {
+        setIsAddModalOpen(false);
+        const accountNote = result.accountCreated
+          ? ' Akun login berhasil dibuat.'
+          : ' (Akun login tidak dibuat — cek hak akses admin.)';
+        showToast(`Guru ${result.teacher.full_name} berhasil didaftarkan ke sistem.${accountNote}`);
+      },
+      onError: (error) => {
+        showToast(apiErrorMessage(error, 'Gagal mendaftarkan guru. Silakan coba lagi.'));
+      },
+    });
+  };
+
+  const handleToggleStatus = (teacherId: string, name: string, next: 'active' | 'inactive') => {
+    updateStatus.mutate(
+      { id: teacherId, status: next },
+      {
+        onSuccess: () => {
+          showToast(
+            next === 'active'
+              ? `Status ${name} diubah menjadi Aktif.`
+              : `Status ${name} diubah menjadi Nonaktif.`,
+          );
+        },
+        onError: (error) => {
+          showToast(apiErrorMessage(error, 'Gagal mengubah status guru.'));
+        },
+      },
+    );
   };
 
   const handleImportSuccess = (count: number) => {
@@ -67,24 +141,21 @@ export function MasterGuruManager() {
   };
 
   const handleExport = () => {
-    showToast('Mengekspor daftar PTK & penugasan ke berkas format Excel (.xlsx)...');
+    showToast('Menyiapkan berkas ekspor data guru (.xlsx)...');
+    const run = async () => {
+      try {
+        const { blob, filename } = await downloadTeacherExport();
+        saveBlob(blob, filename ?? 'data-guru.xlsx');
+      } catch (error: unknown) {
+        showToast(apiErrorMessage(error, 'Ekspor guru gagal dilakukan.'));
+      }
+    };
+    void run();
   };
 
-  // Filter teachers based on search query, role tab, and employment status
-  const filteredTeachers = teachers.filter((teacher) => {
-    // Search filter: name, nip, nuptk, subject
-    if (searchQuery.trim() !== '') {
-      const q = searchQuery.toLowerCase();
-      const matchName = teacher.name.toLowerCase().includes(q);
-      const matchNip = teacher.nip.replaceAll(/\s+/g, '').includes(q.replaceAll(/\s+/g, ''));
-      const matchNuptk = teacher.nuptk?.includes(q) ?? false;
-      const matchSubject = teacher.subject.toLowerCase().includes(q);
-      if (!matchName && !matchNip && !matchNuptk && !matchSubject) {
-        return false;
-      }
-    }
-
-    // Role tab filter
+  // Client-side filters for tabs the backend cannot query (role joins and the
+  // employment-status column, which the Teacher DTO does not model).
+  const filteredTeachers = profiles.filter((teacher) => {
     if (selectedRole === 'homeroom' && !teacher.homeroomClass) {
       return false;
     }
@@ -95,7 +166,6 @@ export function MasterGuruManager() {
       return false;
     }
 
-    // Employment status filter
     if (selectedStatus !== 'all' && teacher.employmentStatus !== selectedStatus) {
       return false;
     }
@@ -103,9 +173,9 @@ export function MasterGuruManager() {
     return true;
   });
 
-  const homeroomCount = teachers.filter((t) => t.homeroomClass).length;
-  const picketCount = teachers.filter((t) => t.picketDuty).length;
-  const adminCount = teachers.filter((t) => t.accessLevel === 'admin').length;
+  const homeroomCount = profiles.filter((t) => t.homeroomClass).length;
+  const picketCount = profiles.filter((t) => t.picketDuty).length;
+  const adminCount = profiles.filter((t) => t.accessLevel === 'admin').length;
   const activePicketCount = picketPosts.filter((p) => p.isCheckedIn).length;
   const isFilterActive = searchQuery !== '' || selectedRole !== 'all' || selectedStatus !== 'all';
 
@@ -131,9 +201,9 @@ export function MasterGuruManager() {
 
       {/* Bento Header & Analytics */}
       <MasterGuruHeader
-        totalCount={teachers.length}
+        totalCount={teachersQuery.data?.total ?? profiles.length}
         homeroomCount={homeroomCount}
-        totalRombels={18}
+        totalRombels={classesQuery.data?.length ?? 0}
         activePicketCount={activePicketCount}
         onOpenAddModal={() => {
           setIsAddModalOpen(true);
@@ -165,7 +235,7 @@ export function MasterGuruManager() {
         onRoleChange={setSelectedRole}
         selectedStatus={selectedStatus}
         onStatusChange={setSelectedStatus}
-        totalTeachers={teachers.length}
+        totalTeachers={profiles.length}
         homeroomCount={homeroomCount}
         picketCount={picketCount}
         adminCount={adminCount}
@@ -173,9 +243,35 @@ export function MasterGuruManager() {
         isFilterActive={isFilterActive}
       />
 
+      {/* Query status banners */}
+      {teachersQuery.isPending && (
+        <div className="bg-surface-card text-text-muted mb-4 rounded-xl border border-border-control px-4 py-3 text-xs font-semibold">
+          Memuat data guru dari server…
+        </div>
+      )}
+      {teachersQuery.isError && (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-semibold text-rose-700">
+          <span>{apiErrorMessage(teachersQuery.error, 'Gagal memuat data guru.')}</span>
+          <button
+            type="button"
+            onClick={() => {
+              void teachersQuery.refetch();
+            }}
+            className="cursor-pointer rounded-lg border border-rose-300 px-3 py-1 transition-colors hover:bg-rose-100"
+          >
+            Coba Lagi
+          </button>
+        </div>
+      )}
+
       {/* Responsive Table of Teachers */}
       <MasterGuruTable
         teachers={filteredTeachers}
+        accounts={accountsByTeacher}
+        isStatusUpdating={updateStatus.isPending}
+        onToggleStatus={(teacherId, name, next) => {
+          handleToggleStatus(teacherId, name, next);
+        }}
         onEditTeacher={(teacher) => {
           showToast(`Mengedit data guru: ${teacher.name}`);
         }}
@@ -191,7 +287,8 @@ export function MasterGuruManager() {
           setIsAddModalOpen(false);
         }}
         onSubmit={handleAddTeacher}
-        availableClasses={AVAILABLE_ROMBELS}
+        availableClasses={(classesQuery.data ?? []).map((cls) => ({ id: cls.id, name: cls.name }))}
+        isSubmitting={createTeacher.isPending}
       />
 
       {/* Excel Bulk Import & Validation Modal */}

@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable jsx-a11y/prefer-tag-over-role, eslint/eqeqeq, typescript/promise-function-async -- vendored shadcn/ui component, generated form-field composition from upstream shadcn/ui; do not hand-edit */
 import { cva } from 'class-variance-authority';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from 'cn';

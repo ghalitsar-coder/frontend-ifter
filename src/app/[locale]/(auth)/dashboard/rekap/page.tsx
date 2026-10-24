@@ -11,9 +11,7 @@ export type RekapPageProps = {
  * @param props - Page route params.
  * @returns Metadata object.
  */
-export async function generateMetadata(
-  props: RekapPageProps,
-): Promise<Metadata> {
+export async function generateMetadata(props: RekapPageProps): Promise<Metadata> {
   const { locale } = await props.params;
   const t = await getTranslations({
     locale,

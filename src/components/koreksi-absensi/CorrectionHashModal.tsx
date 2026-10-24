@@ -1,17 +1,24 @@
 import { ArrowRight, CheckCircle2, Fingerprint, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { attendanceStatusStyles } from '@/components/koreksi-absensi/statusStyles';
+// shortcut: no backend integrity-hash endpoint for the ledger, keep mock hash display
 import { mockAuditLedgerHash } from '@/data/mockAttendanceCorrection';
-import type { CorrectionLog } from '@/types/attendanceCorrection';
+import { toTrailEntry, useAttendanceRecord } from '@/lib/api/koreksi-absensi';
+import type { CorrectionRow } from '@/lib/api/koreksi-absensi';
 
 /**
- * Immutable ledger modal with the entry hash and verification status.
+ * Immutable ledger modal wired to GET /attendance/records/:id: shows the
+ * record header plus the full correction trail (old → new status, reason,
+ * timestamp) recorded by the backend.
  *
- * @param props - Audit entry and close handler.
- * @returns Ledger integrity modal.
+ * @param props - Audit row (record id) and close handler.
+ * @returns Ledger modal.
  */
-export function CorrectionHashModal(props: { log: CorrectionLog; onClose: () => void }) {
+export function CorrectionHashModal(props: { row: CorrectionRow; onClose: () => void }) {
   const t = useTranslations('AttendanceCorrectionPage');
+  const detailQuery = useAttendanceRecord(props.row.recordId);
+  const corrections = (detailQuery.data?.corrections ?? []).map(toTrailEntry);
+  const latest = corrections.at(-1);
 
   return (
     <div
@@ -34,7 +41,7 @@ export function CorrectionHashModal(props: { log: CorrectionLog; onClose: () => 
               >
                 {t('ledger_title')}
               </h2>
-              <p className="text-[10px] text-muted-foreground">{props.log.id}</p>
+              <p className="text-[10px] text-muted-foreground">{props.row.id}</p>
             </div>
           </div>
           <button
@@ -47,47 +54,96 @@ export function CorrectionHashModal(props: { log: CorrectionLog; onClose: () => 
           </button>
         </div>
 
-        <div className="space-y-3 px-5 py-5">
+        <div className="max-h-[70vh] space-y-3 overflow-y-auto px-5 py-5">
           <div className="flex items-center justify-between gap-3 rounded-xl bg-surface-container-low px-3 py-2.5">
             <span className="text-[10px] text-muted-foreground">{t('ledger_subject')}</span>
-            <span className="text-xs font-bold text-foreground">{props.log.student.name}</span>
+            <span className="text-xs font-bold text-foreground">{props.row.student.name}</span>
           </div>
 
           <div className="flex items-center justify-between gap-3 rounded-xl bg-surface-container-low px-3 py-2.5">
             <span className="text-[10px] text-muted-foreground">{t('ledger_change')}</span>
             <span className="flex items-center gap-1.5">
-              <span
-                className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold ${attendanceStatusStyles[props.log.fromStatus]}`}
-              >
-                {t(`status_${props.log.fromStatus}`)}
-              </span>
-              <ArrowRight className="size-3 text-muted-foreground" />
-              <span
-                className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold ${attendanceStatusStyles[props.log.toStatus]}`}
-              >
-                {t(`status_${props.log.toStatus}`)}
-              </span>
+              {latest ? (
+                <>
+                  <span
+                    className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold ${attendanceStatusStyles[latest.fromStatus]}`}
+                  >
+                    {t(`status_${latest.fromStatus}`)}
+                  </span>
+                  <ArrowRight className="size-3 text-muted-foreground" />
+                  <span
+                    className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold ${attendanceStatusStyles[latest.toStatus]}`}
+                  >
+                    {t(`status_${latest.toStatus}`)}
+                  </span>
+                </>
+              ) : (
+                <span className="text-[10px] font-semibold text-muted-foreground">
+                  {detailQuery.isPending
+                    ? 'Memuat koreksi…'
+                    : `Belum pernah dikoreksi — status ${props.row.sessionLabel.toLowerCase()}`}
+                </span>
+              )}
             </span>
           </div>
 
-          <div className="flex items-center justify-between gap-3 rounded-xl bg-surface-container-low px-3 py-2.5">
-            <span className="text-[10px] text-muted-foreground">{t('ledger_officer')}</span>
-            <span className="text-right">
-              <span className="block text-xs font-bold text-foreground">
-                {props.log.officer.name}
+          {latest && (
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-surface-container-low px-3 py-2.5">
+              <span className="text-[10px] text-muted-foreground">{t('ledger_officer')}</span>
+              <span className="text-right">
+                <span className="block text-xs font-bold text-foreground">
+                  {latest.officerName}
+                </span>
+                <span className="block text-[9px] text-muted-foreground">Koreksi tersimpan</span>
               </span>
-              <span className="block text-[9px] text-muted-foreground">
-                {props.log.officer.role}
-              </span>
-            </span>
-          </div>
+            </div>
+          )}
 
-          <div className="flex items-center justify-between gap-3 rounded-xl bg-surface-container-low px-3 py-2.5">
-            <span className="text-[10px] text-muted-foreground">{t('ledger_timestamp')}</span>
-            <span className="text-xs font-semibold text-foreground">
-              {props.log.loggedDate}, {props.log.loggedTime}
-            </span>
-          </div>
+          {latest && (
+            <div className="flex items-center justify-between gap-3 rounded-xl bg-surface-container-low px-3 py-2.5">
+              <span className="text-[10px] text-muted-foreground">{t('ledger_timestamp')}</span>
+              <span className="text-xs font-semibold text-foreground">
+                {latest.loggedDate}, {latest.loggedTime}
+              </span>
+            </div>
+          )}
+
+          {corrections.length > 0 && (
+            <div>
+              <p className="mb-1 text-[10px] text-muted-foreground">
+                Riwayat koreksi ({corrections.length})
+              </p>
+              <ul className="space-y-2">
+                {corrections.map((entry) => (
+                  <li
+                    key={entry.id}
+                    className="rounded-xl border border-border-subtle bg-surface-container-low/60 p-3"
+                  >
+                    <p className="flex items-center gap-1.5 text-[10px] font-bold text-foreground">
+                      <span
+                        className={`rounded-md border px-1.5 py-0.5 ${attendanceStatusStyles[entry.fromStatus]}`}
+                      >
+                        {t(`status_${entry.fromStatus}`)}
+                      </span>
+                      <ArrowRight className="size-3 text-muted-foreground" />
+                      <span
+                        className={`rounded-md border px-1.5 py-0.5 ${attendanceStatusStyles[entry.toStatus]}`}
+                      >
+                        {t(`status_${entry.toStatus}`)}
+                      </span>
+                      <span className="ml-auto font-medium text-muted-foreground">
+                        {entry.loggedDate}, {entry.loggedTime}
+                      </span>
+                    </p>
+                    <p className="mt-1 text-[10px] leading-relaxed text-foreground/80">
+                      {entry.reason}
+                    </p>
+                    <p className="mt-0.5 text-[9px] text-muted-foreground">{entry.officerName}</p>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <div>
             <p className="mb-1 text-[10px] text-muted-foreground">{t('ledger_hash')}</p>

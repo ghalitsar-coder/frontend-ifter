@@ -1,5 +1,6 @@
 import { MapPin, Navigation } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+// shortcut: no backend endpoint, keep mock
 import { GEOFENCE_RADIUS_RANGE } from '@/data/mockSettings';
 import type { GeofencePolicy } from '@/types/settings';
 

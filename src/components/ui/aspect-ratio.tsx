@@ -1,3 +1,4 @@
+/* oxlint-disable typescript/no-unsafe-type-assertion -- vendored shadcn/ui component, CSS custom-property object cast is upstream shadcn/ui style typing; do not hand-edit */
 import { cn } from 'cn';
 
 function AspectRatio({

@@ -3,8 +3,11 @@
 import { CheckCircle2, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { getRuleSeverity, mockSanctionTiers, mockTatibRules } from '@/data/mockTatib';
+// shortcut: no backend endpoint for the sanction escalation ladder, keep mock
+import { mockSanctionTiers } from '@/data/mockTatib';
+import { getApiErrorMessage, useTatibRules, useTatibSave, useTatibStatus } from '@/lib/api/tatib';
 import type { NewRuleInput, RuleSeverity, SeverityFilter, TatibRule } from '@/types/tatib';
+import { getRuleSeverity } from './severityStyles';
 import { TatibAddModal } from './TatibAddModal';
 import { TatibHeader } from './TatibHeader';
 import { TatibSanctionTiers } from './TatibSanctionTiers';
@@ -13,15 +16,21 @@ import { TatibToolbar } from './TatibToolbar';
 
 /**
  * Coordinator for the school code of conduct catalog state and modals.
+ * The catalog is backed by GET/POST/PUT/PATCH /discipline/categories.
  *
  * @returns Conduct rule workspace.
  */
 export function TatibManager() {
   const t = useTranslations('TatibPage');
-  const [rules, setRules] = useState<TatibRule[]>(mockTatibRules);
+  const rulesQuery = useTatibRules();
+  const rules = rulesQuery.data ?? [];
+  const saveMutation = useTatibSave();
+  const statusMutation = useTatibStatus();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSeverity, setSelectedSeverity] = useState<SeverityFilter>('all');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingRule, setEditingRule] = useState<TatibRule | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (message: string) => {
@@ -61,19 +70,38 @@ export function TatibManager() {
 
   const nextCode = `PASAL-${String(rules.length + 1).padStart(2, '0')}`;
 
-  const handleAddRule = (input: NewRuleInput, publish: boolean) => {
-    const newRule: TatibRule = {
-      ...input,
-      id: `tatib-${Date.now()}`,
-      code: nextCode,
-      isActive: publish,
-    };
+  const closeModal = () => {
+    setIsAddModalOpen(false);
+    setEditingRule(null);
+  };
 
-    setRules([newRule, ...rules]);
-    showToast(publish ? t('toast_rule_published', { code: newRule.code }) : t('toast_rule_draft'));
-    if (publish) {
-      setIsAddModalOpen(false);
+  const handleAddRule = async (input: NewRuleInput, publish: boolean) => {
+    const code = editingRule ? editingRule.code : nextCode;
+    try {
+      await saveMutation.mutateAsync({ code, input, publish, editing: editingRule });
+      showToast(publish ? t('toast_rule_published', { code }) : t('toast_rule_draft'));
+      if (publish || editingRule) {
+        closeModal();
+      }
+    } catch (error) {
+      showToast(getApiErrorMessage(error, 'Gagal menyimpan tata tertib.'));
     }
+  };
+
+  const handleToggleStatus = (rule: TatibRule) => {
+    statusMutation.mutate(
+      { id: rule.id, is_active: !rule.isActive },
+      {
+        onSuccess: () => {
+          showToast(
+            rule.isActive ? t('toast_rule_draft') : t('toast_rule_published', { code: rule.code }),
+          );
+        },
+        onError: (error) => {
+          showToast(getApiErrorMessage(error, 'Gagal mengubah status pasal.'));
+        },
+      },
+    );
   };
 
   return (
@@ -99,9 +127,11 @@ export function TatibManager() {
         ruleCount={rules.length}
         tierCount={mockSanctionTiers.length}
         onOpenAddModal={() => {
+          setEditingRule(null);
           setIsAddModalOpen(true);
         }}
         onDownloadHandbook={() => {
+          // shortcut: no backend handbook export endpoint, keep toast-only behavior
           showToast(t('toast_download_handbook'));
         }}
       />
@@ -125,20 +155,50 @@ export function TatibManager() {
           severityCounts={severityCounts}
         />
 
-        <TatibTable
-          rules={filteredRules}
-          onEditRule={(rule) => {
-            showToast(t('toast_edit_rule', { code: rule.code }));
-          }}
-        />
+        {rulesQuery.isPending && (
+          <div
+            className="h-72 animate-pulse rounded-2xl border border-border-control bg-card"
+            aria-hidden="true"
+          />
+        )}
+
+        {rulesQuery.isError && (
+          <div className="rounded-2xl border border-red-300 bg-red-50 p-6 text-center">
+            <p className="text-xs font-semibold text-red-700">
+              {getApiErrorMessage(rulesQuery.error, 'Gagal memuat tata tertib dari server.')}
+            </p>
+            <button
+              type="button"
+              onClick={() => {
+                void rulesQuery.refetch();
+              }}
+              className="mt-3 cursor-pointer rounded-xl border border-red-300 bg-white px-4 py-2 text-xs font-semibold text-red-700 hover:bg-red-100"
+            >
+              {/* shortcut: no TatibPage locale key for retry */}
+              Coba lagi
+            </button>
+          </div>
+        )}
+
+        {!rulesQuery.isPending && !rulesQuery.isError && (
+          <TatibTable
+            rules={filteredRules}
+            onEditRule={(rule) => {
+              setEditingRule(rule);
+              setIsAddModalOpen(true);
+            }}
+            onToggleStatus={handleToggleStatus}
+          />
+        )}
       </section>
 
       <TatibAddModal
+        key={editingRule?.id ?? 'new'}
         isOpen={isAddModalOpen}
-        nextCode={nextCode}
-        onClose={() => {
-          setIsAddModalOpen(false);
-        }}
+        nextCode={editingRule ? editingRule.code : nextCode}
+        editingRule={editingRule}
+        isSaving={saveMutation.isPending}
+        onClose={closeModal}
         onSubmit={handleAddRule}
       />
     </div>

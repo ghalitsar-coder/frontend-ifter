@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable eslint/no-shadow, eslint/no-use-before-define -- vendored shadcn/ui component, generated react-day-picker wrapper; identifiers kept in sync with upstream source; do not hand-edit */
 import { cn } from 'cn';
 import { ChevronLeftIcon, ChevronRightIcon, ChevronDownIcon } from 'lucide-react';
 import * as React from 'react';

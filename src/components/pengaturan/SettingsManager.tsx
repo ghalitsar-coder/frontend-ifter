@@ -4,7 +4,14 @@ import { CheckCircle2, Clock, MessageCircle, Scale, ShieldAlert, X } from 'lucid
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { defaultSystemSettings } from '@/data/mockSettings';
-import type { SettingsTab, SystemSettings } from '@/types/settings';
+import { ApiError } from '@/lib/api/client';
+import {
+  presencePolicyToSettings,
+  settingsToPresencePolicy,
+  useAttendanceSettings,
+  useUpdateAttendanceSettings,
+} from '@/lib/api/pengaturan';
+import type { PresencePolicy, SettingsTab, SystemSettings } from '@/types/settings';
 import { SettingsGeofencePanel } from './SettingsGeofencePanel';
 import { SettingsHeader } from './SettingsHeader';
 import { SettingsNotificationPanel } from './SettingsNotificationPanel';
@@ -17,6 +24,10 @@ const TABS = [
   { id: 'notifications', labelKey: 'tab_notifications', icon: MessageCircle },
 ] as const satisfies { id: SettingsTab; labelKey: string; icon: typeof Clock }[];
 
+// No 'toast_save_error' key exists in SettingsPage locales; backend messages
+// are Indonesian domain content, the fallback matches that style.
+const SAVE_ERROR_FALLBACK = 'Gagal menyimpan pengaturan, silakan coba lagi.';
+
 /**
  * Coordinator for operational policy state, tabs, and save feedback.
  *
@@ -28,8 +39,20 @@ export function SettingsManager() {
   const [settings, setSettings] = useState<SystemSettings>(defaultSystemSettings);
   const [savedSettings, setSavedSettings] = useState<SystemSettings>(defaultSystemSettings);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [presencePatch, setPresencePatch] = useState<Partial<PresencePolicy> | null>(null);
+  const { data: serverSettings } = useAttendanceSettings();
+  const updateAttendanceSettings = useUpdateAttendanceSettings();
 
-  const isDirty = JSON.stringify(settings) !== JSON.stringify(savedSettings);
+  // The gate window is server-driven; local edits are kept as a sparse patch
+  // so no effect-based state syncing is needed.
+  const savedPresence: PresencePolicy =
+    serverSettings === undefined
+      ? defaultSystemSettings.presence
+      : settingsToPresencePolicy(serverSettings);
+  const presence: PresencePolicy = { ...savedPresence, ...presencePatch };
+
+  const isDirty =
+    presencePatch !== null || JSON.stringify(settings) !== JSON.stringify(savedSettings);
 
   const showToast = (message: string) => {
     setToastMessage(message);
@@ -39,13 +62,28 @@ export function SettingsManager() {
   };
 
   const handleSave = () => {
-    setSavedSettings(settings);
-    showToast(t('toast_saved'));
+    // shortcut: no backend endpoints for geofence/notification policies, keep mock
+    if (serverSettings === undefined) {
+      showToast(SAVE_ERROR_FALLBACK);
+
+      return;
+    }
+
+    updateAttendanceSettings.mutate(presencePolicyToSettings(serverSettings, presence), {
+      onSuccess: () => {
+        setPresencePatch(null);
+        setSavedSettings(settings);
+        showToast(t('toast_saved'));
+      },
+      onError: (err) => {
+        showToast(err instanceof ApiError ? err.message : SAVE_ERROR_FALLBACK);
+      },
+    });
   };
 
   const handleReset = () => {
     setSettings(defaultSystemSettings);
-    setSavedSettings(defaultSystemSettings);
+    setPresencePatch(defaultSystemSettings.presence);
     showToast(t('toast_reset'));
   };
 
@@ -107,12 +145,9 @@ export function SettingsManager() {
 
           <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
             <SettingsPresencePanel
-              policy={settings.presence}
+              policy={presence}
               onChange={(patch) => {
-                setSettings((current) => ({
-                  ...current,
-                  presence: { ...current.presence, ...patch },
-                }));
+                setPresencePatch((current) => ({ ...current, ...patch }));
               }}
             />
             <SettingsGeofencePanel

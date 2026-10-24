@@ -1,9 +1,8 @@
 import { CheckCircle2, Gavel, Minus, Plus, Scale, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import { getRuleSeverity } from '@/data/mockTatib';
-import type { NewRuleInput, RuleSeverity } from '@/types/tatib';
-import { SEVERITY_STYLES } from './severityStyles';
+import type { NewRuleInput, RuleSeverity, TatibRule } from '@/types/tatib';
+import { getRuleSeverity, SEVERITY_STYLES } from './severityStyles';
 
 const SEVERITY_ORDER: RuleSeverity[] = ['ringan', 'sedang', 'berat', 'kritis'];
 
@@ -17,6 +16,8 @@ const AUTHORITIES = [
 
 /**
  * Modal form for publishing a new article of the school code of conduct.
+ * When `editingRule` is provided (and the parent remounts the modal with a
+ * rule-specific key) the fields are pre-filled for an update.
  *
  * @param props - Component properties.
  * @returns Modal JSX element or null.
@@ -24,17 +25,21 @@ const AUTHORITIES = [
 export function TatibAddModal(props: {
   isOpen: boolean;
   nextCode: string;
+  editingRule: TatibRule | null;
+  isSaving: boolean;
   onClose: () => void;
   onSubmit: (rule: NewRuleInput, publish: boolean) => void;
 }) {
   const t = useTranslations('TatibPage');
 
-  const [title, setTitle] = useState('');
-  const [detail, setDetail] = useState('');
-  const [points, setPoints] = useState(5);
-  const [procedure, setProcedure] = useState('');
-  const [authority, setAuthority] = useState('Guru Piket');
-  const [legalBasis, setLegalBasis] = useState('Tata Tertib Sekolah');
+  const [title, setTitle] = useState(props.editingRule?.title ?? '');
+  const [detail, setDetail] = useState(props.editingRule?.detail ?? '');
+  const [points, setPoints] = useState(props.editingRule?.points ?? 5);
+  const [procedure, setProcedure] = useState(props.editingRule?.procedure ?? '');
+  const [authority, setAuthority] = useState(props.editingRule?.authority ?? 'Guru Piket');
+  const [legalBasis, setLegalBasis] = useState(
+    props.editingRule?.legalBasis ?? 'Tata Tertib Sekolah',
+  );
 
   if (!props.isOpen) {
     return null;
@@ -317,7 +322,7 @@ export function TatibAddModal(props: {
           </button>
           <button
             type="button"
-            disabled={!isValid}
+            disabled={!isValid || props.isSaving}
             onClick={() => {
               handleSave(false);
             }}
@@ -327,7 +332,7 @@ export function TatibAddModal(props: {
           </button>
           <button
             type="button"
-            disabled={!isValid}
+            disabled={!isValid || props.isSaving}
             onClick={() => {
               handleSave(true);
             }}

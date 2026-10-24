@@ -9,56 +9,56 @@ export function RekapStatusLegend() {
   const t = useTranslations('RekapPage');
 
   return (
-    <section className="flex flex-col items-start justify-between gap-4 rounded-2xl bg-surface-card px-6 py-4 shadow-xs md:flex-row md:items-center">
-      <div className="flex items-center gap-2 text-sm font-semibold text-text-primary">
+    <section className="bg-surface-card flex flex-col items-start justify-between gap-4 rounded-2xl px-6 py-4 shadow-xs md:flex-row md:items-center">
+      <div className="text-text-primary flex items-center gap-2 text-sm font-semibold">
         <Info className="size-4 text-pine-deep" />
         <span>{t('legend_title')}</span>
       </div>
 
       <div className="flex flex-wrap items-center gap-2.5">
         {/* H: Hadir */}
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-status-present px-3 py-1 font-caption text-xs font-semibold text-pine-deep">
-          <span className="flex size-4 items-center justify-center rounded-full bg-pine-deep font-caption text-[10px] font-bold text-on-primary">
+        <div className="bg-status-present font-caption inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-pine-deep">
+          <span className="font-caption text-on-primary flex size-4 items-center justify-center rounded-full bg-pine-deep text-[10px] font-bold">
             H
           </span>
           <span>{t('legend_h')}</span>
         </div>
 
         {/* T: Terlambat */}
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-secondary-fixed px-3 py-1 font-caption text-xs font-semibold text-[#78350F]">
-          <span className="flex size-4 items-center justify-center rounded-full bg-[#78350F] font-caption text-[10px] font-bold text-on-primary">
+        <div className="bg-secondary-fixed font-caption inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-[#78350F]">
+          <span className="font-caption text-on-primary flex size-4 items-center justify-center rounded-full bg-[#78350F] text-[10px] font-bold">
             T
           </span>
           <span>{t('legend_t')}</span>
         </div>
 
         {/* S: Sakit */}
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-status-permission px-3 py-1 font-caption text-xs font-semibold text-[#1E3A8A]">
-          <span className="flex size-4 items-center justify-center rounded-full bg-[#1E3A8A] font-caption text-[10px] font-bold text-on-primary">
+        <div className="bg-status-permission font-caption inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-[#1E3A8A]">
+          <span className="font-caption text-on-primary flex size-4 items-center justify-center rounded-full bg-[#1E3A8A] text-[10px] font-bold">
             S
           </span>
           <span>{t('legend_s')}</span>
         </div>
 
         {/* I: Izin */}
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-status-active/40 px-3 py-1 font-caption text-xs font-semibold text-[#581C87]">
-          <span className="flex size-4 items-center justify-center rounded-full bg-[#581C87] font-caption text-[10px] font-bold text-on-primary">
+        <div className="bg-status-active/40 font-caption inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold text-[#581C87]">
+          <span className="font-caption text-on-primary flex size-4 items-center justify-center rounded-full bg-[#581C87] text-[10px] font-bold">
             I
           </span>
           <span>{t('legend_i')}</span>
         </div>
 
         {/* A: Alpa */}
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-status-absent px-3 py-1 font-caption text-xs font-semibold text-error">
-          <span className="flex size-4 items-center justify-center rounded-full bg-error font-caption text-[10px] font-bold text-on-primary">
+        <div className="bg-status-absent font-caption text-error inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold">
+          <span className="bg-error font-caption text-on-primary flex size-4 items-center justify-center rounded-full text-[10px] font-bold">
             A
           </span>
           <span>{t('legend_a')}</span>
         </div>
 
         {/* L: Libur */}
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-surface-container px-3 py-1 font-caption text-xs font-medium text-text-muted">
-          <span className="flex size-4 items-center justify-center rounded-full bg-outline-variant font-caption text-[10px] font-bold text-text-primary">
+        <div className="bg-surface-container font-caption text-text-muted inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium">
+          <span className="bg-outline-variant font-caption text-text-primary flex size-4 items-center justify-center rounded-full text-[10px] font-bold">
             L
           </span>
           <span>{t('legend_l')}</span>

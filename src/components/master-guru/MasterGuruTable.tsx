@@ -2,6 +2,7 @@ import {
   CalendarDays,
   Edit2,
   GraduationCap,
+  Link2,
   Mail,
   MapPin,
   MessageCircle,
@@ -9,7 +10,28 @@ import {
   Settings,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import type { TeacherAccount } from '@/lib/api/master-guru';
 import type { TeacherProfile } from '@/types/masterGuru';
+
+/**
+ * Tone classes for the role badge in the roles column.
+ * @param isAdmin - Role text mentions Admin.
+ * @param isHomeroom - Role text mentions Wali.
+ * @param isPiket - Role text mentions Piket.
+ * @returns Tailwind class fragment for the badge.
+ */
+function roleBadgeTone(isAdmin: boolean, isHomeroom: boolean, isPiket: boolean): string {
+  if (isAdmin) {
+    return 'border border-amber-300 bg-amber-100 text-amber-900';
+  }
+  if (isHomeroom) {
+    return 'border border-emerald-200 bg-emerald-50 text-emerald-800';
+  }
+  if (isPiket) {
+    return 'border border-sky-200 bg-sky-50 text-sky-800';
+  }
+  return 'bg-slate-100 text-slate-700';
+}
 
 /**
  * Responsive table displaying educator records, homeroom classes, and picket assignments.
@@ -21,6 +43,9 @@ export function MasterGuruTable(props: {
   teachers: TeacherProfile[];
   onEditTeacher: (teacher: TeacherProfile) => void;
   onAssignHomeroom: (teacher: TeacherProfile) => void;
+  accounts?: Record<string, TeacherAccount>;
+  isStatusUpdating?: boolean;
+  onToggleStatus?: (teacherId: string, name: string, next: 'active' | 'inactive') => void;
 }) {
   const t = useTranslations('MasterGuruPage');
 
@@ -54,7 +79,7 @@ export function MasterGuruTable(props: {
           <tbody className="divide-y divide-border-subtle">
             {props.teachers.map((teacher) => {
               const initials = teacher.name
-                .replace(/^(Drs\.|Bpk\.|Ibu)\s+/i, '')
+                .replace(/^(Drs\.|Bpk\.|Ibu)\s+/iu, '')
                 .split(' ')
                 .map((part) => part[0])
                 .slice(0, 2)
@@ -64,6 +89,7 @@ export function MasterGuruTable(props: {
               return (
                 <tr key={teacher.id} className="group transition-colors hover:bg-slate-50/80">
                   {/* Name & NIP */}
+                  {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
                   <td className="px-4 py-4 sm:px-6">
                     <div className="flex items-center gap-3">
                       <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-pine-deep text-xs font-bold text-white shadow-xs ring-1 ring-border-subtle">
@@ -76,9 +102,20 @@ export function MasterGuruTable(props: {
                         <span className="text-text-muted mt-0.5 text-[11px]">
                           {t('label_nip')}: {teacher.nip}
                         </span>
-                        <span className="text-[10px] font-medium text-amber-800">
-                          {teacher.subject}
-                        </span>
+                        {teacher.subject !== '' && (
+                          <span className="text-[10px] font-medium text-amber-800">
+                            {teacher.subject}
+                          </span>
+                        )}
+                        {props.accounts?.[teacher.id] !== undefined && (
+                          <span
+                            className="mt-0.5 flex items-center gap-1 text-[10px] font-semibold text-emerald-700"
+                            title={`Akun sistem terhubung: @${props.accounts[teacher.id]?.username}`}
+                          >
+                            <Link2 className="size-3 shrink-0" />@
+                            {props.accounts[teacher.id]?.username}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -88,15 +125,17 @@ export function MasterGuruTable(props: {
                     <div className="flex flex-col gap-1 text-xs">
                       <a
                         href={`mailto:${teacher.email}`}
+                        aria-label={teacher.email}
                         className="text-text-muted flex items-center gap-1.5 transition-colors hover:text-pine-deep"
                       >
                         <Mail className="text-text-muted size-3 shrink-0" />
                         <span className="max-w-[150px] truncate">{teacher.email}</span>
                       </a>
                       <a
-                        href={`https://wa.me/${teacher.phone.replaceAll(/[^0-9]/g, '')}`}
+                        href={`https://wa.me/${teacher.phone.replaceAll(/[^0-9]/gu, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
+                        aria-label={teacher.phone}
                         className="flex items-center gap-1.5 font-medium text-emerald-700 transition-colors hover:text-emerald-800"
                       >
                         <Phone className="size-3 shrink-0 text-emerald-600" />
@@ -116,15 +155,7 @@ export function MasterGuruTable(props: {
                         return (
                           <span
                             key={role}
-                            className={`rounded-md px-2 py-0.5 text-[10px] font-bold tracking-tight whitespace-nowrap ${
-                              isAdmin
-                                ? 'border border-amber-300 bg-amber-100 text-amber-900'
-                                : isHomeroom
-                                  ? 'border border-emerald-200 bg-emerald-50 text-emerald-800'
-                                  : isPiket
-                                    ? 'border border-sky-200 bg-sky-50 text-sky-800'
-                                    : 'bg-slate-100 text-slate-700'
-                            }`}
+                            className={`rounded-md px-2 py-0.5 text-[10px] font-bold tracking-tight whitespace-nowrap ${roleBadgeTone(isAdmin, isHomeroom, isPiket)}`}
                           >
                             {role}
                           </span>
@@ -142,7 +173,11 @@ export function MasterGuruTable(props: {
                           {teacher.homeroomClass.className}
                         </span>
                         <span className="text-text-muted mt-0.5 text-[11px]">
-                          ({teacher.homeroomClass.studentCount} {t('unit_students')})
+                          {teacher.homeroomClass.studentCount > 0 && (
+                            <>
+                              ({teacher.homeroomClass.studentCount} {t('unit_students')})
+                            </>
+                          )}
                         </span>
                       </div>
                     ) : (
@@ -176,16 +211,50 @@ export function MasterGuruTable(props: {
 
                   {/* Status */}
                   <td className="px-4 py-4">
-                    {teacher.status === 'active' ? (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100/70 px-2.5 py-1 text-[11px] font-bold text-emerald-800">
-                        <span className="size-1.5 rounded-full bg-emerald-600" />
-                        {t('status_badge_active')}
+                    {props.onToggleStatus === undefined ? (
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                          teacher.status === 'active'
+                            ? 'bg-emerald-100/70 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}
+                      >
+                        <span
+                          className={`size-1.5 rounded-full ${
+                            teacher.status === 'active' ? 'bg-emerald-600' : 'bg-amber-600'
+                          }`}
+                        />
+                        {teacher.status === 'active'
+                          ? t('status_badge_active')
+                          : t('status_badge_leave')}
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-800">
-                        <span className="size-1.5 rounded-full bg-amber-600" />
-                        {t('status_badge_leave')}
-                      </span>
+                      <button
+                        type="button"
+                        disabled={props.isStatusUpdating ?? false}
+                        title="Klik untuk mengubah status aktif/nonaktif"
+                        onClick={() => {
+                          props.onToggleStatus?.(
+                            teacher.id,
+                            teacher.name,
+                            teacher.status === 'active' ? 'inactive' : 'active',
+                          );
+                        }}
+                        className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors disabled:opacity-50 ${
+                          teacher.status === 'active'
+                            ? 'bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200/80'
+                            : 'bg-amber-100 text-amber-800 hover:bg-amber-200/80'
+                        }`}
+                      >
+                        <span
+                          className={`size-1.5 rounded-full ${
+                            teacher.status === 'active' ? 'bg-emerald-600' : 'bg-amber-600'
+                          }`}
+                        />
+                        {teacher.status === 'active'
+                          ? t('status_badge_active')
+                          : t('status_badge_leave')}
+                      </button>
                     )}
                   </td>
 
@@ -215,7 +284,7 @@ export function MasterGuruTable(props: {
                         <Edit2 className="size-4" />
                       </button>
                       <a
-                        href={`https://wa.me/${teacher.phone.replaceAll(/[^0-9]/g, '')}`}
+                        href={`https://wa.me/${teacher.phone.replaceAll(/[^0-9]/gu, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="rounded-lg p-1.5 text-emerald-600 transition-colors hover:bg-emerald-50 hover:text-emerald-700"

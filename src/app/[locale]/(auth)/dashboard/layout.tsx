@@ -1,6 +1,6 @@
-import { currentUser } from '@clerk/nextjs/server';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { AuthProvider } from '@/components/auth/AuthProvider';
 import { AttendlyShell } from '@/components/layout/AttendlyShell';
 
 type DashboardLayoutProps = {
@@ -30,17 +30,20 @@ export async function generateMetadata(props: DashboardLayoutProps): Promise<Met
 /**
  * Attendly school dashboard application shell layout.
  *
+ * AuthProvider performs the client-side session gate (refresh + /auth/me) and
+ * redirects unauthenticated visitors to sign-in; the HttpOnly refresh cookie
+ * is not readable here in cross-origin dev setups, so no server check.
+ *
  * @param props - Layout properties.
  * @returns Shell layout wrapping dashboard pages.
  */
 export default async function DashboardLayout(props: DashboardLayoutProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
-  const user = await currentUser();
 
   return (
-    <AttendlyShell userEmail={user?.primaryEmailAddress?.emailAddress}>
-      {props.children}
-    </AttendlyShell>
+    <AuthProvider>
+      <AttendlyShell>{props.children}</AttendlyShell>
+    </AuthProvider>
   );
 }

@@ -36,7 +36,7 @@ export function AttendanceHeader(props: { dateText?: string }) {
           <div className="flex flex-col">
             <span className="text-xs text-muted-foreground">{t('date_label')}</span>
             <span className="text-sm font-semibold text-foreground">
-              {props.dateText || t('current_date')}
+              {props.dateText ?? t('current_date')}
             </span>
           </div>
         </div>

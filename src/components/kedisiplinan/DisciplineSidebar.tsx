@@ -1,6 +1,5 @@
 import { AlertOctagon, Calendar, Download, Eye, Headphones, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { mockDisciplineWatchlist } from '@/data/mockDiscipline';
 import type { DisciplineWatchStudent } from '@/types/discipline';
 
 /**
@@ -111,6 +110,7 @@ function WatchlistActionButton(props: {
 
 /**
  * Trigger download of discipline handbook file.
+ * shortcut: no backend endpoint for the handbook document, keep local download.
  *
  * @param e - Click event.
  */
@@ -134,6 +134,7 @@ function handleHandbookDownload(e: React.MouseEvent) {
  * @returns Rendered discipline sidebar.
  */
 export function DisciplineSidebar(props: {
+  watchlist: DisciplineWatchStudent[];
   onSendParentCall: (studentName: string) => void;
   onScheduleBk: (studentName: string) => void;
   onReviewHistory: (studentName: string) => void;
@@ -150,7 +151,7 @@ export function DisciplineSidebar(props: {
             <h3 className="text-sm font-bold text-foreground">{t('watchlist_title')}</h3>
           </div>
           <span className="rounded-full border border-amber-gold/40 bg-amber-surface px-2 py-0.5 text-[11px] font-bold text-amber-dark">
-            {t('watchlist_students_count', { count: mockDisciplineWatchlist.length })}
+            {t('watchlist_students_count', { count: props.watchlist.length })}
           </span>
         </div>
 
@@ -159,7 +160,12 @@ export function DisciplineSidebar(props: {
         </p>
 
         <div className="space-y-3">
-          {mockDisciplineWatchlist.map((student) => (
+          {props.watchlist.length === 0 ? (
+            <p className="rounded-xl border border-border bg-surface-container-low p-3 text-[11px] text-muted-foreground">
+              Belum ada siswa dengan akumulasi poin &ge; 30 pada halaman ini.
+            </p>
+          ) : null}
+          {props.watchlist.map((student) => (
             <div
               key={student.id}
               className={`space-y-2 rounded-xl border p-3 ${getRiskContainerClass(student.riskLevel)}`}

@@ -13,7 +13,7 @@ const DAY_NAMES = ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sa'];
 
 export function generateOctober2026Days(): CalendarDayInfo[] {
   const days: CalendarDayInfo[] = [];
-  for (let i = 1; i <= 31; i++) {
+  for (let i = 1; i <= 31; i += 1) {
     // 2026-10-01 was Thursday (day index 4)
     const date = new Date(2026, 9, i);
     const dayOfWeek = date.getDay();
@@ -42,21 +42,22 @@ export function calculateAggregates(
 
   for (const status of Object.values(attendanceByDay)) {
     if (status === 'H') {
-      hadir++;
+      hadir += 1;
     } else if (status === 'T') {
-      terlambat++;
+      terlambat += 1;
     } else if (status === 'S') {
-      sakit++;
+      sakit += 1;
     } else if (status === 'I') {
-      izin++;
+      izin += 1;
     } else if (status === 'A') {
-      alpa++;
+      alpa += 1;
     }
   }
 
   // Hadir + Terlambat counts towards physical presence
   const presenceCount = hadir + terlambat;
-  const percentage = effectiveDays > 0 ? Math.round((presenceCount / effectiveDays) * 1000) / 10 : 0;
+  const percentage =
+    effectiveDays > 0 ? Math.round((presenceCount / effectiveDays) * 1000) / 10 : 0;
 
   let raporStatus: 'safe' | 'warning' | 'critical' = 'safe';
   if (alpa >= 2 || percentage < 85) {
@@ -88,11 +89,7 @@ function buildStudentRow(data: {
   const attendanceByDay: Record<number, DayAttendanceStatus> = {};
 
   for (const day of OCTOBER_2026_DAYS) {
-    if (day.isWeekend) {
-      attendanceByDay[day.dayNumber] = 'L';
-    } else {
-      attendanceByDay[day.dayNumber] = data.overrides?.[day.dayNumber] ?? 'H';
-    }
+    attendanceByDay[day.dayNumber] = day.isWeekend ? 'L' : (data.overrides?.[day.dayNumber] ?? 'H');
   }
 
   const aggregates = calculateAggregates(attendanceByDay, OCTOBER_EFFECTIVE_DAYS);
@@ -266,6 +263,10 @@ export const MOCK_REKAP_SUMMARY: RekapSummaryMetrics = {
 
 /**
  * Filter student matrix rows by search query and rapor status.
+ * @param rows - All matrix rows.
+ * @param search - Free-text search over name and NIS.
+ * @param filterStatus - Rapor status bucket, or 'all'.
+ * @returns Rows matching both filters.
  */
 export function filterMatrixRows(
   rows: StudentMatrixRow[],
@@ -276,9 +277,7 @@ export function filterMatrixRows(
 
   return rows.filter((row) => {
     const matchesSearch =
-      query === '' ||
-      row.name.toLowerCase().includes(query) ||
-      row.nis.includes(query);
+      query === '' || row.name.toLowerCase().includes(query) || row.nis.includes(query);
 
     const matchesStatus = filterStatus === 'all' || row.raporStatus === filterStatus;
 
@@ -288,11 +287,11 @@ export function filterMatrixRows(
 
 /**
  * Generate a CSV format string for exporting the attendance matrix.
+ * @param rows - Matrix rows to serialize.
+ * @param days - Calendar days that become CSV columns.
+ * @returns CSV document text.
  */
-export function generateCsvExport(
-  rows: StudentMatrixRow[],
-  days: CalendarDayInfo[],
-): string {
+export function generateCsvExport(rows: StudentMatrixRow[], days: CalendarDayInfo[]): string {
   const header = [
     'No',
     'NIS',

@@ -9,9 +9,11 @@ import {
   Hourglass,
   Pencil,
   Search,
+  XOctagon,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import type { DisciplineIncident, IncidentStatus } from '@/types/discipline';
+import type { DisciplineIncidentRow, IncidentDisplayStatus } from '@/lib/api/kedisiplinan';
+import { pageWindow } from '@/lib/api/kedisiplinan';
 
 /**
  * Get progress bar color class depending on point threshold.
@@ -66,7 +68,7 @@ function CategoryBadge(props: { categoryLabel: string; points: number }) {
  * @param props - Component properties.
  * @returns Rendered status badge.
  */
-function StatusBadge(props: { status: IncidentStatus }) {
+function StatusBadge(props: { status: IncidentDisplayStatus }) {
   if (props.status === 'tindak') {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-pine-deep px-2.5 py-1 text-[11px] font-bold text-white shadow-2xs">
@@ -94,6 +96,15 @@ function StatusBadge(props: { status: IncidentStatus }) {
     );
   }
 
+  if (props.status === 'dibatalkan') {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700">
+        <XOctagon className="size-3" />
+        Dibatalkan
+      </span>
+    );
+  }
+
   return (
     <span className="bg-surface-container inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
       <CheckCircle className="size-3 text-pine-deep" />
@@ -109,12 +120,20 @@ function StatusBadge(props: { status: IncidentStatus }) {
  * @returns Rendered discipline incident table.
  */
 export function DisciplineIncidentTable(props: {
-  incidents: DisciplineIncident[];
-  onViewDetail: (incident: DisciplineIncident) => void;
-  onEditIncident: (incident: DisciplineIncident) => void;
-  onViewHistory: (incident: DisciplineIncident) => void;
+  incidents: DisciplineIncidentRow[];
+  isLoading: boolean;
+  pagination: { page: number; pageSize: number; total: number };
+  onPageChange: (page: number) => void;
+  onPageSizeChange: (size: number) => void;
+  onViewDetail: (incident: DisciplineIncidentRow) => void;
+  onEditIncident: (incident: DisciplineIncidentRow) => void;
+  onViewHistory: (incident: DisciplineIncidentRow) => void;
 }) {
   const t = useTranslations('DisciplinePage');
+
+  const { page, pageSize, total } = props.pagination;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const pages = pageWindow(page, totalPages);
 
   return (
     <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
@@ -153,7 +172,9 @@ export function DisciplineIncidentTable(props: {
             {props.incidents.length === 0 ? (
               <tr>
                 <td colSpan={8} className="py-12 text-center text-muted-foreground">
-                  Tidak ada data insiden kedisiplinan yang cocok dengan filter.
+                  {props.isLoading
+                    ? 'Memuat data pelanggaran…'
+                    : 'Tidak ada data insiden kedisiplinan yang cocok dengan filter.'}
                 </td>
               </tr>
             ) : (
@@ -311,16 +332,20 @@ export function DisciplineIncidentTable(props: {
           <span>{t('rows_per_page')}</span>
           <select
             aria-label={t('rows_per_page')}
+            value={String(pageSize)}
+            onChange={(e) => {
+              props.onPageSizeChange(Number(e.target.value));
+            }}
             className="rounded-lg border border-border bg-card px-2 py-1 text-xs text-foreground focus:ring-1 focus:ring-pine-deep"
           >
-            <option>10</option>
-            <option>25</option>
-            <option>50</option>
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
           </select>
           <span>
             {t('showing_count', {
               count: props.incidents.length,
-              total: 42,
+              total,
             })}
           </span>
         </div>
@@ -328,40 +353,40 @@ export function DisciplineIncidentTable(props: {
         <div className="flex items-center gap-1">
           <button
             type="button"
-            disabled
+            disabled={page <= 1}
             aria-label="Previous Page"
-            className="rounded-lg border border-border bg-card p-1 text-muted-foreground opacity-50 shadow-2xs"
+            onClick={() => {
+              props.onPageChange(page - 1);
+            }}
+            className="rounded-lg border border-border bg-card p-1 text-muted-foreground shadow-2xs transition-colors hover:bg-muted disabled:opacity-50 disabled:hover:bg-card"
           >
             <ChevronLeft className="size-4" />
           </button>
+          {pages.map((number) => (
+            <button
+              key={number}
+              type="button"
+              onClick={() => {
+                props.onPageChange(number);
+              }}
+              aria-current={number === page ? 'page' : undefined}
+              className={`rounded-lg px-3 py-1 shadow-2xs transition-colors ${
+                number === page
+                  ? 'bg-pine-deep font-bold text-white'
+                  : 'border border-border bg-card text-foreground hover:bg-muted'
+              }`}
+            >
+              {number}
+            </button>
+          ))}
           <button
             type="button"
-            className="rounded-lg bg-pine-deep px-3 py-1 font-bold text-white shadow-2xs"
-          >
-            1
-          </button>
-          <button
-            type="button"
-            className="rounded-lg border border-border bg-card px-3 py-1 text-foreground transition-colors hover:bg-muted"
-          >
-            2
-          </button>
-          <button
-            type="button"
-            className="rounded-lg border border-border bg-card px-3 py-1 text-foreground transition-colors hover:bg-muted"
-          >
-            3
-          </button>
-          <button
-            type="button"
-            className="rounded-lg border border-border bg-card px-3 py-1 text-foreground transition-colors hover:bg-muted"
-          >
-            4
-          </button>
-          <button
-            type="button"
+            disabled={page >= totalPages}
             aria-label="Next Page"
-            className="rounded-lg border border-border bg-card p-1 text-muted-foreground shadow-2xs transition-colors hover:bg-muted"
+            onClick={() => {
+              props.onPageChange(page + 1);
+            }}
+            className="rounded-lg border border-border bg-card p-1 text-muted-foreground shadow-2xs transition-colors hover:bg-muted disabled:opacity-50 disabled:hover:bg-card"
           >
             <ChevronRight className="size-4" />
           </button>

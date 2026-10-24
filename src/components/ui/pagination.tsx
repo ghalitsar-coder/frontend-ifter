@@ -1,3 +1,4 @@
+/* oxlint-disable jsx-a11y/anchor-has-content -- vendored shadcn/ui component, link content arrives via polymorphic render/children props; do not hand-edit */
 import { cn } from 'cn';
 import { ChevronLeftIcon, ChevronRightIcon, MoreHorizontalIcon } from 'lucide-react';
 import * as React from 'react';

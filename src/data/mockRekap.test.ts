@@ -13,17 +13,13 @@ describe('mockRekap calculations and utilities', () => {
     const days = generateOctober2026Days();
     expect(days).toHaveLength(31);
 
-    // Day 1 is Thursday (weekday)
-    expect(days[0]?.dayNumber).toBe(1);
-    expect(days[0]?.isWeekend).toBeFalsy();
-
-    // Day 3 is Saturday (weekend)
-    expect(days[2]?.dayNumber).toBe(3);
-    expect(days[2]?.isWeekend).toBeTruthy();
-
-    // Day 4 is Sunday (weekend)
-    expect(days[3]?.dayNumber).toBe(4);
-    expect(days[3]?.isWeekend).toBeTruthy();
+    // Day 1 Thu (weekday), day 2 Fri (weekday), day 3 Sat and day 4 Sun (weekend)
+    expect(days.slice(0, 4).map((d) => [d.dayNumber, d.isWeekend])).toStrictEqual([
+      [1, false],
+      [2, false],
+      [3, true],
+      [4, true],
+    ]);
 
     expect(OCTOBER_EFFECTIVE_DAYS).toBe(22);
   });

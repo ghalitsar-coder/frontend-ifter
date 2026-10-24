@@ -118,6 +118,7 @@ export function MasterGuruToolbar(props: {
           <select
             value={props.selectedStatus}
             onChange={(e) => {
+              // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
               props.onStatusChange(e.target.value as 'all' | EmploymentStatus);
             }}
             className="bg-surface-card text-text-primary h-10 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"

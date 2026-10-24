@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable eslint/no-use-before-define -- vendored shadcn/ui component, generated shadcn/ui progress wrapper ordering from upstream; do not hand-edit */
 import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
 import { cn } from 'cn';
 

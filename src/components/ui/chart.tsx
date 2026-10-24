@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable eslint/no-shadow, eslint/no-use-before-define, eslint/complexity, eslint/eqeqeq, eslint/no-eq-null, react/jsx-no-constructed-context-values, react/no-danger, typescript/no-unsafe-type-assertion, typescript/no-unsafe-argument, typescript/restrict-template-expressions, typescript/consistent-return -- vendored shadcn/ui component, generated recharts theming layer from upstream shadcn/ui; CSS variable lookups and tooltip HTML rendering are upstream designs; do not hand-edit */
 import { cn } from 'cn';
 import * as React from 'react';
 import * as RechartsPrimitive from 'recharts';

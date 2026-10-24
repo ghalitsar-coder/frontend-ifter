@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable eslint/no-use-before-define -- vendored shadcn/ui component, generated shadcn/ui scroll area wrapper ordering from upstream; do not hand-edit */
 import { ScrollArea as ScrollAreaPrimitive } from '@base-ui/react/scroll-area';
 import { cn } from 'cn';
 

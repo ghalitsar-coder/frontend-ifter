@@ -1,6 +1,5 @@
 'use client';
 
-import { SignOutButton } from '@clerk/nextjs';
 import {
   Bell,
   Calendar,
@@ -25,6 +24,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
 import { Link, usePathname } from '@/libs/I18nNavigation';
 
@@ -35,8 +35,9 @@ import { Link, usePathname } from '@/libs/I18nNavigation';
  * @param props - Layout properties containing page children.
  * @returns Shell JSX layout.
  */
-export function AttendlyShell(props: { children: React.ReactNode; userEmail?: string }) {
+export function AttendlyShell(props: { children: React.ReactNode }) {
   const t = useTranslations('DashboardLayout');
+  const auth = useAuth();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -199,16 +200,17 @@ export function AttendlyShell(props: { children: React.ReactNode; userEmail?: st
           <div className="h-6 w-px bg-[#E4E8E6]" />
 
           {/* Sign Out Button */}
-          <SignOutButton>
-            <button
-              type="button"
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-transparent px-3 py-1.5 text-xs font-semibold text-[#6E7A76] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
-              title={t('sign_out')}
-            >
-              <LogOut className="size-3.5" />
-              <span className="hidden sm:inline">{t('sign_out')}</span>
-            </button>
-          </SignOutButton>
+          <button
+            type="button"
+            onClick={() => {
+              void auth.logout();
+            }}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-transparent px-3 py-1.5 text-xs font-semibold text-[#6E7A76] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+            title={t('sign_out')}
+          >
+            <LogOut className="size-3.5" />
+            <span className="hidden sm:inline">{t('sign_out')}</span>
+          </button>
         </div>
       </header>
 
@@ -296,8 +298,10 @@ export function AttendlyShell(props: { children: React.ReactNode; userEmail?: st
               </div>
               <CheckCircle2 className="size-4 text-[#173F36]" />
             </div>
-            {props.userEmail && (
-              <p className="truncate px-1 text-[10px] text-[#6E7A76]">Akun: {props.userEmail}</p>
+            {(auth.user?.email ?? auth.user?.username) !== undefined && (
+              <p className="truncate px-1 text-[10px] text-[#6E7A76]">
+                Akun: {auth.user?.email ?? auth.user?.username}
+              </p>
             )}
           </div>
         </aside>
@@ -387,15 +391,16 @@ export function AttendlyShell(props: { children: React.ReactNode; userEmail?: st
               </div>
 
               <div className="border-t border-[#E4E8E6] pt-3">
-                <SignOutButton>
-                  <button
-                    type="button"
-                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition-colors hover:bg-red-100"
-                  >
-                    <LogOut className="size-4" />
-                    <span>{t('sign_out')}</span>
-                  </button>
-                </SignOutButton>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void auth.logout();
+                  }}
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition-colors hover:bg-red-100"
+                >
+                  <LogOut className="size-4" />
+                  <span>{t('sign_out')}</span>
+                </button>
               </div>
             </div>
           </div>

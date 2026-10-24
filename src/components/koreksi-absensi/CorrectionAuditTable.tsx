@@ -1,6 +1,4 @@
 import {
-  ArrowRight,
-  BadgeCheck,
   Check,
   CheckCircle2,
   ChevronLeft,
@@ -10,7 +8,7 @@ import {
   Eye,
   Hourglass,
   MoreVertical,
-  Paperclip,
+  PencilLine,
   Plus,
   Star,
   X,
@@ -20,8 +18,8 @@ import {
   auditAvatarTones,
   attendanceStatusStyles,
 } from '@/components/koreksi-absensi/statusStyles';
-import type { paginateCorrectionLogs } from '@/data/mockAttendanceCorrection';
-import type { AttendanceStatus, CorrectionLog } from '@/types/attendanceCorrection';
+import type { CorrectionRow, PaginationMeta } from '@/lib/api/koreksi-absensi';
+import type { AttendanceStatus } from '@/types/attendanceCorrection';
 
 const statusIcons = {
   alpa: X,
@@ -52,20 +50,31 @@ function StatusPill(props: { status: AttendanceStatus }) {
 }
 
 /**
- * Audit log table with verification state, evidence, and ledger actions.
+ * Audit log table over GET /attendance/history: one row per recorded session
+ * with its current status, verification (day-lock) state, and ledger actions.
  *
- * @param props - Page of audit entries, pagination info, and handlers.
+ * @param props - Page of audit rows, pagination meta, and handlers.
  * @returns Audit table panel.
  */
 export function CorrectionAuditTable(props: {
-  logs: CorrectionLog[];
-  pagination: ReturnType<typeof paginateCorrectionLogs>;
+  rows: CorrectionRow[];
+  pagination: PaginationMeta;
+  loading: boolean;
+  error: string | null;
   onPageChange: (page: number) => void;
-  onOpenEvidence: (log: CorrectionLog) => void;
-  onOpenHash: (log: CorrectionLog) => void;
+  onOpenEvidence: (row: CorrectionRow) => void;
+  onOpenLedger: (row: CorrectionRow) => void;
+  onCorrect: (row: CorrectionRow) => void;
 }) {
   const t = useTranslations('AttendanceCorrectionPage');
   const pages = Array.from({ length: props.pagination.totalPages }, (_, index) => index + 1);
+
+  let bodyMessage = t('table_empty');
+  if (props.loading) {
+    bodyMessage = 'Memuat riwayat absensi…';
+  } else if (props.error !== null) {
+    bodyMessage = props.error;
+  }
 
   return (
     <section className="rounded-2xl border border-border-subtle bg-card shadow-xs">
@@ -107,20 +116,20 @@ export function CorrectionAuditTable(props: {
             </tr>
           </thead>
           <tbody className="divide-y divide-border-subtle">
-            {props.pagination.items.map((log) => {
-              const initials = log.student.name
+            {props.rows.map((row, index) => {
+              const initials = row.student.name
                 .split(' ')
                 .map((part) => part[0])
                 .slice(0, 2)
                 .join('');
 
               return (
-                <tr key={log.id} className="align-top transition-colors hover:bg-hover-row">
+                <tr key={row.recordId} className="align-top transition-colors hover:bg-hover-row">
                   <td className="min-w-[8.5rem] px-5 py-4">
-                    <p className="text-xs font-bold whitespace-nowrap text-pine-deep">{log.id}</p>
+                    <p className="text-xs font-bold whitespace-nowrap text-pine-deep">{row.id}</p>
                     <p className="mt-0.5 flex items-center gap-1 text-[10px] whitespace-nowrap text-muted-foreground">
                       <Clock3 className="size-2.5" />
-                      {log.loggedDate}, {log.loggedTime}
+                      {row.loggedDate}, {row.loggedTime}
                     </p>
                   </td>
 
@@ -129,17 +138,17 @@ export function CorrectionAuditTable(props: {
                     <div className="flex items-center gap-2.5">
                       <span
                         className={`flex size-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
-                          auditAvatarTones[props.logs.indexOf(log) % auditAvatarTones.length]
+                          auditAvatarTones[index % auditAvatarTones.length]
                         }`}
                       >
                         {initials}
                       </span>
                       <div>
                         <p className="text-xs font-bold whitespace-nowrap text-foreground">
-                          {log.student.name}
+                          {row.student.name}
                         </p>
                         <p className="text-[10px] whitespace-nowrap text-muted-foreground">
-                          NIS: {log.student.nis} • {log.student.className}
+                          NIS: {row.student.nis} • {row.student.className}
                         </p>
                       </div>
                     </div>
@@ -147,58 +156,35 @@ export function CorrectionAuditTable(props: {
 
                   <td className="min-w-[7.5rem] px-3 py-4">
                     <p className="text-xs font-semibold whitespace-nowrap text-foreground">
-                      {log.sessionDate}
+                      {row.sessionDate}
                     </p>
                     <p className="text-[10px] whitespace-nowrap text-muted-foreground">
-                      {log.sessionLabel}
+                      {row.sessionLabel}
                     </p>
                   </td>
 
                   <td className="px-3 py-4">
                     <div className="flex items-start gap-1.5">
-                      <StatusPill status={log.fromStatus} />
-                      <ArrowRight className="mt-0.5 size-3 shrink-0 text-muted-foreground" />
-                      <div>
-                        <StatusPill status={log.toStatus} />
-                        <p className="mt-0.5 text-[9px] font-medium text-muted-foreground">
-                          {log.toNote}
-                        </p>
-                      </div>
+                      <StatusPill status={row.status} />
+                      <p className="mt-0.5 text-[9px] font-medium text-muted-foreground">
+                        {row.isLate ? 'Hadir Terlambat' : 'Status tercatat'}
+                      </p>
                     </div>
                   </td>
 
                   <td className="max-w-[17rem] px-3 py-4">
-                    <p className="text-[11px] leading-relaxed text-foreground/80">{log.reason}</p>
-                    {log.attachment && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          props.onOpenEvidence(log);
-                        }}
-                        className="mt-1.5 inline-flex cursor-pointer items-center gap-1 rounded-md bg-surface-container-low px-1.5 py-1 text-[10px] font-semibold text-pine-deep transition-colors hover:bg-pine-light"
-                      >
-                        <Paperclip className="size-3" />
-                        {log.attachment.fileName}
-                        <span className="font-normal text-muted-foreground">
-                          • {log.attachment.fileSize}
-                        </span>
-                      </button>
-                    )}
-                    {log.confirmationNote && (
-                      <p className="mt-1.5 inline-flex items-center gap-1 rounded-md bg-pine-light px-1.5 py-1 text-[10px] font-semibold text-pine-deep">
-                        <BadgeCheck className="size-3" />
-                        {log.confirmationNote}
-                      </p>
-                    )}
+                    <p className="text-[11px] leading-relaxed text-foreground/80">{row.reason}</p>
                   </td>
 
                   <td className="min-w-[8.5rem] px-3 py-4">
-                    <p className="text-xs font-semibold text-foreground">{log.officer.name}</p>
-                    <p className="text-[10px] text-muted-foreground">{log.officer.role}</p>
+                    <p className="text-xs font-semibold text-foreground">{row.sourceLabel}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      {row.closed ? 'Hari telah ditutup' : 'Hari masih terbuka'}
+                    </p>
                   </td>
 
                   <td className="px-3 py-4">
-                    {log.verification === 'validated' ? (
+                    {row.closed ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-pine-light px-2 py-1 text-[10px] font-bold whitespace-nowrap text-pine-deep">
                         <CheckCircle2 className="size-3" />
                         {t('verification_validated')}
@@ -216,7 +202,19 @@ export function CorrectionAuditTable(props: {
                       <button
                         type="button"
                         onClick={() => {
-                          props.onOpenEvidence(log);
+                          props.onCorrect(row);
+                        }}
+                        title="Koreksi kehadiran"
+                        aria-label={`Koreksi kehadiran ${row.student.name}`}
+                        className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border-control bg-card px-2 py-1 text-[10px] font-bold text-pine-deep transition-colors hover:bg-pine-light"
+                      >
+                        <PencilLine className="size-3" />
+                        Koreksi
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          props.onOpenEvidence(row);
                         }}
                         className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-border-control bg-card px-2 py-1 text-[10px] font-bold text-pine-deep transition-colors hover:bg-pine-light"
                       >
@@ -226,9 +224,9 @@ export function CorrectionAuditTable(props: {
                       <button
                         type="button"
                         onClick={() => {
-                          props.onOpenHash(log);
+                          props.onOpenLedger(row);
                         }}
-                        aria-label={t('btn_ledger', { id: log.id })}
+                        aria-label={t('btn_ledger', { id: row.id })}
                         className="flex size-7 cursor-pointer items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-surface-container-low hover:text-pine-deep"
                       >
                         <MoreVertical className="size-3.5" />
@@ -239,10 +237,10 @@ export function CorrectionAuditTable(props: {
               );
             })}
 
-            {props.pagination.items.length === 0 && (
+            {(props.loading || props.error !== null || props.rows.length === 0) && (
               <tr>
                 <td colSpan={8} className="px-5 py-10 text-center text-xs text-muted-foreground">
-                  {t('table_empty')}
+                  {bodyMessage}
                 </td>
               </tr>
             )}

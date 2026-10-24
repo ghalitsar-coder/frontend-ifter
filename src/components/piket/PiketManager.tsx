@@ -4,6 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { PiketActiveCompensation } from '@/components/piket/PiketActiveCompensation';
+import { PiketDutyRoster } from '@/components/piket/PiketDutyRoster';
 import { PiketHeader } from '@/components/piket/PiketHeader';
 import { PiketLiveTapStream } from '@/components/piket/PiketLiveTapStream';
 import { PiketManualTapModal } from '@/components/piket/PiketManualTapModal';
@@ -17,6 +18,7 @@ import {
   INITIAL_PIKET_METRICS,
   INITIAL_RFID_TAP_LOGS,
 } from '@/data/mockPiket';
+import { onDutyTeacherNames, todayIsoDate, useDutyAssignments } from '@/lib/api/piket';
 import type {
   ActiveCompensation,
   GateFilterOptions,
@@ -34,7 +36,9 @@ import type { RotationSubmission } from '@/types/teacherRotation';
 export function PiketManager() {
   const t = useTranslations('PiketPage');
 
-  const [shiftInfo, setShiftInfo] = useState<GateShiftInfo>(INITIAL_GATE_SHIFT);
+  const [isGateOpen, setIsGateOpen] = useState(INITIAL_GATE_SHIFT.isGateOpen);
+  // shortcut: no backend endpoint for RFID tap stream / gate telemetry /
+  // compensation tickets — tap logs, metrics and compensations stay mock.
   const [metrics, setMetrics] = useState<PiketMetricsType>(INITIAL_PIKET_METRICS);
   const [logs, setLogs] = useState<RfidTapLog[]>(INITIAL_RFID_TAP_LOGS);
   const [compensations, setCompensations] = useState<ActiveCompensation[]>(
@@ -49,6 +53,20 @@ export function PiketManager() {
   const [isRotationOpen, setIsRotationOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState('07:07:42 WIB');
   const [toast, setToast] = useState<{ title: string; desc: string } | null>(null);
+
+  // Real duty roster (GET /duty-assignments, admin-only). Non-admins receive a
+  // 403 and the roster data stays undefined, so the header keeps the mock
+  // on-duty names as a fallback.
+  const dutyAssignmentsQuery = useDutyAssignments();
+  const onDutyTeachers =
+    dutyAssignmentsQuery.data === undefined
+      ? INITIAL_GATE_SHIFT.onDutyTeachers
+      : onDutyTeacherNames(dutyAssignmentsQuery.data, todayIsoDate());
+  const shiftInfo: GateShiftInfo = {
+    ...INITIAL_GATE_SHIFT,
+    isGateOpen,
+    onDutyTeachers,
+  };
 
   // Clock tick simulator
   useEffect(() => {
@@ -72,9 +90,10 @@ export function PiketManager() {
     }, 3800);
   };
 
+  // shortcut: no backend endpoint for gate open/close or bell trigger, keep local-only toggle.
   const handleToggleGate = () => {
-    const nextState = !shiftInfo.isGateOpen;
-    setShiftInfo((prev) => ({ ...prev, isGateOpen: nextState }));
+    const nextState = !isGateOpen;
+    setIsGateOpen(nextState);
     if (nextState) {
       showToast(t('toast_gate_opened_title'), t('toast_gate_opened_desc'));
     } else {
@@ -135,6 +154,7 @@ export function PiketManager() {
     );
   };
 
+  // shortcut: no backend endpoint for the gate uniform-infraction flow, keep mock.
   const handleUniformSubmit = (_data: {
     studentName: string;
     infractionIds: string[];
@@ -170,6 +190,8 @@ export function PiketManager() {
     );
   };
 
+  // shortcut: no backend endpoint for substitute-rotation eligibility/SK decrees
+  // (real duty assignment goes through PiketDutyRoster -> POST /duty-assignments), keep mock.
   const handleRotationConfirm = (submission: RotationSubmission) => {
     setIsRotationOpen(false);
     showToast(
@@ -191,6 +213,9 @@ export function PiketManager() {
         onRingBell={handleRingBell}
         onToggleGate={handleToggleGate}
       />
+
+      {/* Duty Roster (GET/POST /duty-assignments, PUT /duty-assignments/:id/end) */}
+      <PiketDutyRoster onToast={showToast} />
 
       {/* 5 KPI Telemetry Cards */}
       <PiketMetrics metrics={metrics} />

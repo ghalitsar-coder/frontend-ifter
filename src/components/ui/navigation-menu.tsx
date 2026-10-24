@@ -1,3 +1,4 @@
+/* oxlint-disable eslint/no-use-before-define -- vendored shadcn/ui component, generated shadcn/ui navigation menu ordering kept in sync with upstream; do not hand-edit */
 import { NavigationMenu as NavigationMenuPrimitive } from '@base-ui/react/navigation-menu';
 import { cva } from 'class-variance-authority';
 import { cn } from 'cn';

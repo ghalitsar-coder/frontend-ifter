@@ -3,6 +3,72 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import type { StudentProfile } from '@/types/masterSiswa';
 
+const attendanceTones = {
+  high: { badge: 'bg-emerald-100 text-emerald-800', bar: 'bg-pine-deep' },
+  mid: { badge: 'bg-amber-100 text-amber-800', bar: 'bg-amber-gold' },
+  low: { badge: 'bg-rose-100 text-rose-800', bar: 'bg-rose-600' },
+} as const;
+
+type AttendanceTone = keyof typeof attendanceTones;
+
+/**
+ * Buckets a semester attendance rate into a color tone.
+ * @param rate - Attendance percentage (0-100).
+ * @returns The tone bucket for the rate.
+ */
+function attendanceToneFor(rate: number): AttendanceTone {
+  if (rate >= 95) {
+    return 'high';
+  }
+  if (rate >= 90) {
+    return 'mid';
+  }
+  return 'low';
+}
+
+const statusBadgeClasses = {
+  active: 'border border-emerald-300 bg-emerald-100 text-emerald-900',
+  mutation: 'border border-amber-300 bg-amber-100 text-amber-900',
+  alumni: 'border border-gray-300 bg-gray-100 text-gray-800',
+} as const;
+
+const statusBadgeLabelKeys = {
+  active: 'status_badge_active',
+  mutation: 'status_badge_mutation',
+  alumni: 'status_badge_alumni',
+} as const;
+
+/**
+ * Pill showing accumulated discipline points with stage coloring.
+ * @param props - Points bucket inputs.
+ * @param props.points - Accumulated discipline points.
+ * @param props.stage - Optional escalation stage label.
+ * @returns Badge JSX element.
+ */
+function DisciplineBadge(props: { points: number; stage?: string }) {
+  const t = useTranslations('MasterSiswaPage');
+  if (props.points === 0) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
+        <span className="size-1.5 rounded-full bg-emerald-600" />0 {t('unit_points')}
+      </span>
+    );
+  }
+  const critical = props.points > 40;
+  return (
+    <span
+      className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs ${
+        critical
+          ? 'border-rose-200 bg-rose-50 font-bold text-rose-700'
+          : 'border-amber-200 bg-amber-50 font-semibold text-amber-800'
+      }`}
+    >
+      <span className={`size-1.5 rounded-full ${critical ? 'bg-rose-600' : 'bg-amber-600'}`} />
+      {props.points} {t('unit_points')} {props.stage ? `(${props.stage})` : ''}
+    </span>
+  );
+}
+
 /**
  * Data table rendering student records with selection, sorting, and action triggers.
  *
@@ -11,6 +77,7 @@ import type { StudentProfile } from '@/types/masterSiswa';
  */
 export function MasterSiswaTable(props: {
   students: StudentProfile[];
+  isLoading?: boolean;
   selectedStudentIds: string[];
   onToggleSelectAll: () => void;
   onToggleSelectStudent: (id: string) => void;
@@ -78,8 +145,15 @@ export function MasterSiswaTable(props: {
                 <td colSpan={9} className="text-text-muted p-8 text-center">
                   <div className="flex flex-col items-center justify-center gap-2">
                     <User className="text-text-muted/60 size-8" />
-                    <p className="text-sm font-semibold">{t('empty_students_title')}</p>
-                    <p className="text-text-muted text-xs">{t('empty_students_desc')}</p>
+                    <p className="text-sm font-semibold">
+                      {/* shortcut: no loading locale key in MasterSiswaPage namespace */}
+                      {props.isLoading === true
+                        ? 'Memuat data siswa...'
+                        : t('empty_students_title')}
+                    </p>
+                    {!props.isLoading && (
+                      <p className="text-text-muted text-xs">{t('empty_students_desc')}</p>
+                    )}
                   </div>
                 </td>
               </tr>
@@ -108,6 +182,7 @@ export function MasterSiswaTable(props: {
                     </td>
 
                     {/* NIS & Photo */}
+                    {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border-control bg-pine-light text-xs font-bold text-pine-deep">
@@ -142,6 +217,7 @@ export function MasterSiswaTable(props: {
                     </td>
 
                     {/* Name & NISN */}
+                    {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
                     <td className="p-4">
                       <div>
                         <button
@@ -170,6 +246,7 @@ export function MasterSiswaTable(props: {
                     </td>
 
                     {/* Attendance */}
+                    {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
                     <td className="p-4">
                       <div className="flex w-32 flex-col gap-1.5">
                         <div className="flex items-center justify-between text-xs">
@@ -177,26 +254,14 @@ export function MasterSiswaTable(props: {
                             {student.semesterAttendanceRate}%
                           </span>
                           <span
-                            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
-                              student.semesterAttendanceRate >= 95
-                                ? 'bg-emerald-100 text-emerald-800'
-                                : (student.semesterAttendanceRate >= 90
-                                  ? 'bg-amber-100 text-amber-800'
-                                  : 'bg-rose-100 text-rose-800')
-                            }`}
+                            className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${attendanceTones[attendanceToneFor(student.semesterAttendanceRate)].badge}`}
                           >
                             {student.attendanceCategory}
                           </span>
                         </div>
                         <div className="bg-surface-container h-1.5 w-full overflow-hidden rounded-full">
                           <div
-                            className={`h-1.5 rounded-full ${
-                              student.semesterAttendanceRate >= 95
-                                ? 'bg-pine-deep'
-                                : (student.semesterAttendanceRate >= 90
-                                  ? 'bg-amber-gold'
-                                  : 'bg-rose-600')
-                            }`}
+                            className={`h-1.5 rounded-full ${attendanceTones[attendanceToneFor(student.semesterAttendanceRate)].bar}`}
                             style={{ width: `${student.semesterAttendanceRate}%` }}
                           />
                         </div>
@@ -205,46 +270,23 @@ export function MasterSiswaTable(props: {
 
                     {/* Discipline points */}
                     <td className="p-4">
-                      {student.disciplinePoints === 0 ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-800">
-                          <span className="size-1.5 rounded-full bg-emerald-600" />0{' '}
-                          {t('unit_points')}
-                        </span>
-                      ) : (student.disciplinePoints > 40 ? (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-1 text-xs font-bold text-rose-700">
-                          <span className="size-1.5 rounded-full bg-rose-600" />
-                          {student.disciplinePoints} {t('unit_points')}{' '}
-                          {student.disciplineStage ? `(${student.disciplineStage})` : ''}
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs font-semibold text-amber-800">
-                          <span className="size-1.5 rounded-full bg-amber-600" />
-                          {student.disciplinePoints} {t('unit_points')}{' '}
-                          {student.disciplineStage ? `(${student.disciplineStage})` : ''}
-                        </span>
-                      ))}
+                      <DisciplineBadge
+                        points={student.disciplinePoints}
+                        stage={student.disciplineStage}
+                      />
                     </td>
 
                     {/* Status */}
                     <td className="p-4">
                       <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                          student.status === 'active'
-                            ? 'border border-emerald-300 bg-emerald-100 text-emerald-900'
-                            : (student.status === 'mutation'
-                              ? 'border border-amber-300 bg-amber-100 text-amber-900'
-                              : 'border border-gray-300 bg-gray-100 text-gray-800')
-                        }`}
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${statusBadgeClasses[student.status]}`}
                       >
-                        {student.status === 'active'
-                          ? t('status_badge_active')
-                          : (student.status === 'mutation'
-                            ? t('status_badge_mutation')
-                            : t('status_badge_alumni'))}
+                        {t(statusBadgeLabelKeys[student.status])}
                       </span>
                     </td>
 
                     {/* Actions */}
+                    {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
                     <td className="p-4 text-center">
                       <div className="inline-flex items-center gap-1.5">
                         <button

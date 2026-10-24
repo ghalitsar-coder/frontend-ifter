@@ -1,6 +1,7 @@
 import { Award, Flag, Send, UserSearch } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+// shortcut: no backend endpoint for the uniform-infraction catalog (see PiketManager), keep mock
 import { calculateInfractionPoints, UNIFORM_INFRACTIONS_CATALOG } from '@/data/mockPiket';
 
 /**
@@ -32,7 +33,7 @@ export function PiketUniformForm(props: {
     );
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     props.onSubmit({
       studentName: studentInput,

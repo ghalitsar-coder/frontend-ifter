@@ -73,7 +73,7 @@ export function SettingsPresencePanel(props: {
               <input
                 id={`presence-${field.key}`}
                 type="time"
-                value={String(props.policy[field.key])}
+                value={props.policy[field.key]}
                 onChange={(e) => {
                   props.onChange({ [field.key]: e.target.value });
                 }}

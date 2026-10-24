@@ -1,6 +1,43 @@
 import { Info, Scale } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { mockDisciplineRules } from '@/data/mockDiscipline';
+import type { DisciplineCategory } from '@/lib/api/dto';
+import { useDisciplineCategories } from '@/lib/api/queries';
+
+/**
+ * Badge styling for a category card depending on its default point weight.
+ *
+ * @param points - Category default points.
+ * @returns CSS class string.
+ */
+function ruleBadgeClass(points: number): string {
+  if (points >= 50) {
+    return 'bg-red-700 text-white';
+  }
+  if (points >= 25) {
+    return 'bg-error-container text-red-700 border border-red-200';
+  }
+  if (points >= 5) {
+    return 'bg-amber-surface text-amber-dark border border-amber-gold/40';
+  }
+  return 'bg-surface-card text-pine-deep border border-border-subtle';
+}
+
+/**
+ * Map one backend discipline category to the catalog card shape.
+ * The backend has no separate subtitle field, so the description is used.
+ *
+ * @param category - Active discipline category.
+ * @returns Renderable catalog rule.
+ */
+function toCatalogRule(category: DisciplineCategory) {
+  return {
+    key: category.id,
+    title: category.name,
+    subtitle: category.description ?? '',
+    points: category.default_points ?? 0,
+    badgeClass: ruleBadgeClass(category.default_points ?? 0),
+  };
+}
 
 /**
  * Preview strip of point weight rules and threshold limits from handbook.
@@ -9,6 +46,9 @@ import { mockDisciplineRules } from '@/data/mockDiscipline';
  */
 export function DisciplineRuleCatalog() {
   const t = useTranslations('DisciplinePage');
+
+  const categories = useDisciplineCategories();
+  const rules = (categories.data ?? []).map(toCatalogRule);
 
   return (
     <section className="space-y-3 rounded-2xl border border-border bg-card p-5 shadow-xs">
@@ -27,7 +67,7 @@ export function DisciplineRuleCatalog() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 pt-1 md:grid-cols-5">
-        {mockDisciplineRules.map((rule) => (
+        {rules.map((rule) => (
           <div
             key={rule.key}
             className="flex items-center justify-between rounded-xl border border-border bg-surface-container-low p-2.5 transition-colors hover:border-pine-light"

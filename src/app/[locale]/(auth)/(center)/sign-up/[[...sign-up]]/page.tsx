@@ -1,6 +1,6 @@
-import { SignUp } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { redirect } from 'next/navigation';
 import { getI18nPath } from '@/utils/Helpers';
 
 type SignUpPageProps = {
@@ -24,5 +24,7 @@ export default async function SignUpPage(props: SignUpPageProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
 
-  return <SignUp path={getI18nPath('/sign-up', locale)} />;
+  // Self-service sign-up is disabled: accounts are provisioned by admins
+  // (POST /users) and activated via token (POST /auth/activate).
+  redirect(getI18nPath('/sign-in', locale));
 }

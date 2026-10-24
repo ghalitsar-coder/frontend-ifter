@@ -11,6 +11,43 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import type { RombelOption, StudentProfile } from '@/types/masterSiswa';
 
+const ROMBEL_FALLBACK_COUNT = 32; // shortcut: no capacity field on backend Class, keep mock
+
+/**
+ * Resolves the preselected target rombel: explicit pick first, else the first
+ * rombel of the source grade, else the very first rombel.
+ * @param targetClassId - User-picked class id ('' when untouched).
+ * @param rombels - Available class options.
+ * @param sourceGrade - Grade of the selected students.
+ * @returns Class id to highlight / submit.
+ */
+function resolveActiveTargetId(
+  targetClassId: string,
+  rombels: RombelOption[],
+  sourceGrade: string,
+): string {
+  if (targetClassId === '') {
+    const sameGrade = rombels.find((r) => r.grade === sourceGrade);
+    if (sameGrade === undefined) {
+      const [firstRombel] = rombels;
+      return firstRombel === undefined ? '' : firstRombel.id;
+    }
+    return sameGrade.id;
+  }
+  return targetClassId;
+}
+
+/**
+ * Reads the live roster count for a class name.
+ * @param rombels - Available class options.
+ * @param className - Source class name.
+ * @returns Current student count or the mock fallback.
+ */
+function countForClass(rombels: RombelOption[], className: string): number {
+  const row = rombels.find((r) => r.name === className);
+  return row === undefined ? ROMBEL_FALLBACK_COUNT : row.currentCount;
+}
+
 /**
  * Modal dialog executing bulk student class mutations and attendance reconciliation.
  *
@@ -22,6 +59,7 @@ export function MasterSiswaMutationModal(props: {
   onClose: () => void;
   selectedStudents: StudentProfile[];
   availableRombels: RombelOption[];
+  isSubmitting?: boolean;
   onConfirmMutation: (params: {
     studentIds: string[];
     targetClassId: string;
@@ -33,7 +71,7 @@ export function MasterSiswaMutationModal(props: {
 }) {
   const t = useTranslations('MasterSiswaPage');
 
-  const [targetClassId, setTargetClassId] = useState('VIII-B');
+  const [targetClassId, setTargetClassId] = useState('');
   const [reason, setReason] = useState('pemerataan');
   const [skNumber, setSkNumber] = useState('421.3/SK-MUT/2024/09-VIII');
   const [notifyWhatsApp, setNotifyWhatsApp] = useState(true);
@@ -43,15 +81,21 @@ export function MasterSiswaMutationModal(props: {
   }
 
   const selectedCount = props.selectedStudents.length;
-  const sourceClassName = props.selectedStudents[0]?.className || 'VIII A';
+  const sourceClassName = props.selectedStudents[0]?.className ?? '-';
+  const sourceGrade = props.selectedStudents[0]?.grade ?? 'VIII';
+  const activeTargetId = resolveActiveTargetId(targetClassId, props.availableRombels, sourceGrade);
   const targetRombel =
-    props.availableRombels.find((r) => r.id === targetClassId) || props.availableRombels[1];
+    props.availableRombels.find((r) => r.id === activeTargetId) ?? props.availableRombels[0];
+  const sourceCount = countForClass(props.availableRombels, sourceClassName);
 
   const handleExecute = () => {
+    if (targetRombel === undefined) {
+      return;
+    }
     props.onConfirmMutation({
       studentIds: props.selectedStudents.map((s) => s.id),
-      targetClassId,
-      targetClassName: targetRombel?.name || targetClassId,
+      targetClassId: targetRombel.id,
+      targetClassName: targetRombel.name,
       reason,
       skNumber,
       notifyWhatsApp,
@@ -61,6 +105,7 @@ export function MasterSiswaMutationModal(props: {
 
   return (
     <div
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- modal overlay is already scoped by aria-modal
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-mutation-title"
@@ -163,7 +208,7 @@ export function MasterSiswaMutationModal(props: {
               <div className="flex items-center gap-3">
                 <div className="bg-surface-card flex items-center gap-2.5 rounded-xl border border-border-control p-2">
                   <span className="text-text-muted flex size-8 items-center justify-center rounded-lg bg-surface-container-high text-xs font-bold">
-                    8A
+                    {sourceGrade.slice(0, 2)}
                   </span>
                   <div>
                     <span className="text-text-muted block text-[10px] font-bold uppercase">
@@ -177,9 +222,9 @@ export function MasterSiswaMutationModal(props: {
                 <div className="flex flex-col text-xs">
                   <span className="text-text-muted">{t('mutation_running_capacity')}</span>
                   <div className="flex items-center gap-1 font-bold text-pine-deep">
-                    <span>32</span>
+                    <span>{sourceCount}</span>
                     <ArrowRight className="text-text-muted size-3" />
-                    <span>{32 - selectedCount} Siswa</span>
+                    <span>{Math.max(0, sourceCount - selectedCount)} Siswa</span>
                     <span className="text-[11px] text-amber-700">(-{selectedCount})</span>
                   </div>
                 </div>
@@ -194,11 +239,11 @@ export function MasterSiswaMutationModal(props: {
             {/* Target Class Cards */}
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {props.availableRombels
-                .filter((r) => r.grade === 'VIII')
+                .filter((r) => r.grade === sourceGrade)
                 .map((rombel) => {
                   const remainingQuota = rombel.capacity - rombel.currentCount;
                   const isEnough = remainingQuota >= selectedCount;
-                  const isSelected = targetClassId === rombel.id;
+                  const isSelected = activeTargetId === rombel.id;
 
                   if (!isEnough) {
                     return (
@@ -368,7 +413,7 @@ export function MasterSiswaMutationModal(props: {
                 3
               </span>
               <h4 className="text-text-primary text-sm font-bold">
-                {t('mutation_step_3_title', { target: targetRombel?.name || 'VIII B' })}
+                {t('mutation_step_3_title', { target: targetRombel?.name ?? '-' })}
               </h4>
             </div>
 
@@ -383,7 +428,7 @@ export function MasterSiswaMutationModal(props: {
               </div>
               <div className="divide-y divide-border-subtle">
                 {props.selectedStudents.map((std, idx) => {
-                  const newAbsent = (targetRombel?.currentCount || 29) + idx + 1;
+                  const newAbsent = (targetRombel?.currentCount ?? 0) + idx + 1;
                   return (
                     <div
                       key={std.id}
@@ -401,7 +446,7 @@ export function MasterSiswaMutationModal(props: {
                       </span>
                       <span className="w-32 text-center">
                         <span className="rounded-full bg-pine-deep px-2.5 py-1 font-mono text-xs font-bold text-white">
-                          #{newAbsent} ({targetRombel?.name || 'VIII B'})
+                          #{newAbsent} ({targetRombel?.name ?? '-'})
                         </span>
                       </span>
                       <span className="w-24 text-right">
@@ -425,8 +470,8 @@ export function MasterSiswaMutationModal(props: {
                 </span>
                 <p className="mt-0.5 leading-relaxed text-pine-light/90">
                   {t('mutation_data_guarantee_desc', {
-                    teacher: targetRombel?.homeroomTeacher || 'Wali Kelas Baru',
-                    class: targetRombel?.name || 'VIII B',
+                    teacher: targetRombel?.homeroomTeacher ?? 'Wali Kelas Baru',
+                    class: targetRombel?.name ?? '-',
                   })}
                 </p>
               </div>
@@ -461,10 +506,13 @@ export function MasterSiswaMutationModal(props: {
             <button
               type="button"
               onClick={handleExecute}
-              className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-pine-deep px-5 text-xs font-bold text-white shadow-md transition-colors hover:bg-pine-hover sm:text-sm"
+              disabled={props.isSubmitting === true || targetRombel === undefined}
+              className="flex h-10 cursor-pointer items-center justify-center gap-2 rounded-xl bg-pine-deep px-5 text-xs font-bold text-white shadow-md transition-colors hover:bg-pine-hover disabled:opacity-50 sm:text-sm"
             >
               <CheckCircle2 className="size-4 text-amber-gold" />
-              <span>{t('btn_execute_mutation')}</span>
+              <span>
+                {props.isSubmitting === true ? 'Memproses...' : t('btn_execute_mutation')}
+              </span>
             </button>
           </div>
         </div>

@@ -1,3 +1,4 @@
+/* oxlint-disable jsx-a11y/prefer-tag-over-role -- vendored shadcn/ui component, role=status on span matches upstream shadcn/ui spinner announcement; do not hand-edit */
 import { cn } from 'cn';
 import { Loader2Icon } from 'lucide-react';
 

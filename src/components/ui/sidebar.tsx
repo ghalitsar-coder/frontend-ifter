@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable eslint/no-shadow, eslint/no-unused-expressions, eslint/no-param-reassign, react/hook-use-state, unicorn/no-document-cookie, typescript/no-unsafe-type-assertion -- vendored shadcn/ui component, generated shadcn/ui sidebar; cookie persistence of open state and CSS var casts are upstream features; do not hand-edit */
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { cva } from 'class-variance-authority';
@@ -273,6 +274,7 @@ function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
 
   return (
     <button
+      type="button"
       data-sidebar="rail"
       data-slot="sidebar-rail"
       aria-label="Toggle Sidebar"

@@ -1,93 +1,305 @@
 'use client';
 
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
+import type { ImportJob, ImportUploadResponse } from '@/lib/api/dto';
+import {
+  apiErrorMessage,
+  downloadImportTemplate,
+  mapImportPreview,
+  saveBlob,
+  uploadImportFile,
+  useConfirmImport,
+} from '@/lib/api/master-guru';
+import type { TeacherImportRowView } from '@/lib/api/master-guru';
 
-/**
- * Import validation sample row item.
- */
-type ValidationPreviewRow = {
-  rowNumber: number;
-  nip: string;
-  name: string;
-  subject: string;
-  status: string;
-  homeroom: string;
-  validationStatus: 'valid' | 'warning' | 'error';
-  statusLabel: string;
-  note: string;
-};
-
-const SAMPLE_GURU_ROWS: ValidationPreviewRow[] = [
+// shortcut: no backend endpoint for class (rombel) imports, keep mock preview rows
+const SAMPLE_KELAS_ROWS: TeacherImportRowView[] = [
   {
     rowNumber: 1,
-    nip: '19680512 199303 1 004',
-    name: 'Drs. Agus Subagyo, M.Pd.',
-    subject: 'Matematika Peminatan',
-    status: 'PNS',
-    homeroom: 'XII MIPA 1',
+    nip: '-',
+    name: 'Kelas VII A',
+    detail: '7',
+    actionLabel: 'Baru',
     validationStatus: 'valid',
     statusLabel: 'Valid',
-    note: 'Data lengkap, NIP terverifikasi unik dan valid di Dapodik.',
-  },
-  {
-    rowNumber: 2,
-    nip: '19850315 200902 2 008',
-    name: 'Sarah Rahma, S.Pd.',
-    subject: 'Bahasa Indonesia',
-    status: 'PPPK',
-    homeroom: 'XI IPS 1',
-    validationStatus: 'valid',
-    statusLabel: 'Valid',
-    note: 'Format NIP dan NUPTK sesuai spesifikasi.',
-  },
-  {
-    rowNumber: 3,
-    nip: '19791104 200501 1 003',
-    name: 'Hendra Gunawan, S.Si.',
-    subject: 'Fisika Terapan',
-    status: 'PNS',
-    homeroom: 'XI MIPA 2',
-    validationStatus: 'warning',
-    statusLabel: 'Duplikat NIP',
-    note: 'NIP sudah ada di database. Mode Upsert akan otomatis memperbarui penugasan mengajar.',
-  },
-  {
-    rowNumber: 4,
-    nip: '',
-    name: 'Siti Fatimah, S.Pd.',
-    subject: 'Biologi',
-    status: 'Guru Honorer',
-    homeroom: '-',
-    validationStatus: 'error',
-    statusLabel: 'NIP / NUPTK Kosong',
-    note: 'Kolom NIP / NUPTK tidak boleh kosong. Guru membutuhkan identifier unik primer.',
-  },
-  {
-    rowNumber: 5,
-    nip: '19650220 199003 1 002',
-    name: 'Drs. Bambang Sutrisno',
-    subject: 'Kimia Analitik',
-    status: 'PNS',
-    homeroom: '-',
-    validationStatus: 'valid',
-    statusLabel: 'Valid',
-    note: 'Data lengkap dan siap diintegrasikan ke master data.',
-  },
-  {
-    rowNumber: 6,
-    nip: '19800101 2008',
-    name: 'Joko Susilo, S.Pd.',
-    subject: 'Sejarah Indonesia',
-    status: 'PNS',
-    homeroom: '-',
-    validationStatus: 'error',
-    statusLabel: 'Format NIP Salah',
-    note: 'Format NIP tidak valid (hanya 12 digit, standar BKN 18 digit angka).',
+    note: 'Contoh pratinjau — import kelas belum tersedia di API.',
   },
 ];
 
+const pickRows = (
+  uploadResult: ImportUploadResponse | undefined,
+  isKelasMock: boolean,
+): TeacherImportRowView[] => {
+  if (isKelasMock) {
+    return SAMPLE_KELAS_ROWS;
+  }
+  if (uploadResult === undefined) {
+    return [];
+  }
+  return mapImportPreview(uploadResult.preview, uploadResult.errors);
+};
+
+const applyRowFilter = (
+  rows: TeacherImportRowView[],
+  filterType: 'all' | 'valid' | 'issues',
+): TeacherImportRowView[] => {
+  if (filterType === 'valid') {
+    return rows.filter((row) => row.validationStatus === 'valid');
+  }
+  if (filterType === 'issues') {
+    return rows.filter((row) => row.validationStatus !== 'valid');
+  }
+  return rows;
+};
+
+const uploadBadgeFor = (
+  isPending: boolean,
+  hasUpload: boolean,
+): { tone: string; dot: string; text: string } => {
+  if (isPending) {
+    return { tone: 'bg-amber-100 text-amber-800', dot: 'bg-amber-600', text: 'Memeriksa…' };
+  }
+  if (hasUpload) {
+    return {
+      tone: 'bg-emerald-100 text-emerald-800',
+      dot: 'bg-emerald-700',
+      text: 'Sintaks Valid',
+    };
+  }
+  return { tone: 'bg-stone-100 text-stone-500', dot: 'bg-stone-400', text: 'Belum Ada Berkas' };
+};
+
+const computeCanConfirm = (vars: {
+  isKelasMock: boolean;
+  job: ImportJob | undefined;
+  allowPartialImport: boolean;
+  issueCount: number;
+}): boolean => {
+  if (vars.isKelasMock || vars.job === undefined) {
+    return false;
+  }
+  if (vars.job.status === 'completed' || vars.job.valid_rows <= 0) {
+    return false;
+  }
+  return vars.allowPartialImport || vars.issueCount === 0;
+};
+
+const stepBadgeClass = (done: boolean, active: boolean): string => {
+  if (done) {
+    return 'bg-emerald-800 text-white ring-2 ring-emerald-100';
+  }
+  if (active) {
+    return 'animate-pulse bg-amber-100 text-amber-900 ring-2 ring-amber-200';
+  }
+  return 'bg-stone-200 text-stone-500';
+};
+
+const step3BadgeClass = (syncing: boolean): string =>
+  syncing ? 'bg-emerald-800 text-white' : 'bg-stone-200 text-stone-500';
+
+const stepLabelClass = (done: boolean, active: boolean, idleClass: string): string => {
+  if (done) {
+    return 'font-semibold text-emerald-900';
+  }
+  if (active) {
+    return 'font-bold text-stone-900';
+  }
+  return idleClass;
+};
+
+const step1BadgeContent = (done: boolean) => {
+  if (!done) {
+    return '1';
+  }
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+    </svg>
+  );
+};
+
+const entityTabClass = (active: boolean): string =>
+  `flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+    active
+      ? 'bg-emerald-900 text-white shadow-xs'
+      : 'bg-stone-100 text-stone-600 hover:text-stone-900'
+  }`;
+
+const strategyCardClass = (active: boolean): string =>
+  `flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-all ${
+    active
+      ? 'border-emerald-700 bg-emerald-50/50 shadow-xs'
+      : 'border-stone-200 bg-white hover:bg-stone-50'
+  }`;
+
+const fileTitleLabel = (file: File | null): string => file?.name ?? 'Belum ada berkas dipilih';
+
+const fileNameLabel = (file: File | null): string =>
+  file?.name ?? 'Pilih berkas .xlsx terlebih dahulu';
+
+const fileSizeLabel = (file: File | null): string =>
+  file === null ? '—' : `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+
+const filePickLabel = (file: File | null): string => (file === null ? 'Pilih File' : 'Ganti File');
+
+const bannerTextFor = (feedback: string | null, uploadError: Error | null): string | null => {
+  if (feedback !== null) {
+    return feedback;
+  }
+  if (uploadError !== null) {
+    return apiErrorMessage(uploadError, 'Gagal mengunggah berkas.');
+  }
+  return null;
+};
+
+const kpiSubtitle = (hasUpload: boolean, jobId: string | undefined): string => {
+  if (hasUpload) {
+    return `Job #${(jobId ?? '').slice(0, 8)} • format NIP, duplikasi, dan kelengkapan diverifikasi server.`;
+  }
+  return 'Format NIP 18 digit, duplikasi, dan mapel terdaftar (diperiksa server setelah unggah).';
+};
+
+const filterPillClass = (active: boolean): string =>
+  active
+    ? 'bg-emerald-900 text-white'
+    : 'border border-stone-200 bg-white text-stone-600 hover:text-stone-900';
+
+const issuesPillClass = (active: boolean): string =>
+  active
+    ? 'bg-amber-600 text-white'
+    : 'border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100';
+
+const emptyRowText = (isPending: boolean): string =>
+  isPending
+    ? 'Server sedang memvalidasi baris Excel…'
+    : 'Unggah berkas .xlsx untuk melihat pratinjau validasi server.';
+
+const rowToneClass = (status: TeacherImportRowView['validationStatus']): string => {
+  if (status === 'error') {
+    return 'bg-red-50/60 hover:bg-red-50';
+  }
+  if (status === 'warning') {
+    return 'bg-amber-50/50 hover:bg-amber-50';
+  }
+  return 'hover:bg-stone-50/80';
+};
+
+const partialToleranceLabel = (on: boolean): string => (on ? 'aktif' : 'mati');
+
+const confirmButtonContent = (isPending: boolean, readyCount: number) => {
+  if (isPending) {
+    return (
+      <>
+        <svg className="h-3.5 w-3.5 animate-spin text-white" fill="none" viewBox="0 0 24 24">
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+        </svg>
+        Menyimpan...
+      </>
+    );
+  }
+  return (
+    <>
+      <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+      </svg>
+      Simpan {readyCount} Guru ke Database
+    </>
+  );
+};
+
+const ImportPreviewRowRow = (props: { row: TeacherImportRowView }) => {
+  const { row } = props;
+  return (
+    <tr className={`transition-colors ${rowToneClass(row.validationStatus)}`}>
+      <td className="px-3 py-2.5 text-center font-mono font-semibold text-stone-500">
+        #{row.rowNumber}
+      </td>
+      <td className="px-3 py-2.5 font-mono font-medium text-stone-800">
+        {row.nip === '' ? (
+          <span className="rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">
+            [KOSONG]
+          </span>
+        ) : (
+          row.nip
+        )}
+      </td>
+      <td className="px-3 py-2.5 font-semibold text-stone-900">{row.name}</td>
+      <td className="px-3 py-2.5 text-stone-700">{row.actionLabel}</td>
+      <td className="px-3 py-2.5 text-center">
+        <span className="inline-block rounded bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-700">
+          {row.statusLabel}
+        </span>
+      </td>
+      <td className="px-3 py-2.5 text-center">
+        {row.validationStatus === 'valid' && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={3}
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+            Valid
+          </span>
+        )}
+        {row.validationStatus === 'warning' && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900">
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            Duplikat
+          </span>
+        )}
+        {row.validationStatus === 'error' && (
+          <span className="inline-flex items-center gap-1 rounded-full border border-red-300 bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700">
+            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+            Error
+          </span>
+        )}
+      </td>
+      <td
+        className={`px-3 py-2.5 text-[11px] ${
+          row.validationStatus === 'error' ? 'font-medium text-red-700' : 'text-stone-600'
+        }`}
+      >
+        {row.note}
+      </td>
+    </tr>
+  );
+};
+
 /**
- * Excel Bulk Import & Row Validation Modal (FR-G01, FR-G02, FR-G03, FR-G07).
+ * Excel Bulk Import & Validation Modal (FR-G01, FR-G02, FR-G03, FR-G07).
+ * Uploads the workbook to POST /imports/{entity}, shows the real server-side
+ * preview + row errors, then syncs via POST /imports/:id/confirm.
+ * @param props - Modal control props.
+ * @param props.isOpen - Whether the modal is rendered.
+ * @param props.onClose - Requested close handler.
+ * @param props.onImportSuccess - Callback with the confirmed row count.
+ * @returns Import modal JSX element.
  */
 export const MasterGuruImportModal = (props: {
   isOpen: boolean;
@@ -98,39 +310,133 @@ export const MasterGuruImportModal = (props: {
   const [importStrategy, setImportStrategy] = useState<'upsert' | 'create_only'>('upsert');
   const [filterType, setFilterType] = useState<'all' | 'valid' | 'issues'>('all');
   const [allowPartialImport, setAllowPartialImport] = useState<boolean>(true);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [file, setFile] = useState<File | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<Error | null>(null);
+
+  const confirmImport = useConfirmImport();
+
+  const uploadMutation = useMutation({
+    mutationFn: async (vars: { entity: 'teachers' | 'students'; file: File }) =>
+      await uploadImportFile(
+        vars.entity,
+        vars.file,
+        importStrategy === 'upsert' ? 'upsert' : 'create_only',
+      ),
+    onSuccess: () => {
+      setUploadError(null);
+    },
+    onError: (error) => {
+      setUploadError(error);
+    },
+  });
 
   if (!props.isOpen) {
     return null;
   }
 
-  const validCount = SAMPLE_GURU_ROWS.filter((r) => r.validationStatus === 'valid').length;
-  const issueCount = SAMPLE_GURU_ROWS.filter((r) => r.validationStatus !== 'valid').length;
-  const totalCount = 36; // Full sheet count representation
-  const readyToImportCount = allowPartialImport ? 34 : 0;
+  const isKelasMock = targetEntity === 'kelas';
+  const uploadResult = uploadMutation.data;
+  const job = uploadResult?.job;
+  const hasUpload = uploadResult !== undefined;
+  const totalCount = job?.total_rows ?? 0;
+  const validCount = job?.valid_rows ?? 0;
+  const issueCount = (job?.invalid_rows ?? 0) + (job?.duplicate_rows ?? 0);
 
-  const filteredRows = SAMPLE_GURU_ROWS.filter((row) => {
-    if (filterType === 'valid') {
-      return row.validationStatus === 'valid';
-    }
-    if (filterType === 'issues') {
-      return row.validationStatus !== 'valid';
-    }
-    return true;
+  const allRows: TeacherImportRowView[] = pickRows(uploadResult, isKelasMock);
+
+  const filteredRows = applyRowFilter(allRows, filterType);
+
+  const canConfirm = computeCanConfirm({
+    isKelasMock,
+    job,
+    allowPartialImport,
+    issueCount,
   });
 
-  const handleExecuteImport = () => {
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      props.onImportSuccess(readyToImportCount);
-      props.onClose();
-    }, 600);
+  const handlePickFile = (next: File | null) => {
+    uploadMutation.reset();
+    setFeedback(null);
+    setUploadError(null);
+    if (next === null) {
+      setFile(null);
+      return;
+    }
+    if (!next.name.toLowerCase().endsWith('.xlsx')) {
+      setFeedback('Berkas harus berformat Excel .xlsx.');
+      return;
+    }
+    setFile(next);
+    if (isKelasMock) {
+      return;
+    }
+    uploadMutation.mutate({
+      entity: targetEntity === 'guru' ? 'teachers' : 'students',
+      file: next,
+    });
   };
+
+  const handleTemplateDownload = () => {
+    if (isKelasMock) {
+      setFeedback('Template kelas belum tersedia di API.');
+      return;
+    }
+    const run = async () => {
+      try {
+        const { blob, filename } = await downloadImportTemplate(
+          targetEntity === 'guru' ? 'teachers' : 'students',
+        );
+        saveBlob(blob, filename ?? 'template-import.xlsx');
+      } catch (error: unknown) {
+        setFeedback(apiErrorMessage(error, 'Gagal mengunduh template.'));
+      }
+    };
+    void run();
+  };
+
+  const handleExecuteImport = () => {
+    if (job === undefined) {
+      return;
+    }
+    confirmImport.mutate(job.id, {
+      onSuccess: (confirmed) => {
+        props.onImportSuccess(confirmed.success_rows);
+        props.onClose();
+        setFile(null);
+        uploadMutation.reset();
+        setFeedback(null);
+        setUploadError(null);
+      },
+      onError: (error) => {
+        setFeedback(apiErrorMessage(error, 'Gagal menyinkronkan data ke database.'));
+      },
+    });
+  };
+
+  const step1Done = file !== null;
+  const step2Active = file !== null && !confirmImport.isPending;
+
+  const clearSelection = () => {
+    setFile(null);
+    uploadMutation.reset();
+    setFeedback(null);
+    setUploadError(null);
+  };
+
+  const badge = uploadBadgeFor(uploadMutation.isPending, hasUpload);
+  const bannerText = bannerTextFor(feedback, uploadError);
+
+  let syncStatus = 'Menunggu';
+  if (isKelasMock) {
+    syncStatus = 'Mock';
+  } else if (hasUpload) {
+    syncStatus = 'Ready';
+  }
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-3 sm:p-6"
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- modal overlay is already scoped by aria-modal
       role="dialog"
       aria-modal="true"
       aria-labelledby="import-modal-title"
@@ -198,33 +504,31 @@ export const MasterGuruImportModal = (props: {
           <nav aria-label="Alur Import" className="border-b border-stone-200 pb-3">
             <ol className="flex flex-wrap items-center gap-2 text-xs font-medium sm:gap-4 sm:text-sm">
               <li className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-800 text-xs font-bold text-white ring-2 ring-emerald-100">
-                  <svg
-                    className="h-3.5 w-3.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={3}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${stepBadgeClass(step1Done, false)}`}
+                >
+                  {step1BadgeContent(step1Done)}
                 </span>
-                <span className="font-semibold text-emerald-900">1. Berkas & Target</span>
+                <span className={stepLabelClass(step1Done, false, 'text-stone-500')}>
+                  1. Berkas & Target
+                </span>
               </li>
               <span className="text-stone-300">/</span>
               <li className="flex items-center gap-2" aria-current="step">
-                <span className="flex h-6 w-6 animate-pulse items-center justify-center rounded-full bg-amber-100 text-xs font-bold text-amber-900 ring-2 ring-amber-200">
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${stepBadgeClass(false, step2Active)}`}
+                >
                   2
                 </span>
-                <span className="font-bold text-stone-900">2. Validasi Baris (Aktif)</span>
+                <span className={stepLabelClass(false, step2Active, 'text-stone-400')}>
+                  2. Validasi Baris (Aktif)
+                </span>
               </li>
               <span className="text-stone-300">/</span>
               <li className="flex items-center gap-2 text-stone-400">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-stone-200 text-xs font-bold text-stone-500">
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${step3BadgeClass(confirmImport.isPending)}`}
+                >
                   3
                 </span>
                 <span>3. Eksekusi Sinkronisasi</span>
@@ -245,12 +549,9 @@ export const MasterGuruImportModal = (props: {
                     type="button"
                     onClick={() => {
                       setTargetEntity('guru');
+                      clearSelection();
                     }}
-                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      targetEntity === 'guru'
-                        ? 'bg-emerald-900 text-white shadow-xs'
-                        : 'bg-stone-100 text-stone-600 hover:text-stone-900'
-                    }`}
+                    className={entityTabClass(targetEntity === 'guru')}
                   >
                     <svg
                       className="h-3.5 w-3.5"
@@ -271,12 +572,9 @@ export const MasterGuruImportModal = (props: {
                     type="button"
                     onClick={() => {
                       setTargetEntity('siswa');
+                      clearSelection();
                     }}
-                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      targetEntity === 'siswa'
-                        ? 'bg-emerald-900 text-white shadow-xs'
-                        : 'bg-stone-100 text-stone-600 hover:text-stone-900'
-                    }`}
+                    className={entityTabClass(targetEntity === 'siswa')}
                   >
                     <svg
                       className="h-3.5 w-3.5"
@@ -297,12 +595,9 @@ export const MasterGuruImportModal = (props: {
                     type="button"
                     onClick={() => {
                       setTargetEntity('kelas');
+                      clearSelection();
                     }}
-                    className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                      targetEntity === 'kelas'
-                        ? 'bg-emerald-900 text-white shadow-xs'
-                        : 'bg-stone-100 text-stone-600 hover:text-stone-900'
-                    }`}
+                    className={entityTabClass(targetEntity === 'kelas')}
                   >
                     <svg
                       className="h-3.5 w-3.5"
@@ -323,13 +618,8 @@ export const MasterGuruImportModal = (props: {
 
                 {/* Strategy Radios */}
                 <div className="space-y-2">
-                  <label
-                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-all ${
-                      importStrategy === 'upsert'
-                        ? 'border-emerald-700 bg-emerald-50/50 shadow-xs'
-                        : 'border-stone-200 bg-white hover:bg-stone-50'
-                    }`}
-                  >
+                  {/* oxlint-disable-next-line jsx-a11y/label-has-associated-control -- label text is rendered alongside the wrapped radio/checkbox control */}
+                  <label className={strategyCardClass(importStrategy === 'upsert')}>
                     <input
                       type="radio"
                       name="strategy"
@@ -349,19 +639,14 @@ export const MasterGuruImportModal = (props: {
                         </span>
                       </div>
                       <p className="mt-0.5 text-[11px] text-stone-600">
-                        Memperbarui profil, mapel, dan penugasan wali kelas jika NIP sudah tercatat
-                        di sistem.
+                        Memperbarui profil dan penugasan jika NIP sudah tercatat di sistem (mode =
+                        upsert).
                       </p>
                     </div>
                   </label>
 
-                  <label
-                    className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-all ${
-                      importStrategy === 'create_only'
-                        ? 'border-emerald-700 bg-emerald-50/50 shadow-xs'
-                        : 'border-stone-200 bg-white hover:bg-stone-50'
-                    }`}
-                  >
+                  {/* oxlint-disable-next-line jsx-a11y/label-has-associated-control -- label text is rendered alongside the wrapped radio/checkbox control */}
+                  <label className={strategyCardClass(importStrategy === 'create_only')}>
                     <input
                       type="radio"
                       name="strategy"
@@ -397,9 +682,11 @@ export const MasterGuruImportModal = (props: {
                   <span className="text-[11px] font-bold tracking-wider text-stone-500 uppercase">
                     File Excel Terunggah
                   </span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-700" />
-                    Sintaks Valid
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ${badge.tone}`}
+                  >
+                    <span className={`h-1.5 w-1.5 rounded-full ${badge.dot}`} />
+                    {badge.text}
                   </span>
                 </div>
                 <div className="flex items-start gap-3 rounded-xl border border-stone-200 bg-stone-50/80 p-3.5">
@@ -416,37 +703,48 @@ export const MasterGuruImportModal = (props: {
                   <div className="min-w-0 flex-1">
                     <h4
                       className="truncate text-xs font-bold text-stone-900"
-                      title="Template_Data_Guru_PTK_2024_2025.xlsx"
+                      title={fileTitleLabel(file)}
                     >
-                      Template_Data_Guru_PTK_2024_2025.xlsx
+                      {fileNameLabel(file)}
                     </h4>
-                    <p className="mt-0.5 text-[11px] text-stone-500">
-                      1.4 MB • Sheet: &quot;DATA_GURU_AKTIF&quot;
-                    </p>
+                    <p className="mt-0.5 text-[11px] text-stone-500">{fileSizeLabel(file)}</p>
                     <div className="mt-2 flex items-center gap-2 text-xs">
+                      <label className="cursor-pointer font-bold text-emerald-800 underline underline-offset-2 hover:text-emerald-950">
+                        {filePickLabel(file)}
+                        <input
+                          type="file"
+                          accept=".xlsx"
+                          className="hidden"
+                          onChange={(e) => {
+                            handlePickFile(e.target.files?.[0] ?? null);
+                          }}
+                        />
+                      </label>
+                      <span className="text-stone-300">•</span>
                       <button
                         type="button"
-                        className="font-bold text-emerald-800 underline underline-offset-2 hover:text-emerald-950"
-                      >
-                        Ganti File
-                      </button>
-                      <span className="text-stone-300">•</span>
-                      <a
-                        href="#template"
-                        className="font-medium text-stone-500 hover:text-stone-900"
+                        onClick={handleTemplateDownload}
+                        className="cursor-pointer font-medium text-stone-500 hover:text-stone-900"
                       >
                         Unduh Template Resmi
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="mt-3 flex items-center justify-between border-t border-stone-100 pt-2 text-[11px] text-stone-500">
                 <span>Skema Kemendikbudristek Dapodik</span>
-                <span className="font-mono font-semibold text-emerald-800">Ready</span>
+                <span className="font-mono font-semibold text-emerald-800">{syncStatus}</span>
               </div>
             </div>
           </div>
+
+          {/* Feedback banner (upload / confirm errors) */}
+          {bannerText !== null && (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-[11px] font-semibold text-red-700">
+              {bannerText}
+            </div>
+          )}
 
           {/* Validation Metrics KPI Bar */}
           <div className="flex flex-col justify-between gap-4 rounded-xl border border-stone-200 bg-white p-4 shadow-sm md:flex-row md:items-center">
@@ -466,7 +764,7 @@ export const MasterGuruImportModal = (props: {
                   Ringkasan Validasi Baris Excel
                 </h3>
                 <p className="mt-0.5 text-[11px] text-stone-600">
-                  Parsed in 0.38s • Format NIP 18 digit, duplikasi, dan mapel terdaftar.
+                  {kpiSubtitle(hasUpload, job?.id)}
                 </p>
               </div>
             </div>
@@ -480,7 +778,9 @@ export const MasterGuruImportModal = (props: {
               </div>
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-center">
                 <span className="block text-[10px] font-medium text-emerald-800">Baris Valid</span>
-                <span className="text-base font-extrabold text-emerald-800 sm:text-lg">34</span>
+                <span className="text-base font-extrabold text-emerald-800 sm:text-lg">
+                  {validCount}
+                </span>
               </div>
               <div className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-center">
                 <span className="block text-[10px] font-medium text-amber-900">
@@ -501,7 +801,7 @@ export const MasterGuruImportModal = (props: {
                   Pratinjau Data Guru yang Terbaca
                 </span>
                 <span className="rounded bg-stone-200 px-2 py-0.5 font-mono text-[11px] text-stone-500">
-                  {filteredRows.length} sampel ditampilkan
+                  {filteredRows.length} baris ditampilkan
                 </span>
               </div>
 
@@ -512,39 +812,27 @@ export const MasterGuruImportModal = (props: {
                   onClick={() => {
                     setFilterType('all');
                   }}
-                  className={`rounded-md px-2.5 py-1 font-semibold transition-colors ${
-                    filterType === 'all'
-                      ? 'bg-emerald-900 text-white'
-                      : 'border border-stone-200 bg-white text-stone-600 hover:text-stone-900'
-                  }`}
+                  className={`rounded-md px-2.5 py-1 font-semibold transition-colors ${filterPillClass(filterType === 'all')}`}
                 >
-                  Semua ({SAMPLE_GURU_ROWS.length})
+                  Semua ({allRows.length})
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setFilterType('valid');
                   }}
-                  className={`rounded-md px-2.5 py-1 font-medium transition-colors ${
-                    filterType === 'valid'
-                      ? 'bg-emerald-900 text-white'
-                      : 'border border-stone-200 bg-white text-stone-600 hover:text-stone-900'
-                  }`}
+                  className={`rounded-md px-2.5 py-1 font-medium transition-colors ${filterPillClass(filterType === 'valid')}`}
                 >
-                  Hanya Valid ({validCount})
+                  Hanya Valid ({allRows.filter((r) => r.validationStatus === 'valid').length})
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setFilterType('issues');
                   }}
-                  className={`rounded-md px-2.5 py-1 font-semibold transition-colors ${
-                    filterType === 'issues'
-                      ? 'bg-amber-600 text-white'
-                      : 'border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100'
-                  }`}
+                  className={`rounded-md px-2.5 py-1 font-semibold transition-colors ${issuesPillClass(filterType === 'issues')}`}
                 >
-                  Perlu Perhatian ({issueCount})
+                  Perlu Perhatian ({allRows.filter((r) => r.validationStatus !== 'valid').length})
                 </button>
               </div>
             </div>
@@ -564,7 +852,7 @@ export const MasterGuruImportModal = (props: {
                       Nama Guru / PTK
                     </th>
                     <th className="px-3 py-2.5" scope="col">
-                      Mata Pelajaran
+                      Aksi Server
                     </th>
                     <th className="w-24 px-3 py-2.5 text-center" scope="col">
                       Status
@@ -578,109 +866,26 @@ export const MasterGuruImportModal = (props: {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-stone-200">
-                  {filteredRows.map((row) => (
-                    <tr
-                      key={row.rowNumber}
-                      className={`transition-colors ${
-                        row.validationStatus === 'error'
-                          ? 'bg-red-50/60 hover:bg-red-50'
-                          : (row.validationStatus === 'warning'
-                            ? 'bg-amber-50/50 hover:bg-amber-50'
-                            : 'hover:bg-stone-50/80')
-                      }`}
-                    >
-                      <td className="px-3 py-2.5 text-center font-mono font-semibold text-stone-500">
-                        #{row.rowNumber}
-                      </td>
-                      <td className="px-3 py-2.5 font-mono font-medium text-stone-800">
-                        {row.nip || (
-                          <span className="rounded bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-700">
-                            [KOSONG]
-                          </span>
-                        )}
-                      </td>
-                      <td className="px-3 py-2.5 font-semibold text-stone-900">{row.name}</td>
-                      <td className="px-3 py-2.5 text-stone-700">{row.subject}</td>
-                      <td className="px-3 py-2.5 text-center">
-                        <span className="inline-block rounded bg-stone-100 px-2 py-0.5 text-[10px] font-medium text-stone-700">
-                          {row.status}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2.5 text-center">
-                        {row.validationStatus === 'valid' && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-800">
-                            <svg
-                              className="h-3 w-3"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={3}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
-                            Valid
-                          </span>
-                        )}
-                        {row.validationStatus === 'warning' && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-900">
-                            <svg
-                              className="h-3 w-3"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                              />
-                            </svg>
-                            Duplikat
-                          </span>
-                        )}
-                        {row.validationStatus === 'error' && (
-                          <span className="inline-flex items-center gap-1 rounded-full border border-red-300 bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700">
-                            <svg
-                              className="h-3 w-3"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M6 18L18 6M6 6l12 12"
-                              />
-                            </svg>
-                            Error
-                          </span>
-                        )}
-                      </td>
-                      <td
-                        className={`px-3 py-2.5 text-[11px] ${
-                          row.validationStatus === 'error'
-                            ? 'font-medium text-red-700'
-                            : 'text-stone-600'
-                        }`}
-                      >
-                        {row.note}
+                  {filteredRows.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-3 py-6 text-center text-[11px] text-stone-500">
+                        {emptyRowText(uploadMutation.isPending)}
                       </td>
                     </tr>
+                  )}
+                  {filteredRows.map((row) => (
+                    <ImportPreviewRowRow key={row.rowNumber} row={row} />
                   ))}
                 </tbody>
               </table>
             </div>
 
             <div className="flex items-center justify-between border-t border-stone-200 bg-stone-50 px-4 py-2.5 text-[11px] text-stone-500">
-              <span>Menampilkan {filteredRows.length} dari 36 baris total pada file Excel</span>
+              <span>
+                Menampilkan {filteredRows.length} dari {totalCount} baris total pada file Excel
+              </span>
               <span className="font-semibold text-emerald-800">
-                Toleransi error parsial aktif (FR-G07)
+                Toleransi error parsial {partialToleranceLabel(allowPartialImport)} (FR-G07)
               </span>
             </div>
           </div>
@@ -689,6 +894,7 @@ export const MasterGuruImportModal = (props: {
         {/* Modal Bottom Footer Actions */}
         <div className="flex flex-col justify-between gap-3 border-t border-stone-200 bg-white px-6 py-4 sm:flex-row sm:items-center">
           {/* FR-G07 Checkbox */}
+          {/* oxlint-disable-next-line jsx-a11y/label-has-associated-control -- label text is rendered alongside the wrapped radio/checkbox control */}
           <label className="flex cursor-pointer items-start gap-2.5 select-none">
             <input
               type="checkbox"
@@ -701,7 +907,7 @@ export const MasterGuruImportModal = (props: {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-bold text-stone-900">
-                  Lewati 2 baris error dan tetap import {readyToImportCount} baris valid
+                  Lewati {issueCount} baris error dan tetap import {validCount} baris valid
                 </span>
                 <span className="py-0.2 rounded bg-emerald-100 px-1.5 font-mono text-[10px] font-bold text-emerald-800">
                   FR-G07
@@ -718,7 +924,7 @@ export const MasterGuruImportModal = (props: {
             <button
               type="button"
               onClick={props.onClose}
-              disabled={isSubmitting}
+              disabled={confirmImport.isPending}
               className="rounded-xl border border-stone-200 px-4 py-2 text-xs font-semibold text-stone-700 transition-colors hover:bg-stone-100"
             >
               Batalkan & Tutup
@@ -726,46 +932,10 @@ export const MasterGuruImportModal = (props: {
             <button
               type="button"
               onClick={handleExecuteImport}
-              disabled={isSubmitting || readyToImportCount === 0}
+              disabled={!canConfirm || confirmImport.isPending || uploadMutation.isPending}
               className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-900 px-5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-emerald-950 disabled:opacity-50"
             >
-              {isSubmitting ? (
-                <>
-                  <svg
-                    className="h-3.5 w-3.5 animate-spin text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                  </svg>
-                  Menyimpan...
-                </>
-              ) : (
-                <>
-                  <svg
-                    className="h-3.5 w-3.5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  Simpan {readyToImportCount} Guru ke Database
-                </>
-              )}
+              {confirmButtonContent(confirmImport.isPending, validCount)}
             </button>
           </div>
         </div>

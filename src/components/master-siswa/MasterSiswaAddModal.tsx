@@ -13,8 +13,78 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import type { GradeLevel, RombelOption, StudentProfile } from '@/types/masterSiswa';
 
+type AddFormSeed = {
+  nisn: string;
+  nis: string;
+  name: string;
+  gender: 'L' | 'P';
+  dob: string;
+  grade: GradeLevel;
+  targetClassId: string;
+  absentNumber: number;
+  guardianName: string;
+  guardianPhone: string;
+};
+
+/** Default form values for a new student. */
+const NEW_STUDENT_SEED: AddFormSeed = {
+  nisn: '0082910399',
+  nis: '262708101',
+  name: '',
+  gender: 'L',
+  dob: '2012-05-14',
+  grade: 'VII',
+  targetClassId: '',
+  absentNumber: 31,
+  guardianName: '',
+  guardianPhone: '81234567890',
+};
+
 /**
- * Modal dialog for enrolling a new student record into master database with Dapodik validation.
+ * Builds the initial form values for the modal.
+ * @param initial - Existing profile in edit mode, undefined when adding.
+ * @param rombels - Class options used to resolve the picked class id by name.
+ * @returns Seed values for every form useState.
+ */
+function formSeedFor(initial: StudentProfile | undefined, rombels: RombelOption[]): AddFormSeed {
+  if (initial === undefined) {
+    return NEW_STUDENT_SEED;
+  }
+  const matched = rombels.find((r) => r.name === initial.className);
+  return {
+    nisn: initial.nisn,
+    nis: initial.nis,
+    name: initial.name,
+    gender: initial.gender,
+    dob: initial.dob,
+    grade: initial.grade,
+    targetClassId: matched?.id ?? '',
+    absentNumber: initial.absentNumber,
+    guardianName: initial.guardian.name === '-' ? '' : initial.guardian.name,
+    guardianPhone: initial.guardian.phone,
+  };
+}
+
+/**
+ * Submit button label (busy / edit / create variants).
+ * @param isEdit - Whether the modal edits an existing student.
+ * @param isSubmitting - Whether the save mutation is pending.
+ * @param createLabel - Translated label for the create mode.
+ * @returns Hard-coded Indonesian busy/edit label or the translated create label.
+ */
+function submitLabelFor(isEdit: boolean, isSubmitting: boolean, createLabel: string): string {
+  if (isSubmitting) {
+    return 'Menyimpan...';
+  }
+  if (isEdit) {
+    return 'Simpan Perubahan';
+  }
+  return createLabel;
+}
+
+/**
+ * Modal dialog for enrolling a new student record — or editing an existing one
+ * (identity fields) — against the real backend (POST / PUT /students).
  *
  * @param props - Component properties.
  * @returns Modal element or null.
@@ -24,24 +94,30 @@ export function MasterSiswaAddModal(props: {
   onClose: () => void;
   onSubmit: (student: Omit<StudentProfile, 'id'>, keepOpen?: boolean) => void;
   availableRombels: RombelOption[];
+  initialStudent?: StudentProfile;
+  isSubmitting?: boolean;
 }) {
   const t = useTranslations('MasterSiswaPage');
+  const initial = props.initialStudent;
+  const isEdit = initial !== undefined;
 
-  // Form states
-  const [nisn, setNisn] = useState('0082910399');
-  const [nis, setNis] = useState('262708101');
-  const [name, setName] = useState('');
+  // Form states (prefilled via formSeedFor; the parent re-mounts this modal with
+  // a `key` so state reseeds per student in edit mode)
+  const seed = formSeedFor(initial, props.availableRombels);
+  const [nisn, setNisn] = useState(seed.nisn);
+  const [nis, setNis] = useState(seed.nis);
+  const [name, setName] = useState(seed.name);
   const [callingName, setCallingName] = useState('');
-  const [gender, setGender] = useState<'L' | 'P'>('L');
+  const [gender, setGender] = useState<'L' | 'P'>(seed.gender);
   const [pob, setPob] = useState('Bandung');
-  const [dob, setDob] = useState('2012-05-14');
+  const [dob, setDob] = useState(seed.dob);
   const [religion, setReligion] = useState('Islam');
-  const [grade, setGrade] = useState<GradeLevel>('VII');
-  const [targetClassId, setTargetClassId] = useState('VII-A');
-  const [absentNumber, setAbsentNumber] = useState(31);
-  const [guardianName, setGuardianName] = useState('');
+  const [grade, setGrade] = useState<GradeLevel>(seed.grade);
+  const [targetClassId, setTargetClassId] = useState(seed.targetClassId);
+  const [absentNumber, setAbsentNumber] = useState(seed.absentNumber);
+  const [guardianName, setGuardianName] = useState(seed.guardianName);
   const [guardianRelation, setGuardianRelation] = useState('Ayah Kandung');
-  const [guardianPhone, setGuardianPhone] = useState('81234567890');
+  const [guardianPhone, setGuardianPhone] = useState(seed.guardianPhone);
   const [guardianAddress, setGuardianAddress] = useState('');
   const [rfidUid, setRfidUid] = useState('7A:B4:90:3E');
   const [isValidatedNisn, setIsValidatedNisn] = useState(false);
@@ -51,14 +127,15 @@ export function MasterSiswaAddModal(props: {
   }
 
   const selectedRombel =
-    props.availableRombels.find((r) => r.id === targetClassId) || props.availableRombels[0];
+    props.availableRombels.find((r) => r.id === targetClassId) ?? props.availableRombels[0];
 
   const handleValidateNisn = () => {
+    // shortcut: no Dapodik NISN validation endpoint, keep simulated check
     setIsValidatedNisn(true);
   };
 
   const handleScanRfid = () => {
-    // Generate simulated RFID hex
+    // shortcut: no RFID backend endpoint, keep simulated hex generation
     const randomHex = Array.from({ length: 4 }, () =>
       Math.floor(Math.random() * 256)
         .toString(16)
@@ -83,9 +160,9 @@ export function MasterSiswaAddModal(props: {
       dob,
       religion,
       grade,
-      className: selectedRombel?.name || `${grade} A`,
+      className: selectedRombel?.name ?? `${grade} A`,
       absentNumber,
-      homeroomTeacher: selectedRombel?.homeroomTeacher || 'Drs. Agus Subagyo',
+      homeroomTeacher: selectedRombel?.homeroomTeacher ?? 'Drs. Agus Subagyo',
       semesterAttendanceRate: 100,
       attendanceCategory: 'Hadir Prima',
       disciplinePoints: 0,
@@ -115,6 +192,7 @@ export function MasterSiswaAddModal(props: {
 
   return (
     <div
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- modal overlay is already scoped by aria-modal
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-add-title"
@@ -136,7 +214,8 @@ export function MasterSiswaAddModal(props: {
                   id="modal-add-title"
                   className="text-lg font-bold tracking-tight text-pine-deep sm:text-xl"
                 >
-                  {t('add_modal_title')}
+                  {/* shortcut: no edit-modal title locale key; domain label hard-coded */}
+                  {isEdit ? `Edit Data Siswa — ${initial.name}` : t('add_modal_title')}
                 </h2>
                 <span className="flex items-center gap-1 rounded-full bg-amber-surface px-2.5 py-0.5 text-xs font-semibold text-amber-dark">
                   <span className="size-1.5 animate-pulse rounded-full bg-amber-gold" />
@@ -385,6 +464,7 @@ export function MasterSiswaAddModal(props: {
                 <select
                   value={grade}
                   onChange={(e) => {
+                    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
                     setGrade(e.target.value as GradeLevel);
                   }}
                   className="h-10 cursor-pointer rounded-xl border border-border-control bg-surface-container-low px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
@@ -617,26 +697,32 @@ export function MasterSiswaAddModal(props: {
           </button>
 
           <div className="flex w-full flex-col items-center gap-2.5 sm:w-auto sm:flex-row">
-            <button
-              type="button"
-              onClick={() => {
-                handleSubmitInternal(true);
-              }}
-              className="bg-surface-container flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl px-4 text-xs font-semibold text-pine-deep transition-colors hover:bg-surface-container-high sm:w-auto sm:text-sm"
-            >
-              <PlusCircle className="size-4" />
-              <span>{t('btn_save_and_add_another')}</span>
-            </button>
+            {!isEdit && (
+              <button
+                type="button"
+                disabled={props.isSubmitting === true}
+                onClick={() => {
+                  handleSubmitInternal(true);
+                }}
+                className="bg-surface-container flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl px-4 text-xs font-semibold text-pine-deep transition-colors hover:bg-surface-container-high disabled:opacity-50 sm:w-auto sm:text-sm"
+              >
+                <PlusCircle className="size-4" />
+                <span>{t('btn_save_and_add_another')}</span>
+              </button>
+            )}
 
             <button
               type="button"
+              disabled={props.isSubmitting === true}
               onClick={() => {
                 handleSubmitInternal(false);
               }}
-              className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-pine-deep px-5 text-xs font-bold text-white shadow-md transition-colors hover:bg-pine-hover sm:w-auto sm:text-sm"
+              className="flex h-10 w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-pine-deep px-5 text-xs font-bold text-white shadow-md transition-colors hover:bg-pine-hover disabled:opacity-50 sm:w-auto sm:text-sm"
             >
               <CheckCircle2 className="size-4 text-amber-gold" />
-              <span>{t('btn_save_student')}</span>
+              <span>
+                {submitLabelFor(isEdit, props.isSubmitting === true, t('btn_save_student'))}
+              </span>
             </button>
           </div>
         </div>

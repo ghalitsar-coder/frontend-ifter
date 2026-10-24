@@ -52,6 +52,7 @@ function getLanguage(language: string) {
   }
 
   if (name in languages) {
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- `in` check above guarantees name is a languages key
     return name as keyof typeof languages;
   }
 
@@ -95,6 +96,7 @@ export async function loadHighlighter(language: string) {
           line.map((token, index) => (
             <span
               key={index}
+              // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- shiki token styles are an untyped CSS record
               style={token.htmlStyle as React.CSSProperties}
               className="text-(--shiki-light) dark:text-(--shiki-dark)"
             >
@@ -110,7 +112,7 @@ export async function loadHighlighter(language: string) {
 
 // Returns one React node per line, or null for a language that is not listed.
 export async function highlightCode(code: string, language: string) {
-  const highlighter = await loadHighlighter(language);
+  const core = await loadHighlighter(language);
 
-  return highlighter ? highlighter.highlight(code).lines : null;
+  return core ? core.highlight(code).lines : null;
 }

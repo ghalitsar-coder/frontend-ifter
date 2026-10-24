@@ -27,6 +27,7 @@ export function AttendanceNotificationDispatch(props: {
         </div>
         <div className="flex flex-col gap-3">
           {/* WhatsApp toggle */}
+          {/* oxlint-disable-next-line jsx-a11y/label-has-associated-control -- label text is rendered from next-intl messages inside the wrapped control group */}
           <label className="flex cursor-pointer items-start gap-3 rounded-xl p-2 transition-colors hover:bg-hover-row">
             <input
               type="checkbox"
@@ -45,6 +46,7 @@ export function AttendanceNotificationDispatch(props: {
           </label>
 
           {/* BK toggle */}
+          {/* oxlint-disable-next-line jsx-a11y/label-has-associated-control -- label text is rendered from next-intl messages inside the wrapped control group */}
           <label className="flex cursor-pointer items-start gap-3 rounded-xl p-2 transition-colors hover:bg-hover-row">
             <input
               type="checkbox"
@@ -61,6 +63,7 @@ export function AttendanceNotificationDispatch(props: {
           </label>
 
           {/* Dapodik toggle */}
+          {/* oxlint-disable-next-line jsx-a11y/label-has-associated-control -- label text is rendered from next-intl messages inside the wrapped control group */}
           <label className="flex cursor-pointer items-start gap-3 rounded-xl p-2 transition-colors hover:bg-hover-row">
             <input
               type="checkbox"

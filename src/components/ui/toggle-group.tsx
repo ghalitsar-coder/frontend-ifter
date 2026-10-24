@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable react/jsx-no-constructed-context-values, typescript/no-unsafe-type-assertion, typescript/prefer-nullish-coalescing -- vendored shadcn/ui component, generated shadcn/ui toggle group; upstream context/cast/|| semantics; do not hand-edit */
 import { Toggle as TogglePrimitive } from '@base-ui/react/toggle';
 import { ToggleGroup as ToggleGroupPrimitive } from '@base-ui/react/toggle-group';
 import type { VariantProps } from 'class-variance-authority';

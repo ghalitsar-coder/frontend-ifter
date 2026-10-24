@@ -1,4 +1,4 @@
-import { CheckCheck, Download, Search, Send } from 'lucide-react';
+import { CheckCheck, Download, Lock, Search, Send } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { AttendanceFilter } from '@/types/attendance';
 
@@ -23,6 +23,11 @@ export function AttendanceToolbar(props: {
   onMarkAllPresent: () => void;
   onDownloadPdf: () => void;
   onSubmit: () => void;
+  /** Finalizes the day via POST /attendance/close (optional; hides button when absent). */
+  onCloseDay?: () => void;
+  /** Disables write actions while a mutation is in flight or the day is closed. */
+  saving?: boolean;
+  readOnly?: boolean;
 }) {
   const t = useTranslations('AttendancePage');
 
@@ -137,11 +142,24 @@ export function AttendanceToolbar(props: {
           <button
             type="button"
             onClick={props.onMarkAllPresent}
-            className="flex h-10 items-center gap-1.5 rounded-xl border border-border/50 bg-surface-container-low px-4 text-sm font-medium whitespace-nowrap text-foreground transition-colors hover:bg-surface-container-high"
+            disabled={props.readOnly === true || props.saving === true}
+            className="flex h-10 items-center gap-1.5 rounded-xl border border-border/50 bg-surface-container-low px-4 text-sm font-medium whitespace-nowrap text-foreground transition-colors hover:bg-surface-container-high disabled:opacity-50"
           >
             <CheckCheck className="size-4 text-muted-foreground" />
             <span>{t('mark_all_present')}</span>
           </button>
+
+          {props.onCloseDay !== undefined && (
+            <button
+              type="button"
+              onClick={props.onCloseDay}
+              disabled={props.readOnly === true || props.saving === true}
+              title="Tutup absensi hari ini"
+              className="flex size-10 items-center justify-center rounded-xl border border-border/50 bg-surface-container-low text-foreground transition-colors hover:bg-surface-container-high disabled:opacity-50"
+            >
+              <Lock className="size-4" />
+            </button>
+          )}
 
           <button
             type="button"
@@ -155,7 +173,8 @@ export function AttendanceToolbar(props: {
           <button
             type="button"
             onClick={props.onSubmit}
-            className="flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-xs transition-opacity hover:opacity-90"
+            disabled={props.readOnly === true || props.saving === true}
+            className="flex h-10 items-center gap-2 rounded-xl bg-primary px-5 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-xs transition-opacity hover:opacity-90 disabled:opacity-50"
           >
             <Send className="size-4" />
             <span>{t('submit_attendance')}</span>

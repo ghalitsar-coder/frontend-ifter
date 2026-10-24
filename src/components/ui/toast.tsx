@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable react/no-object-type-as-default-prop -- vendored shadcn/ui component, object defaults mirror upstream sonner toast description props; do not hand-edit */
 import { Toast as ToastPrimitive } from '@base-ui/react/toast';
 import { cn } from 'cn';
 import {

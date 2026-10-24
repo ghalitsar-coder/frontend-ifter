@@ -1,4 +1,4 @@
-import { Download, Plus, Users, UserX } from 'lucide-react';
+import { Download, Plus, Upload, Users, UserX } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 /**
@@ -12,8 +12,10 @@ export function MasterSiswaHeader(props: {
   maleCount: number;
   femaleCount: number;
   rombelCapacitySummary: string;
+  isExporting?: boolean;
   onOpenAddStudent: () => void;
   onExportExcel: () => void;
+  onOpenImportExcel?: () => void;
   onToggleBulkMode?: () => void;
 }) {
   const t = useTranslations('MasterSiswaPage');
@@ -39,12 +41,27 @@ export function MasterSiswaHeader(props: {
 
         {/* Global Action Buttons */}
         <div className="flex flex-wrap items-center gap-2.5">
+          {props.onOpenImportExcel && (
+            <button
+              type="button"
+              onClick={props.onOpenImportExcel}
+              className="bg-surface-card text-text-primary flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2 text-xs font-semibold shadow-xs transition-colors hover:bg-surface-container-low sm:text-sm"
+            >
+              <Upload className="text-text-muted size-4" />
+              {/* shortcut: no locale key for import button in MasterSiswaPage namespace; domain label hard-coded */}
+              <span>Import Excel</span>
+            </button>
+          )}
+
           <button
             type="button"
             onClick={props.onExportExcel}
-            className="bg-surface-card text-text-primary flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2 text-xs font-semibold shadow-xs transition-colors hover:bg-surface-container-low sm:text-sm"
+            disabled={props.isExporting === true}
+            className="bg-surface-card text-text-primary flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2 text-xs font-semibold shadow-xs transition-colors hover:bg-surface-container-low disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
           >
-            <Download className="text-text-muted size-4" />
+            <Download
+              className={`size-4 ${props.isExporting === true ? 'text-text-muted animate-pulse' : 'text-text-muted'}`}
+            />
             <span>{t('btn_export_excel')}</span>
           </button>
 

@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable promise/prefer-await-to-then, eslint/no-empty-function, eslint/require-unicode-regexp, eslint/no-use-before-define, jsx-a11y/no-noninteractive-tabindex, typescript/consistent-return -- vendored shadcn/ui component, syntax-highlighting primitive from upstream shadcn/ui; tabindex/then-chain are intentional; do not hand-edit */
 import { cva } from 'class-variance-authority';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from 'cn';

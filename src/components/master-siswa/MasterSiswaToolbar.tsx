@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl';
 import type { GradeFilter, StatusFilter } from '@/types/masterSiswa';
 
 /**
- * Filter toolbar with debounced-friendly search input and categorical selectors.
+ * Filter toolbar with search input and categorical selectors (server-driven filters).
  *
  * @param props - Component properties.
  * @returns Filter bar component.
@@ -18,8 +18,12 @@ export function MasterSiswaToolbar(props: {
   statusFilter: StatusFilter;
   onStatusChange: (val: StatusFilter) => void;
   yearFilter: string;
+  defaultYearId: string;
+  yearOptions: { id: string; name: string }[];
   onYearChange: (val: string) => void;
-  availableClasses: string[];
+  sortValue: 'name' | 'nis';
+  onSortChange: (val: 'name' | 'nis') => void;
+  availableClasses: { id: string; name: string }[];
   onResetFilters: () => void;
 }) {
   const t = useTranslations('MasterSiswaPage');
@@ -29,7 +33,7 @@ export function MasterSiswaToolbar(props: {
     props.gradeFilter !== 'all' ||
     props.classFilter !== 'all' ||
     props.statusFilter !== 'all' ||
-    props.yearFilter !== '2024/2025';
+    props.yearFilter !== props.defaultYearId;
 
   return (
     <div className="flex flex-col gap-3">
@@ -66,6 +70,7 @@ export function MasterSiswaToolbar(props: {
           <select
             value={props.gradeFilter}
             onChange={(e) => {
+              // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
               props.onGradeChange(e.target.value as GradeFilter);
             }}
             className="bg-surface-card text-text-primary h-9 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
@@ -78,7 +83,7 @@ export function MasterSiswaToolbar(props: {
           <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
         </div>
 
-        {/* Class Rombel filter */}
+        {/* Class Rombel filter (real class ids from GET /classes) */}
         <div className="relative">
           <select
             value={props.classFilter}
@@ -89,8 +94,8 @@ export function MasterSiswaToolbar(props: {
           >
             <option value="all">{t('filter_class_all')}</option>
             {props.availableClasses.map((cls) => (
-              <option key={cls} value={cls}>
-                {t('filter_class_option', { name: cls })}
+              <option key={cls.id} value={cls.id}>
+                {t('filter_class_option', { name: cls.name })}
               </option>
             ))}
           </select>
@@ -102,6 +107,7 @@ export function MasterSiswaToolbar(props: {
           <select
             value={props.statusFilter}
             onChange={(e) => {
+              // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
               props.onStatusChange(e.target.value as StatusFilter);
             }}
             className="bg-surface-card text-text-primary h-9 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
@@ -114,7 +120,7 @@ export function MasterSiswaToolbar(props: {
           <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
         </div>
 
-        {/* Year filter */}
+        {/* Year filter (real academic years from GET /academic-years) */}
         <div className="relative">
           <select
             value={props.yearFilter}
@@ -123,9 +129,29 @@ export function MasterSiswaToolbar(props: {
             }}
             className="bg-surface-card text-text-primary h-9 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           >
-            <option value="2024/2025">{t('filter_year_2024_2025')}</option>
-            <option value="2025/2026">{t('filter_year_2025_2026')}</option>
-            <option value="2026/2027">{t('filter_year_2026_2027')}</option>
+            {props.yearOptions.length === 0 && <option value="">—</option>}
+            {props.yearOptions.map((year) => (
+              <option key={year.id} value={year.id}>
+                {year.name}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
+        </div>
+
+        {/* Sort selector (GET /students sort=name|nis) */}
+        <div className="relative">
+          <select
+            value={props.sortValue}
+            onChange={(e) => {
+              // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
+              props.onSortChange(e.target.value as 'name' | 'nis');
+            }}
+            aria-label={t('th_name_nisn')}
+            className="bg-surface-card text-text-primary h-9 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+          >
+            <option value="name">Urut: Nama</option>
+            <option value="nis">Urut: NIS</option>
           </select>
           <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
         </div>

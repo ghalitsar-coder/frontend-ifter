@@ -1,3 +1,4 @@
+/* oxlint-disable jsx-a11y/prefer-tag-over-role -- vendored shadcn/ui component, role attributes mirror upstream shadcn/ui markup consumed via polymorphic render props; do not hand-edit */
 import { mergeProps } from '@base-ui/react/merge-props';
 import { useRender } from '@base-ui/react/use-render';
 import { cn } from 'cn';

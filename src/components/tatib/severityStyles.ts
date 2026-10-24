@@ -1,6 +1,27 @@
 import type { RuleSeverity } from '@/types/tatib';
 
 /**
+ * Upper bound of each severity band in discipline points, mirroring the
+ * backend `default_points` scale for discipline categories.
+ */
+const SEVERITY_BOUNDS: { severity: RuleSeverity; max: number }[] = [
+  { severity: 'ringan', max: 15 },
+  { severity: 'sedang', max: 25 },
+  { severity: 'berat', max: 50 },
+];
+
+/**
+ * Derive the severity band from a rule point weight.
+ *
+ * @param points - Point deduction of the rule.
+ * @returns Severity band for the given weight.
+ */
+export function getRuleSeverity(points: number): RuleSeverity {
+  const band = SEVERITY_BOUNDS.find((item) => points <= item.max);
+  return band ? band.severity : 'kritis';
+}
+
+/**
  * Badge, dot, and ring styling per severity band, shared by catalog and modal.
  */
 export const SEVERITY_STYLES: Record<RuleSeverity, { badge: string; dot: string; ring: string }> = {

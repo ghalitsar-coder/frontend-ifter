@@ -13,13 +13,17 @@ export function useHighlightedCode(value: string, language: string) {
   React.useEffect(() => {
     let cancelled = false;
 
-    loadHighlighter(language)
-      .then((next) => {
+    const load = async () => {
+      try {
+        const next = await loadHighlighter(language);
         if (!cancelled) {
           setLoaded({ language, highlighter: next });
         }
-      })
-      .catch(() => {});
+      } catch {
+        // Highlighting is decorative; a failed bundle load just keeps plain text.
+      }
+    };
+    void load();
 
     return () => {
       cancelled = true;

@@ -17,8 +17,57 @@ export function AttendanceRosterTable(props: {
   onStatusChange: (id: string, newStatus: AttendanceStatus) => void;
   onPreviewDoc: (preview: DocumentPreviewData) => void;
   totalCount: number;
+  /** Enables inline note editing (wired to the bulk-save draft in the manager). */
+  onNotesChange?: (id: string, notes: string) => void;
+  /** Locks all editing controls when the attendance day is closed. */
+  readOnly?: boolean;
 }) {
   const t = useTranslations('AttendancePage');
+  const readOnly = props.readOnly === true;
+
+  const renderNotesCell = (student: StudentAttendanceRecord) => {
+    const toneClass =
+      student.status === 'alpa' ? 'font-medium text-destructive' : 'text-muted-foreground';
+    const { documentName } = student;
+    if (documentName !== undefined && documentName !== '') {
+      return (
+        <button
+          type="button"
+          onClick={() => {
+            props.onPreviewDoc({
+              title: student.documentTitle ?? documentName ?? 'Dokumen Terlampir',
+              documentName,
+              studentName: student.name,
+              clinic: student.documentClinic,
+              doctor: student.documentDoctor,
+              date: student.documentDate,
+            });
+          }}
+          className="inline-flex max-w-[200px] items-center gap-1.5 rounded-lg border border-border/50 bg-surface-container-low px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-surface-container-high"
+        >
+          <FileText className="size-3.5 shrink-0 text-primary" />
+          <span className="truncate">{documentName}</span>
+        </button>
+      );
+    }
+    const { onNotesChange } = props;
+    if (onNotesChange === undefined) {
+      return <span className={toneClass}>{student.notes}</span>;
+    }
+    return (
+      <input
+        type="text"
+        value={student.notes}
+        disabled={readOnly}
+        placeholder="Catatan guru..."
+        aria-label={`Catatan untuk ${student.name}`}
+        onChange={(e) => {
+          onNotesChange(student.id, e.target.value);
+        }}
+        className={`h-8 w-full max-w-[240px] rounded-lg border border-border/50 bg-surface-container-low px-2.5 text-xs transition-colors focus:bg-background focus:ring-1 focus:ring-ring focus:outline-none disabled:opacity-60 ${toneClass}`}
+      />
+    );
+  };
 
   return (
     <section className="mb-6 overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
@@ -46,6 +95,7 @@ export function AttendanceRosterTable(props: {
                   </td>
 
                   {/* Student Name & NISN */}
+                  {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-3">
                       <div
@@ -103,49 +153,20 @@ export function AttendanceRosterTable(props: {
                   </td>
 
                   {/* Notes / Document Link */}
-                  <td className="px-4 py-4 text-xs">
-                    {student.documentName ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          props.onPreviewDoc({
-                            title:
-                              student.documentTitle || student.documentName || 'Dokumen Terlampir',
-                            documentName: student.documentName || '',
-                            studentName: student.name,
-                            clinic: student.documentClinic,
-                            doctor: student.documentDoctor,
-                            date: student.documentDate,
-                          });
-                        }}
-                        className="inline-flex max-w-[200px] items-center gap-1.5 rounded-lg border border-border/50 bg-surface-container-low px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:bg-surface-container-high"
-                      >
-                        <FileText className="size-3.5 shrink-0 text-primary" />
-                        <span className="truncate">{student.documentName}</span>
-                      </button>
-                    ) : (
-                      <span
-                        className={
-                          student.status === 'alpa'
-                            ? 'font-medium text-destructive'
-                            : 'text-muted-foreground'
-                        }
-                      >
-                        {student.notes}
-                      </span>
-                    )}
-                  </td>
+                  <td className="px-4 py-4 text-xs">{renderNotesCell(student)}</td>
 
                   {/* Quick Status Segmented Controls */}
+                  {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
                   <td className="px-4 py-4 text-right">
                     <div className="inline-flex items-center gap-1 rounded-xl border border-border/50 bg-surface-container-low p-1">
                       <button
                         type="button"
                         title={t('hadir_label')}
+                        disabled={readOnly}
                         onClick={() => {
                           props.onStatusChange(student.id, 'hadir');
                         }}
-                        className={`size-7 rounded-lg text-xs font-semibold transition-all ${
+                        className={`size-7 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 ${
                           student.status === 'hadir'
                             ? 'bg-card text-foreground shadow-xs'
                             : 'text-muted-foreground hover:text-foreground'
@@ -156,10 +177,11 @@ export function AttendanceRosterTable(props: {
                       <button
                         type="button"
                         title={t('sakit_label')}
+                        disabled={readOnly}
                         onClick={() => {
                           props.onStatusChange(student.id, 'sakit');
                         }}
-                        className={`size-7 rounded-lg text-xs font-semibold transition-all ${
+                        className={`size-7 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 ${
                           student.status === 'sakit'
                             ? 'bg-card text-foreground shadow-xs'
                             : 'text-muted-foreground hover:text-foreground'
@@ -170,10 +192,11 @@ export function AttendanceRosterTable(props: {
                       <button
                         type="button"
                         title={t('izin_label')}
+                        disabled={readOnly}
                         onClick={() => {
                           props.onStatusChange(student.id, 'izin');
                         }}
-                        className={`size-7 rounded-lg text-xs font-semibold transition-all ${
+                        className={`size-7 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 ${
                           student.status === 'izin'
                             ? 'bg-card text-foreground shadow-xs'
                             : 'text-muted-foreground hover:text-foreground'
@@ -184,10 +207,11 @@ export function AttendanceRosterTable(props: {
                       <button
                         type="button"
                         title={t('alpa_label')}
+                        disabled={readOnly}
                         onClick={() => {
                           props.onStatusChange(student.id, 'alpa');
                         }}
-                        className={`size-7 rounded-lg text-xs font-semibold transition-all ${
+                        className={`size-7 rounded-lg text-xs font-semibold transition-all disabled:opacity-40 ${
                           student.status === 'alpa'
                             ? 'bg-card text-foreground shadow-xs'
                             : 'text-muted-foreground hover:text-foreground'

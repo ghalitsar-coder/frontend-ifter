@@ -1,6 +1,7 @@
 import { ArrowUpRight, Scale } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { SEVERITY_STYLES } from '@/components/tatib/severityStyles';
+// shortcut: sanction tiers + catalog summary panels have no settings endpoint, keep mock
 import { getRuleSeverity, mockSanctionTiers, mockTatibRules } from '@/data/mockTatib';
 import { Link } from '@/libs/I18nNavigation';
 

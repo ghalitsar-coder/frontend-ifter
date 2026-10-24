@@ -9,7 +9,19 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import type { AccessLevel, EmploymentStatus, TeacherProfile } from '@/types/masterGuru';
+import type { NewTeacherDraft } from '@/lib/api/master-guru';
+import type { AccessLevel, EmploymentStatus } from '@/types/masterGuru';
+
+/** Dropdown day ↔ ISO weekday (Senin=1 … Minggu=7) used by /duty-assignments. */
+const WEEKDAY_BY_NAME: Record<string, number> = {
+  Senin: 1,
+  Selasa: 2,
+  Rabu: 3,
+  Kamis: 4,
+  Jumat: 5,
+  Sabtu: 6,
+  Minggu: 7,
+};
 
 /**
  * Modal form for registering a new teacher or academic staff (PTK) record.
@@ -20,8 +32,9 @@ import type { AccessLevel, EmploymentStatus, TeacherProfile } from '@/types/mast
 export function MasterGuruAddModal(props: {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (teacher: Omit<TeacherProfile, 'id'>) => void;
-  availableClasses: string[];
+  onSubmit: (draft: NewTeacherDraft) => void;
+  availableClasses: { id: string; name: string }[];
+  isSubmitting: boolean;
 }) {
   const t = useTranslations('MasterGuruPage');
 
@@ -39,7 +52,7 @@ export function MasterGuruAddModal(props: {
   const [teachingHours, setTeachingHours] = useState(24);
 
   const [isHomeroom, setIsHomeroom] = useState(false);
-  const [selectedClass, setSelectedClass] = useState(props.availableClasses[0] || 'Kelas VII A');
+  const [selectedClassId, setSelectedClassId] = useState(props.availableClasses[0]?.id ?? '');
   const [isPicket, setIsPicket] = useState(false);
   const [picketDay, setPicketDay] = useState<
     'Senin' | 'Selasa' | 'Rabu' | 'Kamis' | 'Jumat' | 'Sabtu'
@@ -53,62 +66,31 @@ export function MasterGuruAddModal(props: {
     return null;
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !phone.trim() || !subject.trim()) {
+    if (!name.trim() || !email.trim() || !phone.trim()) {
       return;
     }
 
-    const roles: string[] = [];
-    if (isHomeroom) {
-      roles.push('Wali Kelas');
-    }
-    if (isPicket) {
-      roles.push('Guru Piket');
-    }
-    if (accessLevel === 'admin') {
-      roles.push('Administrator');
-    }
-    if (roles.length === 0) {
-      roles.push('Guru Pengampu');
-    }
-
-    const teacherData: Omit<TeacherProfile, 'id'> = {
-      name: name.trim(),
-      nip: nip.trim() || '19850101 201001 1 001',
-      nuptk: nuptk.trim() || undefined,
-      nik: nik.trim() || undefined,
-      gender,
+    // shortcut: nuptk/nik/gender/employmentStatus/subject/teachingHours/rfid have
+    // no fields on the backend Teacher DTO, so they are not submitted.
+    const draft: NewTeacherDraft = {
+      fullName: name.trim(),
+      employeeNumber: nip.trim(),
       email: email.trim(),
       phone: phone.trim(),
-      employmentStatus,
-      subject: subject.trim(),
-      teachingHoursPerWeek: Number(teachingHours) || 24,
-      roles,
-      homeroomClass: isHomeroom
-        ? {
-            className: selectedClass,
-            studentCount: 32,
-          }
-        : undefined,
-      picketDuty: isPicket
-        ? {
-            day: picketDay,
-            postName: 'Pos 01 Gerbang Utama',
-            postLocation: 'Gerbang Utama',
-            isCheckedIn: false,
-          }
-        : undefined,
       accessLevel,
-      status: 'active',
-      rfidUid: rfidUid.trim() || undefined,
+      createAccount: true,
+      homeroomClassId: isHomeroom && selectedClassId !== '' ? selectedClassId : undefined,
+      dutyWeekday: isPicket ? WEEKDAY_BY_NAME[picketDay] : undefined,
     };
 
-    props.onSubmit(teacherData);
+    props.onSubmit(draft);
   };
 
   return (
     <div
+      // oxlint-disable-next-line jsx-a11y/prefer-tag-over-role -- modal overlay is already scoped by aria-modal
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-add-guru-title"
@@ -140,6 +122,11 @@ export function MasterGuruAddModal(props: {
 
         {/* Modal Form */}
         <form onSubmit={handleSubmit} className="max-h-[80vh] space-y-6 overflow-y-auto p-6">
+          <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-800">
+            Catatan: NUPTK, NIK, mata pelajaran, jam mengajar, dan kartu RFID belum diterima API
+            server — hanya nama, NIP, email, telepon, tingkat akses, dan penugasan yang disimpan.
+          </p>
+
           {/* Section 1: Identitas Personal & NIP */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 border-b border-border-subtle pb-2">
@@ -296,6 +283,7 @@ export function MasterGuruAddModal(props: {
                 <select
                   value={employmentStatus}
                   onChange={(e) => {
+                    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
                     setEmploymentStatus(e.target.value as EmploymentStatus);
                   }}
                   className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
@@ -313,7 +301,6 @@ export function MasterGuruAddModal(props: {
                 </label>
                 <input
                   type="text"
-                  required
                   value={subject}
                   onChange={(e) => {
                     setSubject(e.target.value);
@@ -380,15 +367,18 @@ export function MasterGuruAddModal(props: {
                       {t('label_target_rombel')}:
                     </span>
                     <select
-                      value={selectedClass}
+                      value={selectedClassId}
                       onChange={(e) => {
-                        setSelectedClass(e.target.value);
+                        setSelectedClassId(e.target.value);
                       }}
                       className="h-8 rounded-lg border border-border-control bg-white px-2.5 text-xs font-bold text-pine-deep"
                     >
+                      {props.availableClasses.length === 0 && (
+                        <option value="">Belum ada kelas aktif</option>
+                      )}
                       {props.availableClasses.map((cls) => (
-                        <option key={cls} value={cls}>
-                          {cls}
+                        <option key={cls.id} value={cls.id}>
+                          {cls.name}
                         </option>
                       ))}
                     </select>
@@ -428,6 +418,7 @@ export function MasterGuruAddModal(props: {
                       value={picketDay}
                       onChange={(e) => {
                         setPicketDay(
+                          // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
                           e.target.value as
                             | 'Senin'
                             | 'Selasa'
@@ -579,10 +570,11 @@ export function MasterGuruAddModal(props: {
             </button>
             <button
               type="submit"
-              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-pine-deep px-5 py-2.5 text-xs font-semibold text-white shadow-md transition-colors hover:bg-pine-hover sm:text-sm"
+              disabled={props.isSubmitting}
+              className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-pine-deep px-5 py-2.5 text-xs font-semibold text-white shadow-md transition-colors hover:bg-pine-hover disabled:opacity-60 sm:text-sm"
             >
               <CheckCircle2 className="size-4 text-amber-300" />
-              <span>{t('btn_save_teacher_and_account')}</span>
+              <span>{props.isSubmitting ? 'Menyimpan...' : t('btn_save_teacher_and_account')}</span>
             </button>
           </div>
         </form>

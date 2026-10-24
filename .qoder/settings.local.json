@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh repo view get-bb/bb 2>&1 | head -60)",
+      "Bash(gh repo view stablyai/orca 2>&1 | head -60)"
+    ]
+  }
+}

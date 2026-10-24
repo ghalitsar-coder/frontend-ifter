@@ -1,5 +1,6 @@
 'use client';
 
+/* oxlint-disable jsx-a11y/label-has-associated-control -- vendored shadcn/ui component, generic label primitive; htmlFor/control association is the consumer responsibility; do not hand-edit */
 import { cn } from 'cn';
 import * as React from 'react';
 
