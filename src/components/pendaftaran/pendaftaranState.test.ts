@@ -46,14 +46,8 @@ describe(identityIssues, () => {
     );
   });
 
-  it('names the registered school for a duplicate NPSN', () => {
-    const issues = identityIssues({ ...VALID, npsn: '20401234' });
-
-    expect(issues.npsn?.messageKey).toBe('id_error_npsn_duplicate');
-    expect(issues.npsn?.values).toStrictEqual({
-      npsn: '20401234',
-      school: 'SMP Negeri 1 Sleman',
-    });
+  it('accepts an eight-digit NPSN; duplicates are caught by the backend on registration', () => {
+    expect(identityIssues({ ...VALID, npsn: '20401234' }).npsn).toBeUndefined();
   });
 
   it('rejects an email outside the school domain format', () => {

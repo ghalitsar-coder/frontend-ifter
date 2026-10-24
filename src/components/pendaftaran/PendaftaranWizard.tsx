@@ -1,5 +1,6 @@
 'use client';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { PendaftaranDocumentsStep } from '@/components/pendaftaran/PendaftaranDocumentsStep';
@@ -13,27 +14,64 @@ import {
 import type {
   PendaftaranDraft,
   PendaftaranField,
+  PendaftaranRegisterErrorKey,
   PendaftaranStep,
 } from '@/components/pendaftaran/pendaftaranState';
 import { PendaftaranStepRibbon } from '@/components/pendaftaran/PendaftaranStepRibbon';
 import { PendaftaranSuccessStep } from '@/components/pendaftaran/PendaftaranSuccessStep';
 import { useRouter } from '@/libs/I18nNavigation';
+import { AUTH_QUERY_KEY, PresensiApiError, registerSchool } from '@/services/presensiApi';
+
+const REGISTER_ERROR_KEYS: Record<string, PendaftaranRegisterErrorKey> = {
+  email_taken: 'otp_error_email_taken',
+  internal_error: 'otp_error_internal',
+  invalid_registration: 'otp_error_invalid',
+  npsn_taken: 'otp_error_npsn_taken',
+  unreachable: 'otp_error_unreachable',
+};
 
 /**
  * School registration wizard: the portal headline, the progress ribbon and whichever of the four
- * steps the teacher is on. Registration is not sent anywhere yet, so the draft only lives here.
+ * steps the teacher is on. The school and admin are created once the OTP is confirmed.
  *
  * @returns The current wizard step inside the portal page frame.
  */
 export function PendaftaranWizard() {
   const t = useTranslations('PendaftaranPage');
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [draft, setDraft] = useState<PendaftaranDraft>(EMPTY_PENDAFTARAN_DRAFT);
   const [step, setStep] = useState<PendaftaranStep>('identitas');
   const [showIssues, setShowIssues] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<PendaftaranRegisterErrorKey | null>(null);
 
   const issues = showIssues ? identityIssues(draft) : {};
   const school = { name: draft.name, npsn: draft.npsn };
+
+  async function verifyAndRegister() {
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      await registerSchool({
+        adminName: draft.adminName,
+        email: draft.email,
+        level: draft.level,
+        name: draft.name,
+        npsn: draft.npsn,
+        password: draft.password,
+        phone: draft.phone,
+      });
+      await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
+      setStep(nextPendaftaranStep(step, 'next'));
+    } catch (error) {
+      const code = error instanceof PresensiApiError ? error.code : 'internal_error';
+      setSubmitError(REGISTER_ERROR_KEYS[code] ?? 'otp_error_internal');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
   return (
     <div className="flex w-full flex-col">
@@ -101,11 +139,14 @@ export function PendaftaranWizard() {
       {step === 'otp' && (
         <div className="mx-auto w-full max-w-7xl px-margin pb-space-2xl sm:px-gutter">
           <PendaftaranOtpStep
+            errorKey={submitError}
+            isSubmitting={isSubmitting}
             onBack={() => {
+              setSubmitError(null);
               setStep(nextPendaftaranStep(step, 'back'));
             }}
             onVerified={() => {
-              setStep(nextPendaftaranStep(step, 'next'));
+              void verifyAndRegister();
             }}
             school={{
               level: draft.level,
@@ -121,6 +162,12 @@ export function PendaftaranWizard() {
         <PendaftaranSuccessStep
           onStart={() => {
             router.push('/presensi');
+          }}
+          school={{
+            email: draft.email,
+            level: draft.level,
+            name: draft.name,
+            npsn: draft.npsn,
           }}
         />
       )}

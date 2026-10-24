@@ -24,7 +24,6 @@ export type PendaftaranStep = 'dokumen' | 'identitas' | 'otp' | 'selesai';
 export type PendaftaranIssue = {
   messageKey:
     | 'id_error_email'
-    | 'id_error_npsn_duplicate'
     | 'id_error_npsn_format'
     | 'id_error_password_length'
     | 'id_error_password_mismatch'
@@ -35,6 +34,16 @@ export type PendaftaranIssue = {
 };
 
 export type PendaftaranIssueMap = Partial<Record<PendaftaranField, PendaftaranIssue>>;
+
+/**
+ * Translation key of a registration failure, one per backend error the OTP step can surface.
+ */
+export type PendaftaranRegisterErrorKey =
+  | 'otp_error_email_taken'
+  | 'otp_error_internal'
+  | 'otp_error_invalid'
+  | 'otp_error_npsn_taken'
+  | 'otp_error_unreachable';
 
 export const EMPTY_PENDAFTARAN_DRAFT: PendaftaranDraft = {
   adminName: '',
@@ -47,12 +56,6 @@ export const EMPTY_PENDAFTARAN_DRAFT: PendaftaranDraft = {
   phone: '',
   termsAccepted: false,
   waOptIn: true,
-};
-
-// shortcut: no backend lookup exists yet, so the duplicate check reads this fixed register;
-// replace with the NPSN availability endpoint once the public API route lands.
-const REGISTERED_NPSN: Record<string, string> = {
-  '20401234': 'SMP Negeri 1 Sleman',
 };
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
@@ -90,15 +93,8 @@ export function identityIssues(draft: PendaftaranDraft): PendaftaranIssueMap {
     issues.name = { messageKey: 'id_error_required' };
   }
 
-  const registeredSchool = REGISTERED_NPSN[draft.npsn];
-
   if (!/^\d{8}$/u.test(draft.npsn)) {
     issues.npsn = { messageKey: 'id_error_npsn_format' };
-  } else if (registeredSchool !== undefined) {
-    issues.npsn = {
-      messageKey: 'id_error_npsn_duplicate',
-      values: { npsn: draft.npsn, school: registeredSchool },
-    };
   }
 
   if (draft.level === '') {

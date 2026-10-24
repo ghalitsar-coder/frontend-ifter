@@ -88,6 +88,19 @@ export type LoginResult = AuthSession & {
 };
 
 /**
+ * Payload of POST /v1/auth/register, sent through the Next registration route.
+ */
+export type RegisterSchoolInput = {
+  adminName: string;
+  email: string;
+  level: string;
+  name: string;
+  npsn: string;
+  password: string;
+  phone: string;
+};
+
+/**
  * Backend failure that carries the machine-readable code instead of a prose message,
  * so the screen can translate `code` and react to `status`.
  */
@@ -264,6 +277,53 @@ export async function signIn(credentials: {
     throw new PresensiApiError({
       code: payload.code ?? 'internal_error',
       message: payload.message ?? 'login failed',
+      status: response.status,
+    });
+  }
+
+  return payload;
+}
+
+/**
+ * Register a school and its first admin through the Next registration route, which stores the
+ * returned JWT in the httpOnly cookie.
+ *
+ * @param input - School profile, admin account and password from the wizard.
+ * @returns The signed-in admin.
+ * @throws {PresensiApiError} When the backend rejects the registration or is unreachable.
+ */
+export async function registerSchool(input: RegisterSchoolInput): Promise<AuthSession> {
+  const response = await fetch('/api/auth/register', {
+    body: JSON.stringify(input),
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+    signal: AbortSignal.timeout(10_000),
+  }).catch(() => null);
+
+  if (response === null) {
+    throw new PresensiApiError({
+      code: 'unreachable',
+      message: 'backend is not reachable',
+      status: 502,
+    });
+  }
+
+  const payload: (AuthSession & { code?: string; message?: string }) | null = await response
+    .json()
+    .catch(() => null);
+
+  if (payload === null) {
+    throw new PresensiApiError({
+      code: 'internal_error',
+      message: 'registration failed',
+      status: response.status,
+    });
+  }
+
+  if (!response.ok) {
+    throw new PresensiApiError({
+      code: payload.code ?? 'internal_error',
+      message: payload.message ?? 'registration failed',
       status: response.status,
     });
   }

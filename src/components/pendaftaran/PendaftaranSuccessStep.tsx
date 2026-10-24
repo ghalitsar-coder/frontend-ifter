@@ -2,12 +2,13 @@
 
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { LEVEL_LABELS } from '@/components/pendaftaran/PendaftaranIdentityStep';
 import { Link } from '@/libs/I18nNavigation';
+import { getBaseUrl } from '@/utils/Helpers';
 
 const COPY_TOAST_MS = 2500;
 
-// The workspace URL is static demo content; upgrade to the provisioned school URL when registration returns it.
-const WORKSPACE_URL = 'https://smpn1sleman.attendly.sch.id';
+const WORKSPACE_URL = getBaseUrl();
 
 const CONFIG_BUTTON =
   'flex w-full items-center justify-center gap-space-xs rounded-xl bg-surface-container px-space-md py-space-sm font-label-md text-label-md font-semibold text-pine-deep transition-colors hover:bg-surface-container-high';
@@ -117,11 +118,19 @@ function PendaftaranSuccessHeader() {
  * Hero workspace card: the verification crest, the provisioned school identity, the four provisioning
  * metrics, and a quick action to copy the workspace URL.
  *
- * @param props - Clipboard handler for the workspace URL.
+ * @param props - Registered school, and the clipboard handler for the workspace URL.
  * @returns Rounded hero card with accent strip, crest emblem, school data, and copy dock.
  */
-function PendaftaranWorkspaceCard(props: { onCopy: (value: string) => void }) {
+function PendaftaranWorkspaceCard(props: {
+  onCopy: (value: string) => void;
+  school: { email: string; level: string; name: string; npsn: string };
+}) {
   const t = useTranslations('PendaftaranPage');
+  const { level } = props.school;
+  const levelKey =
+    level === 'SD' || level === 'SMP' || level === 'SMA' || level === 'SMK' || level === 'PESANTREN'
+      ? LEVEL_LABELS[level]
+      : undefined;
 
   return (
     <div className="relative mx-auto mb-space-3xl w-full max-w-5xl overflow-hidden rounded-2xl bg-surface-container-lowest shadow-xl">
@@ -153,25 +162,15 @@ function PendaftaranWorkspaceCard(props: { onCopy: (value: string) => void }) {
             <span className="font-caption text-caption font-semibold">{t('done_trial_note')}</span>
           </div>
           <h2 className="mb-space-xs font-headline-lg text-headline-lg tracking-tight text-text-primary">
-            {t('done_school_name')}
+            {props.school.name}
           </h2>
           <p className="mb-space-lg flex flex-wrap items-center justify-center gap-x-space-md gap-y-space-xs font-body-md text-body-md text-text-muted md:justify-start">
             <span className="flex items-center gap-1">
               <span className="material-symbols-outlined text-[16px] text-pine-deep">tag</span>
               <span>
-                {t('done_institution_code_label')}{' '}
+                {t('done_level_label')}{' '}
                 <strong className="font-medium text-text-primary">
-                  {t('done_institution_code')}
-                </strong>
-              </span>
-            </span>
-            <span>•</span>
-            <span className="flex items-center gap-1">
-              <span className="material-symbols-outlined text-[16px] text-pine-deep">link</span>
-              <span>
-                {t('done_domain_label')}{' '}
-                <strong className="text-pine-deep underline decoration-amber-gold decoration-2 underline-offset-4">
-                  {t('done_domain')}
+                  {levelKey === undefined ? props.school.level : t(levelKey)}
                 </strong>
               </span>
             </span>
@@ -180,7 +179,7 @@ function PendaftaranWorkspaceCard(props: { onCopy: (value: string) => void }) {
               <span className="material-symbols-outlined text-[16px] text-pine-deep">domain</span>
               <span>
                 {t('done_npsn_label')}{' '}
-                <strong className="font-medium text-text-primary">{t('done_npsn')}</strong>
+                <strong className="font-medium text-text-primary">{props.school.npsn}</strong>
               </span>
             </span>
             <span>•</span>
@@ -188,7 +187,7 @@ function PendaftaranWorkspaceCard(props: { onCopy: (value: string) => void }) {
               <span className="material-symbols-outlined text-[16px] text-pine-deep">badge</span>
               <span>
                 {t('done_admin_label')}{' '}
-                <strong className="font-medium text-text-primary">{t('done_admin_email')}</strong>
+                <strong className="font-medium text-text-primary">{props.school.email}</strong>
               </span>
             </span>
           </p>
@@ -620,10 +619,13 @@ function PendaftaranSupportBanner() {
  * activation mock's completion band and keeps the editorial confirmation layout of the primary mock,
  * then folds in the second mock's unique trial-licence summary and administrator email.
  *
- * @param props - Handler invoked by the primary dashboard CTA to enter the workspace.
+ * @param props - Registered school and the handler invoked by the primary dashboard CTA.
  * @returns Full success screen with copy-to-clipboard toast feedback.
  */
-export function PendaftaranSuccessStep(props: { onStart: () => void }) {
+export function PendaftaranSuccessStep(props: {
+  onStart: () => void;
+  school: { email: string; level: string; name: string; npsn: string };
+}) {
   const t = useTranslations('PendaftaranPage');
   const [isCopied, setIsCopied] = useState(false);
 
@@ -637,7 +639,7 @@ export function PendaftaranSuccessStep(props: { onStart: () => void }) {
     <section className="mx-auto w-full max-w-7xl px-margin py-space-xl sm:py-space-2xl">
       <PendaftaranCompletionBand />
       <PendaftaranSuccessHeader />
-      <PendaftaranWorkspaceCard onCopy={copyToClipboard} />
+      <PendaftaranWorkspaceCard onCopy={copyToClipboard} school={props.school} />
       <PendaftaranTrialLicence />
       <PendaftaranSetupBento />
       <PendaftaranActionDock onStart={props.onStart} />

@@ -42,6 +42,7 @@ const FIELD_ENTRIES = [
     icon: 'account_balance',
     kind: 'text',
     labelKey: 'id_name_label',
+    maxLength: 120,
     placeholderKey: 'id_name_placeholder',
     span2: true,
     type: 'text',
@@ -70,6 +71,7 @@ const FIELD_ENTRIES = [
     icon: 'badge',
     kind: 'text',
     labelKey: 'id_admin_label',
+    maxLength: 100,
     placeholderKey: 'id_admin_placeholder',
     span2: true,
     type: 'text',
@@ -79,6 +81,7 @@ const FIELD_ENTRIES = [
     icon: 'alternate_email',
     kind: 'text',
     labelKey: 'id_email_label',
+    maxLength: 254,
     placeholderKey: 'id_email_placeholder',
     span2: false,
     type: 'email',
@@ -88,6 +91,7 @@ const FIELD_ENTRIES = [
     icon: 'chat',
     kind: 'text',
     labelKey: 'id_phone_label',
+    maxLength: 20,
     placeholderKey: 'id_phone_placeholder',
     span2: false,
     type: 'tel',
@@ -97,6 +101,7 @@ const FIELD_ENTRIES = [
     icon: 'lock',
     kind: 'password',
     labelKey: 'id_password_label',
+    maxLength: 72,
     placeholderKey: 'id_password_placeholder',
     span2: false,
     type: 'password',
@@ -106,6 +111,7 @@ const FIELD_ENTRIES = [
     icon: 'lock_reset',
     kind: 'password',
     labelKey: 'id_confirm_label',
+    maxLength: 72,
     placeholderKey: 'id_confirm_placeholder',
     span2: false,
     type: 'password',
@@ -114,7 +120,7 @@ const FIELD_ENTRIES = [
 
 const LEVEL_VALUES = ['SD', 'SMP', 'SMA', 'SMK', 'PESANTREN'] as const;
 
-const LEVEL_LABELS = {
+export const LEVEL_LABELS = {
   PESANTREN: 'id_level_pesantren',
   SD: 'id_level_sd',
   SMA: 'id_level_sma',

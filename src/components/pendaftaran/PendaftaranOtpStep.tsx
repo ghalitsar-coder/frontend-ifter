@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { useRef, useState } from 'react';
 import { otpCodeComplete } from '@/components/pendaftaran/pendaftaranState';
+import type { PendaftaranRegisterErrorKey } from '@/components/pendaftaran/pendaftaranState';
 
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 102;
@@ -34,6 +35,8 @@ function formatCountdown(seconds: number): string {
  * @returns The OTP verification layout with the school preview sidebar.
  */
 export function PendaftaranOtpStep(props: {
+  errorKey: PendaftaranRegisterErrorKey | null;
+  isSubmitting: boolean;
   onBack: () => void;
   onVerified: () => void;
   school: { level: string; name: string; npsn: string; pic: string };
@@ -181,7 +184,6 @@ export function PendaftaranOtpStep(props: {
               <fieldset
                 aria-labelledby="otp-heading"
                 className="m-0 flex items-center justify-between gap-space-xs border-0 p-0 sm:gap-space-sm"
-                
               >
                 {digits.map((digit, index) => (
                   <input
@@ -216,7 +218,8 @@ export function PendaftaranOtpStep(props: {
                   <span />
                 )}
                 <button
-                  className="flex items-center gap-0.5 font-caption text-caption font-semibold text-pine-deep transition-colors hover:text-pine-hover"
+                  className="flex items-center gap-0.5 font-caption text-caption font-semibold text-pine-deep transition-colors hover:text-pine-hover disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={props.isSubmitting}
                   onClick={props.onBack}
                   type="button"
                 >
@@ -254,9 +257,18 @@ export function PendaftaranOtpStep(props: {
             </div>
 
             <div className="flex flex-col gap-space-sm">
+              {props.errorKey !== null && (
+                <p
+                  className="flex items-start gap-1 rounded-lg bg-error-container/40 p-space-sm font-caption text-caption font-medium text-error"
+                  role="alert"
+                >
+                  <span className="material-symbols-outlined text-[16px]">error</span>
+                  {t(props.errorKey)}
+                </p>
+              )}
               <button
                 className="flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-pine-deep font-label-md text-label-md font-semibold text-on-primary shadow-md transition-all hover:bg-pine-hover active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60"
-                disabled={!otpCodeComplete(code)}
+                disabled={!otpCodeComplete(code) || props.isSubmitting}
                 onClick={props.onVerified}
                 type="button"
               >
