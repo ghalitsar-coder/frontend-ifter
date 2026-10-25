@@ -17,6 +17,8 @@ export type TeacherProfile = {
  */
 export type TeacherAttendance = {
   isCheckedIn: boolean;
+  /** Today's check-out already recorded (backend `check_out_at`). */
+  isCheckedOut?: boolean;
   status: 'tepat_waktu' | 'terlambat' | 'belum';
   checkInTime: string;
   lateLimit: string;

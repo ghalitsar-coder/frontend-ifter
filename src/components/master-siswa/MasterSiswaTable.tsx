@@ -83,6 +83,8 @@ export function MasterSiswaTable(props: {
   onToggleSelectStudent: (id: string) => void;
   onViewStudent: (student: StudentProfile) => void;
   onEditStudent: (student: StudentProfile) => void;
+  canManageAccount?: boolean;
+  onManageAccount?: (student: StudentProfile) => void;
   currentPage: number;
   totalPages: number;
   pageSize: number;
@@ -286,7 +288,6 @@ export function MasterSiswaTable(props: {
                     </td>
 
                     {/* Actions */}
-                    {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
                     <td className="p-4 text-center">
                       <div className="inline-flex items-center gap-1.5">
                         <button
@@ -310,6 +311,18 @@ export function MasterSiswaTable(props: {
                         >
                           {t('btn_edit')}
                         </button>
+                        {props.canManageAccount === true && props.onManageAccount !== undefined && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              props.onManageAccount?.(student);
+                            }}
+                            className="text-text-muted hover:text-text-primary hover:bg-surface-container cursor-pointer rounded-md border border-border-control px-2.5 py-1.5 text-xs font-semibold transition-colors"
+                            title="Kelola akun login siswa"
+                          >
+                            Akun
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

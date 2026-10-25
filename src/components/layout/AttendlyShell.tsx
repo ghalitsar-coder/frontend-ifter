@@ -15,6 +15,7 @@ import {
   School,
   Scale,
   ScanFace,
+  ScrollText,
   Settings2,
   ShieldAlert,
   User,
@@ -22,15 +23,36 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
-import { Link, usePathname } from '@/libs/I18nNavigation';
+import { can, isStudentOnly, useRolesCatalog } from '@/lib/api/rbac';
+import type { Capability } from '@/lib/api/rbac';
+import { Link, useRouter, usePathname } from '@/libs/I18nNavigation';
+import { getI18nPath } from '@/utils/Helpers';
+
+/** One sidebar menu entry with the RBAC capability that gates its visibility. */
+type NavItem = {
+  label: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+  badge: string | null;
+  capability: Capability;
+};
+
+type NavSection = {
+  title: string;
+  items: NavItem[];
+};
 
 /**
  * Attendly school management responsive application shell.
  * Replaces default boilerplate template with modern Pine & Amber layout.
+ *
+ * Menu visibility follows the 6-role matrix (docs/API_ADDENDUM.md §1–§2) via
+ * `can(roles, capability)`; student-only accounts see no staff menu at all
+ * and are redirected to the `/dashboard/murid` portal.
  *
  * @param props - Layout properties containing page children.
  * @returns Shell JSX layout.
@@ -39,10 +61,27 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
   const t = useTranslations('DashboardLayout');
   const auth = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
+  const locale = useLocale();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Navigation menu groupings
-  const navSections = [
+  // Dynamic role catalog (GET /roles, admin-only endpoint; disabled otherwise).
+  const roleCatalog = useRolesCatalog(auth.roles);
+  const roleNameByCode = new Map((roleCatalog.data ?? []).map((entry) => [entry.code, entry.name]));
+
+  const studentOnly = isStudentOnly(auth.roles);
+
+  // Student portal gate: `student` reaches no staff route on the backend, so
+  // any staff page opened by a student-only account bounces to /dashboard/murid.
+  useEffect(() => {
+    if (studentOnly && !pathname.startsWith('/dashboard/murid')) {
+      router.replace(getI18nPath('/dashboard/murid', locale));
+    }
+  }, [studentOnly, pathname, locale, router]);
+
+  // Navigation menu groupings — each item declares its capability and the
+  // lists below are filtered against the signed-in roles before rendering.
+  const navSections: NavSection[] = [
     {
       title: 'Menu Utama',
       items: [
@@ -51,48 +90,56 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
           href: '/dashboard',
           icon: LayoutDashboard,
           badge: null,
+          capability: 'dashboard',
         },
         {
           label: t('presensi_link'),
           href: '/dashboard/presensi',
           icon: UserCheck,
           badge: 'Sesi Aktif',
+          capability: 'attendance_ops',
         },
         {
           label: t('presensi_guru_link'),
           href: '/dashboard/presensi-guru',
           icon: ScanFace,
           badge: null,
+          capability: 'attendance_ops',
         },
         {
           label: t('koreksi_link'),
           href: '/dashboard/koreksi-absensi',
           icon: FilePenLine,
           badge: 'FR-E05',
+          capability: 'attendance_ops',
         },
         {
           label: t('izin_link'),
           href: '/dashboard/izin-dispensasi',
           icon: FileHeart,
           badge: 'FR-E06',
+          capability: 'dispensations_read',
         },
         {
           label: t('piket_link'),
           href: '/dashboard/piket',
           icon: Nfc,
           badge: 'RFID',
+          capability: 'attendance_ops',
         },
         {
           label: t('kedisiplinan_link'),
           href: '/dashboard/kedisiplinan',
           icon: ShieldAlert,
           badge: null,
+          capability: 'discipline_ops',
         },
         {
           label: t('rekap_link'),
           href: '/dashboard/rekap',
           icon: ChartColumn,
           badge: null,
+          capability: 'reports_read',
         },
       ],
     },
@@ -104,18 +151,21 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
           href: '/dashboard/master-siswa',
           icon: GraduationCap,
           badge: 'FR-A02',
+          capability: 'master_data',
         },
         {
           label: t('master_guru_link'),
           href: '/dashboard/master-guru',
           icon: Users,
           badge: 'FR-A03',
+          capability: 'master_data',
         },
         {
           label: t('tatib_link'),
           href: '/dashboard/aturan',
           icon: Scale,
           badge: 'FR-A05',
+          capability: 'admin',
         },
       ],
     },
@@ -123,20 +173,40 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
       title: 'Konfigurasi Sistem',
       items: [
         {
+          label: t('audit_link'),
+          href: '/dashboard/audit-log',
+          icon: ScrollText,
+          badge: 'Admin',
+          capability: 'admin',
+        },
+        {
           label: t('pengaturan_link'),
           href: '/dashboard/pengaturan',
           icon: Settings2,
           badge: 'FR-A06',
+          // staff_tu sees the master-data part of the page (menu spec); the
+          // attendance-settings API surface stays admin/read-gated.
+          capability: 'settings',
         },
         {
           label: t('user_profile_link'),
           href: '/dashboard/user-profile',
           icon: User,
           badge: null,
+          capability: 'authenticated',
         },
       ],
     },
   ];
+
+  const visibleSections: NavSection[] = studentOnly
+    ? []
+    : navSections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter((item) => can(auth.roles, item.capability)),
+        }))
+        .filter((section) => section.items.length > 0);
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F8F9F8] text-[#111816] selection:bg-[#F2C96C] selection:text-[#173F36]">
@@ -236,7 +306,7 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
             </div>
 
             {/* Navigation Menus */}
-            {navSections.map((section) => (
+            {visibleSections.map((section) => (
               <div key={section.title} className="space-y-1">
                 <span className="block px-3 text-[10px] font-bold tracking-wider text-[#6E7A76] uppercase">
                   {section.title}
@@ -303,6 +373,20 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
                 Akun: {auth.user?.email ?? auth.user?.username}
               </p>
             )}
+            {/* Role chips — names come from the dynamic GET /roles catalog for
+                admins, raw codes for other roles (the endpoint is admin-only). */}
+            {auth.roles.length > 0 && (
+              <div className="flex flex-wrap gap-1 px-1">
+                {auth.roles.map((role) => (
+                  <span
+                    key={role}
+                    className="rounded-full bg-[#173F36]/5 px-2 py-0.5 text-[10px] font-semibold text-[#173F36]"
+                  >
+                    {roleNameByCode.get(role) ?? role}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </aside>
 
@@ -337,7 +421,7 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
                   </button>
                 </div>
 
-                {navSections.map((section) => (
+                {visibleSections.map((section) => (
                   <div key={section.title} className="space-y-1">
                     <span className="block px-3 text-[10px] font-bold tracking-wider text-[#6E7A76] uppercase">
                       {section.title}

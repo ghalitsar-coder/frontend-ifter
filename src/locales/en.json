@@ -66,7 +66,8 @@
     "pengaturan_link": "System settings",
     "presensi_guru_link": "Teacher presence",
     "koreksi_link": "Attendance corrections",
-    "izin_link": "Leave & dispensation"
+    "izin_link": "Leave & dispensation",
+    "audit_link": "Audit log"
   },
   "LocaleSwitcher": {
     "change_language": "Change language"
@@ -1116,6 +1117,10 @@
     "toast_export": "Audit log export is being prepared as an .xlsx file.",
     "toast_request_sent": "Correction request for {student} has been submitted for student affairs review.",
     "toast_evidence_downloaded": "Original evidence document downloaded."
+  },
+  "AuditPage": {
+    "meta_title": "Audit log - Attendly",
+    "meta_description": "Review the system-wide trail of data changes, corrections and administrative actions."
   },
   "DispensationPage": {
     "meta_title": "Dispensation letter & absence statement - Attendly",

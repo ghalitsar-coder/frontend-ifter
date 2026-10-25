@@ -1,9 +1,10 @@
 import { ChevronDown, Filter, Search, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import type { EmploymentStatus, RoleFilter } from '@/types/masterGuru';
+import type { EmploymentType } from '@/lib/api/master-guru';
+import type { RoleFilter } from '@/types/masterGuru';
 
 /**
- * Filter toolbar with role pills, employment status dropdown, and real-time search.
+ * Filter toolbar with role pills, employment type dropdown, and real-time search.
  *
  * @param props - Component properties.
  * @returns Toolbar JSX element.
@@ -13,8 +14,10 @@ export function MasterGuruToolbar(props: {
   onSearchChange: (query: string) => void;
   selectedRole: RoleFilter;
   onRoleChange: (role: RoleFilter) => void;
-  selectedStatus: 'all' | EmploymentStatus;
-  onStatusChange: (status: 'all' | EmploymentStatus) => void;
+  /** '' = semua jenis; otherwise a GET /employment-types id (client-side filter). */
+  selectedEmploymentTypeId: string;
+  onEmploymentTypeIdChange: (id: string) => void;
+  employmentTypes: EmploymentType[];
   totalTeachers: number;
   homeroomCount: number;
   picketCount: number;
@@ -113,21 +116,24 @@ export function MasterGuruToolbar(props: {
           )}
         </div>
 
-        {/* Status Dropdown */}
+        {/* Employment Type Dropdown (master data dari GET /employment-types) */}
         <div className="relative">
           <select
-            value={props.selectedStatus}
+            aria-label="Filter jenis kepegawaian"
+            value={props.selectedEmploymentTypeId}
             onChange={(e) => {
-              // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
-              props.onStatusChange(e.target.value as 'all' | EmploymentStatus);
+              props.onEmploymentTypeIdChange(e.target.value);
             }}
             className="bg-surface-card text-text-primary h-10 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           >
-            <option value="all">{t('status_filter_all')}</option>
-            <option value="PNS">{t('status_filter_pns')}</option>
-            <option value="PPPK">{t('status_filter_pppk')}</option>
-            <option value="Guru Honorer">{t('status_filter_honorer')}</option>
-            <option value="GTY">{t('status_filter_gty')}</option>
+            <option value="">{t('status_filter_all')}</option>
+            {props.employmentTypes
+              .filter((employmentType) => employmentType.is_active)
+              .map((employmentType) => (
+                <option key={employmentType.id} value={employmentType.id}>
+                  {employmentType.name}
+                </option>
+              ))}
           </select>
           <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
         </div>

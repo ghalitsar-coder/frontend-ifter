@@ -12,6 +12,7 @@ import {
   filterRowsBySearch,
   historyQueryFor,
   pageMeta,
+  shortHash,
   toCorrectionRow,
   useAttendanceHistory,
   useSubmitCorrection,
@@ -77,10 +78,14 @@ export function CorrectionManager() {
 
   const handleRequestSubmit = (payload: CorrectionRequestPayload) => {
     submitCorrection.mutate(payload, {
-      onSuccess: () => {
+      onSuccess: (detail) => {
         setIsRequestOpen(false);
         setRequestPrefill(null);
-        showToast(t('toast_request_sent', { student: payload.studentLabel }));
+        const sent = t('toast_request_sent', { student: payload.studentLabel });
+        // Server-computed evidence_hash of the correction just stored
+        // (POST /attendance/records/:id/corrections returns the fresh trail).
+        const hash = detail.corrections.at(-1)?.evidence_hash;
+        showToast(hash === undefined || hash === null ? sent : `${sent} Hash: ${shortHash(hash)}`);
       },
       onError: (error) => {
         showToast(errorMessage(error), 'error');

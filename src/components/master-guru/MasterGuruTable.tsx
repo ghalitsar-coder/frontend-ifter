@@ -2,6 +2,7 @@ import {
   CalendarDays,
   Edit2,
   GraduationCap,
+  KeyRound,
   Link2,
   Mail,
   MapPin,
@@ -46,6 +47,8 @@ export function MasterGuruTable(props: {
   accounts?: Record<string, TeacherAccount>;
   isStatusUpdating?: boolean;
   onToggleStatus?: (teacherId: string, name: string, next: 'active' | 'inactive') => void;
+  canResetPassword?: boolean;
+  onResetPassword?: (teacher: TeacherProfile) => void;
 }) {
   const t = useTranslations('MasterGuruPage');
 
@@ -293,6 +296,19 @@ export function MasterGuruTable(props: {
                       >
                         <MessageCircle className="size-4" />
                       </a>
+                      {props.canResetPassword === true && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            props.onResetPassword?.(teacher);
+                          }}
+                          className="text-text-muted cursor-pointer rounded-lg p-1.5 transition-colors hover:bg-amber-50 hover:text-amber-700"
+                          title="Reset password (token sekali pakai)"
+                          aria-label="Reset password"
+                        >
+                          <KeyRound className="size-4" />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>

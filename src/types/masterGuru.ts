@@ -24,6 +24,8 @@ export type PicketAssignment = {
  */
 export type TeacherProfile = {
   id: string;
+  /** Linked login account id (Teacher.user_id) — needed by PUT /teachers/:id. */
+  userId?: string;
   nip: string;
   nuptk?: string;
   nik?: string;
@@ -32,6 +34,10 @@ export type TeacherProfile = {
   email: string;
   phone: string;
   employmentStatus: EmploymentStatus;
+  /** Employment type master id (GET /employment-types), null-ish when unknown. */
+  employmentTypeId?: string;
+  /** Human label from `employment_type_name` on the teacher payload. */
+  employmentTypeName?: string;
   subject: string;
   teachingHoursPerWeek: number;
   roles: string[];

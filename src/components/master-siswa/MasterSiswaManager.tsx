@@ -3,6 +3,8 @@
 import { CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { MasterSiswaAccountModal } from '@/components/master-siswa/MasterSiswaAccountModal';
 import { MasterSiswaAddModal } from '@/components/master-siswa/MasterSiswaAddModal';
 import { MasterSiswaBulkDrawer } from '@/components/master-siswa/MasterSiswaBulkDrawer';
 import { MasterSiswaHeader } from '@/components/master-siswa/MasterSiswaHeader';
@@ -31,6 +33,7 @@ import {
 } from '@/lib/api/master-siswa';
 import type { MasterSiswaListParams } from '@/lib/api/master-siswa';
 import { useClassList, useAcademicYears } from '@/lib/api/queries';
+import { can } from '@/lib/api/rbac';
 import type { GradeFilter, StatusFilter, StudentProfile } from '@/types/masterSiswa';
 
 const PAGE_SIZE = 6;
@@ -131,6 +134,8 @@ export function MasterSiswaManager() {
 
   // Filter states
   const [searchQuery, setSearchQuery] = useState('');
+  const { roles } = useAuth();
+  const isAdmin = can(roles, 'admin');
   const [gradeFilter, setGradeFilter] = useState<GradeFilter>('all');
   const [classFilter, setClassFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -148,6 +153,7 @@ export function MasterSiswaManager() {
   const [isMutationModalOpen, setIsMutationModalOpen] = useState(false);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [inspectedStudent, setInspectedStudent] = useState<StudentProfile | null>(null);
+  const [accountStudent, setAccountStudent] = useState<StudentProfile | null>(null);
   const [isExporting, setIsExporting] = useState(false);
 
   // Toast feedback state
@@ -469,6 +475,10 @@ export function MasterSiswaManager() {
         }}
         onViewStudent={handleViewStudent}
         onEditStudent={handleEditStudent}
+        canManageAccount={isAdmin}
+        onManageAccount={(student) => {
+          setAccountStudent(student);
+        }}
         currentPage={currentPage}
         totalPages={totalPages}
         pageSize={PAGE_SIZE}
@@ -547,6 +557,17 @@ export function MasterSiswaManager() {
           triggerToast(t('toast_status_quick_changed', { name: student.name }));
         }}
       />
+
+      {/* Student login account management (admin only) */}
+      {accountStudent !== null && (
+        <MasterSiswaAccountModal
+          student={accountStudent}
+          onClose={() => {
+            setAccountStudent(null);
+          }}
+          onToast={triggerToast}
+        />
+      )}
     </div>
   );
 }

@@ -66,7 +66,8 @@
     "pengaturan_link": "Paramètres système",
     "presensi_guru_link": "Présence enseignant",
     "koreksi_link": "Corrections de présence",
-    "izin_link": "Congés et dispenses"
+    "izin_link": "Congés et dispenses",
+    "audit_link": "Journal d'audit"
   },
   "LocaleSwitcher": {
     "change_language": "Changer de langue"
@@ -1116,6 +1117,10 @@
     "toast_export": "L'export du journal d'audit est en préparation au format .xlsx.",
     "toast_request_sent": "La demande de correction pour {student} a été soumise à la revue des affaires scolaires.",
     "toast_evidence_downloaded": "Document justificatif original téléchargé."
+  },
+  "AuditPage": {
+    "meta_title": "Journal d'audit - Attendly",
+    "meta_description": "Consultez la trace des modifications de données, corrections et actions administratives du système."
   },
   "DispensationPage": {
     "meta_title": "Lettre de dispense et justificatif d'absence - Attendly",

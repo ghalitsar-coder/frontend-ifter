@@ -10,12 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/client';
-import { useRouter } from '@/libs/I18nNavigation';
+import { isStudentOnly } from '@/lib/api/rbac';
+import { Link, useRouter } from '@/libs/I18nNavigation';
 import { getI18nPath } from '@/utils/Helpers';
 
 /**
  * Credential sign-in form replacing the former Clerk <SignIn /> widget.
- * Calls POST /auth/login, then redirects to the dashboard.
+ * Calls POST /auth/login, then redirects to the dashboard — student-only
+ * accounts go to their `/dashboard/murid` portal instead of the staff shell.
  * @returns The sign-in card element.
  */
 export function SignInForm() {
@@ -32,8 +34,9 @@ export function SignInForm() {
     setFormError(null);
     setSubmitting(true);
     try {
-      await login(username, password);
-      router.replace(getI18nPath('/dashboard', locale));
+      const user = await login(username, password);
+      const target = isStudentOnly(user.roles) ? '/dashboard/murid' : '/dashboard';
+      router.replace(getI18nPath(target, locale));
     } catch (error) {
       setFormError(
         error instanceof ApiError ? error.message : 'Terjadi kesalahan. Coba lagi beberapa saat.',
@@ -95,7 +98,13 @@ export function SignInForm() {
           </Button>
 
           <p className="text-center text-xs text-neutral-500">
-            Akun dibuat oleh administrator sekolah. Hubungi bagian TU untuk reset password.
+            Akun dibuat oleh administrator sekolah. Punya token aktivasi atau reset?{' '}
+            <Link
+              href="/aktivasi"
+              className="font-semibold underline underline-offset-2 hover:text-neutral-700"
+            >
+              Aktivasi akun
+            </Link>
           </p>
         </form>
       </CardContent>

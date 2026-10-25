@@ -1,8 +1,9 @@
 'use client';
 
-import { ArrowLeft, BadgeCheck, CheckCircle2, ChevronRight, X } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, CheckCircle2, ChevronRight, UserRound, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 import {
   mockDispensationDocument,
   mockDispensationEvent,
@@ -10,6 +11,13 @@ import {
   mockDispensationSubcategories,
   mockMedicalCertificateStudent,
 } from '@/data/mockDispensation';
+import {
+  canVerifyDispensation,
+  dispensationErrorMessage,
+  useCreateDispensation,
+} from '@/lib/api/izin-dispensasi';
+import type { DispensationDto } from '@/lib/api/izin-dispensasi';
+import { useStudentSearch } from '@/lib/api/queries';
 import { Link } from '@/libs/I18nNavigation';
 import type { DispensationCoverage, DispensationSubcategory } from '@/types/dispensation';
 import { AttendanceStatementModal } from './AttendanceStatementModal';
@@ -18,8 +26,10 @@ import { DispensationEventCard } from './DispensationEventCard';
 import { DispensationIdentityCard } from './DispensationIdentityCard';
 import { DispensationLetterModal } from './DispensationLetterModal';
 import { DispensationLetterPreview } from './DispensationLetterPreview';
+import { DispensationQueueCard } from './DispensationQueueCard';
 import { DispensationSidebar } from './DispensationSidebar';
 import { DispensationUploadCard } from './DispensationUploadCard';
+import { DispensationVerifyModal } from './DispensationVerifyModal';
 import { MedicalCertificateModal } from './MedicalCertificateModal';
 
 /**
@@ -29,18 +39,55 @@ import { MedicalCertificateModal } from './MedicalCertificateModal';
  */
 export function DispensationManager() {
   const t = useTranslations('DispensationPage');
+  const { roles } = useAuth();
+  const canVerify = canVerifyDispensation(roles);
   const [subcategory, setSubcategory] = useState<DispensationSubcategory['id']>('osn');
   const [coverage, setCoverage] = useState<DispensationCoverage>('full');
   const [isLetterModalOpen, setIsLetterModalOpen] = useState(false);
   const [isStatementModalOpen, setIsStatementModalOpen] = useState(false);
   const [isMedicalModalOpen, setIsMedicalModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [studentId, setStudentId] = useState('');
+  const [pendingDocument, setPendingDocument] = useState<File | null>(null);
+  const [verifying, setVerifying] = useState<DispensationDto | null>(null);
+
+  const createDispensation = useCreateDispensation();
+  // Shared hook (queries.ts): real student directory to supply the mandatory
+  // `student_id` field of POST /dispensations — the mock identity card has no id.
+  const studentSearch = useStudentSearch({ limit: 100, status: 'active' });
 
   const showToast = (message: string) => {
     setToastMessage(message);
     setTimeout(() => {
       setToastMessage(null);
     }, 4000);
+  };
+
+  const handlePublish = () => {
+    if (studentId === '') {
+      showToast('Pilih siswa pada dropdown Pengajuan Nyata sebelum mengirim.');
+      return;
+    }
+
+    createDispensation.mutate(
+      {
+        studentId,
+        type: 'permit',
+        reason: `${mockDispensationEvent.taskLine} — ${mockDispensationEvent.competition}`,
+        startDate: mockDispensationEvent.startIso,
+        endDate: mockDispensationEvent.endIso,
+        document: pendingDocument,
+      },
+      {
+        onSuccess: () => {
+          setPendingDocument(null);
+          showToast('Dispensasi terkirim ke backend — status menunggu verifikasi.');
+        },
+        onError: (error) => {
+          showToast(dispensationErrorMessage(error, 'Gagal mengirim dispensasi.'));
+        },
+      },
+    );
   };
 
   return (
@@ -127,6 +174,31 @@ export function DispensationManager() {
 
       <div className="mt-4 grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)] lg:items-start">
         <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-pine-deep/15 bg-pine-light/50 px-3 py-2.5">
+            <span className="inline-flex items-center gap-1.5 text-[9px] font-extrabold tracking-wider text-pine-deep uppercase">
+              <UserRound className="size-3" />
+              Pengajuan Nyata (POST /dispensations)
+            </span>
+            <select
+              aria-label="Pilih siswa untuk pengajuan dispensasi"
+              value={studentId}
+              onChange={(event) => {
+                setStudentId(event.target.value);
+              }}
+              className="ml-auto rounded-xl border border-border-control bg-card px-2.5 py-1.5 text-[10px] font-semibold text-foreground focus:border-pine-deep focus:outline-none"
+            >
+              <option value="">
+                {studentSearch.isPending ? 'Memuat siswa…' : '— Pilih siswa —'}
+              </option>
+              {(studentSearch.data ?? []).map((student) => (
+                <option key={student.id} value={student.id}>
+                  {student.full_name} · {student.student_number}
+                  {student.current_class === undefined ? '' : ` · ${student.current_class.name}`}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <DispensationIdentityCard student={mockDispensationStudent} />
 
           <DispensationCategoryCard
@@ -153,7 +225,9 @@ export function DispensationManager() {
               setIsLetterModalOpen(true);
             }}
             onExtraFile={(file) => {
-              showToast(t('toast_extra_file', { fileName: file.name }));
+              // Real file captured for the multipart `document` part of POST /dispensations.
+              setPendingDocument(file);
+              showToast(`File disiapkan untuk pengajuan: ${file.name}`);
             }}
           />
 
@@ -171,6 +245,7 @@ export function DispensationManager() {
               <button
                 type="button"
                 onClick={() => {
+                  // shortcut: no backend draft state (status enum is pending|approved|rejected), keep local toast
                   showToast(t('toast_draft'));
                 }}
                 className="cursor-pointer rounded-xl border border-border-control bg-card px-4 py-2 text-[11px] font-semibold text-foreground transition-colors hover:bg-surface-container-low"
@@ -179,13 +254,12 @@ export function DispensationManager() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  showToast(t('toast_published'));
-                }}
-                className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2 text-[11px] font-bold text-white shadow-sm transition-colors hover:bg-pine-hover"
+                disabled={createDispensation.isPending}
+                onClick={handlePublish}
+                className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2 text-[11px] font-bold text-white shadow-sm transition-colors hover:bg-pine-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <BadgeCheck className="size-3.5 text-amber-gold" />
-                {t('btn_publish')}
+                {createDispensation.isPending ? 'Mengirim…' : t('btn_publish')}
               </button>
             </div>
           </div>
@@ -196,6 +270,8 @@ export function DispensationManager() {
             student={mockDispensationStudent}
             event={mockDispensationEvent}
             onDownload={() => {
+              // shortcut: generated letter preview is mock-only; real documents
+              // are downloaded per row via GET /dispensations/:id/document in the queue.
               showToast(t('toast_download'));
             }}
           />
@@ -208,6 +284,24 @@ export function DispensationManager() {
           />
         </div>
       </div>
+
+      <div className="mt-3">
+        <DispensationQueueCard
+          canVerify={canVerify}
+          onToast={showToast}
+          onVerifyRequest={setVerifying}
+        />
+      </div>
+
+      {verifying !== null && (
+        <DispensationVerifyModal
+          dispensation={verifying}
+          onClose={() => {
+            setVerifying(null);
+          }}
+          onVerified={showToast}
+        />
+      )}
 
       {isLetterModalOpen && (
         <DispensationLetterModal
@@ -224,6 +318,9 @@ export function DispensationManager() {
         />
       )}
 
+      {/* shortcut: statement letter and medical-certificate variants have no
+          backend endpoint in wave 2 (dispensations cover type/status only),
+          keep the AttendanceStatementModal / MedicalCertificateModal mocks. */}
       {isStatementModalOpen && (
         <AttendanceStatementModal
           student={mockDispensationStudent}

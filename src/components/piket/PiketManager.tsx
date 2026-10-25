@@ -27,7 +27,6 @@ import type {
   RfidTapLog,
   TapStatus,
 } from '@/types/piket';
-import type { RotationSubmission } from '@/types/teacherRotation';
 
 /**
  * Gate Duty & RFID Attendance Main Manager Component.
@@ -154,7 +153,10 @@ export function PiketManager() {
     );
   };
 
-  // shortcut: no backend endpoint for the gate uniform-infraction flow, keep mock.
+  // Uniform submissions now go straight to POST /uniform-reports inside
+  // PiketUniformForm; this callback only feeds the (still mock) KPI counters —
+  // shortcut: no backend endpoint for RFID tap stream / gate telemetry /
+  // compensation tickets, so metrics stay mock.
   const handleUniformSubmit = (_data: {
     studentName: string;
     infractionIds: string[];
@@ -165,8 +167,6 @@ export function PiketManager() {
       ...prev,
       uniformHoldCount: prev.uniformHoldCount + 1,
     }));
-
-    showToast(t('toast_infraction_saved_title'), t('toast_infraction_saved_desc'));
   };
 
   const handleCompleteComp = (id: string) => {
@@ -187,16 +187,6 @@ export function PiketManager() {
     showToast(
       'Rekapitulasi Piket Gerbang',
       'Dokumen rekap kehadiran dan penertiban gerbang telah disiapkan untuk kepala sekolah.',
-    );
-  };
-
-  // shortcut: no backend endpoint for substitute-rotation eligibility/SK decrees
-  // (real duty assignment goes through PiketDutyRoster -> POST /duty-assignments), keep mock.
-  const handleRotationConfirm = (submission: RotationSubmission) => {
-    setIsRotationOpen(false);
-    showToast(
-      t('toast_rotation_title'),
-      t('toast_rotation_desc', { name: submission.teacher.name }),
     );
   };
 
@@ -243,7 +233,7 @@ export function PiketManager() {
 
         {/* Right Column (40%): Rapid Uniform Form & Active Compensations */}
         <div className="space-y-6 lg:col-span-5">
-          <PiketUniformForm onSubmit={handleUniformSubmit} />
+          <PiketUniformForm onToast={showToast} onSubmit={handleUniformSubmit} />
 
           <PiketActiveCompensation
             compensations={compensations}
@@ -268,7 +258,7 @@ export function PiketManager() {
           onClose={() => {
             setIsRotationOpen(false);
           }}
-          onConfirm={handleRotationConfirm}
+          onToast={showToast}
         />
       )}
 

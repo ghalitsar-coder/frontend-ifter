@@ -1,5 +1,6 @@
 import { ClipboardList, UserRoundSearch, X } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { ApiError } from '@/lib/api/client';
 import type { IncidentDisplayStatus } from '@/lib/api/kedisiplinan';
 import {
@@ -10,7 +11,9 @@ import {
   useAddDisciplineFollowup,
   useDisciplineRecordDetail,
   useStudentDisciplineProfile,
+  useUpdateDisciplinePoints,
 } from '@/lib/api/kedisiplinan';
+import { can } from '@/lib/api/rbac';
 
 /** Backend statuses the staff UI may move a record to via followups. */
 const FOLLOWUP_STATUS_OPTIONS: { value: IncidentDisplayStatus; label: string }[] = [
@@ -23,8 +26,9 @@ const FOLLOWUP_STATUS_OPTIONS: { value: IncidentDisplayStatus; label: string }[]
 
 /**
  * Modal showing one violation record (GET /discipline/records/:id), its
- * followup history, the per-student summary (GET /discipline/students/:id)
- * and a status-update form (POST /discipline/records/:id/followups).
+ * followup history, the per-student summary (GET /discipline/students/:id),
+ * a status-update form (POST /discipline/records/:id/followups) and — for
+ * admins only — a points-correction form (PATCH /discipline/records/:id/points).
  *
  * @param props - Component properties.
  * @returns Rendered record detail dialog.
@@ -36,10 +40,34 @@ export function DisciplineRecordDetailModal(props: {
 }) {
   const [status, setStatus] = useState('');
   const [notes, setNotes] = useState('');
+  const [points, setPoints] = useState('');
+  const [pointsReason, setPointsReason] = useState('');
+
+  const { roles } = useAuth();
+  const isAdmin = can(roles, 'admin');
 
   const detail = useDisciplineRecordDetail(props.recordId);
   const profile = useStudentDisciplineProfile(detail.data?.student_id ?? '');
   const followup = useAddDisciplineFollowup(props.recordId);
+  const pointsUpdate = useUpdateDisciplinePoints(props.recordId);
+
+  const handlePointsSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    pointsUpdate.mutate(
+      { points: Number(points), reason: pointsReason.trim() },
+      {
+        onSuccess: () => {
+          props.onToast('Poin pelanggaran dikoreksi.');
+          setPoints('');
+          setPointsReason('');
+        },
+        onError: (err) => {
+          props.onToast(err instanceof ApiError ? err.message : 'Gagal mengoreksi poin.');
+        },
+      },
+    );
+  };
 
   const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -249,6 +277,55 @@ export function DisciplineRecordDetailModal(props: {
                   </button>
                 </div>
               </form>
+
+              {/* Points correction form (PATCH /:id/points — admin only) */}
+              {isAdmin ? (
+                <form
+                  onSubmit={handlePointsSubmit}
+                  className="space-y-3 rounded-xl border border-amber-gold/60 bg-amber-gold/5 p-3"
+                >
+                  <p className="text-xs font-bold tracking-wider text-foreground uppercase">
+                    Koreksi Poin (Admin)
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Ganti poin record ini (saat ini +{record.points}). Alasan wajib dicatat dan
+                    tercatat di log audit.
+                  </p>
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    required
+                    aria-label="Poin baru"
+                    value={points}
+                    onChange={(e) => {
+                      setPoints(e.target.value);
+                    }}
+                    placeholder={`Poin baru (mis. ${record.points})`}
+                    className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
+                  />
+                  <input
+                    type="text"
+                    required
+                    aria-label="Alasan koreksi poin"
+                    value={pointsReason}
+                    onChange={(e) => {
+                      setPointsReason(e.target.value);
+                    }}
+                    placeholder="Alasan koreksi (wajib)"
+                    className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={pointsUpdate.isPending}
+                      className="rounded-xl bg-pine-deep px-5 py-2 font-bold text-white shadow-xs transition-colors hover:bg-pine-hover disabled:opacity-60"
+                    >
+                      {pointsUpdate.isPending ? 'Menyimpan…' : 'Simpan Koreksi Poin'}
+                    </button>
+                  </div>
+                </form>
+              ) : null}
             </>
           )}
         </div>

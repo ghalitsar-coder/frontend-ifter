@@ -53,6 +53,22 @@ import { Link } from '@/libs/I18nNavigation';
 
 const DASH = '—';
 
+/**
+ * `active_teachers_breakdown` block added to GET /dashboard by the
+ * employment-type package (API_ADDENDUM §6.5). Declared locally because the
+ * shared `dto.ts` is off-limits to module agents.
+ */
+type TeacherEmploymentBreakdown = {
+  permanent: number;
+  honorary: number;
+  staff_tu: number;
+  unknown: number;
+};
+
+type DashboardDataWithBreakdown = DashboardData & {
+  active_teachers_breakdown?: TeacherEmploymentBreakdown;
+};
+
 const TREND_SERIES = [
   { key: 'present', label: 'Hadir', color: '#173F36' },
   { key: 'late', label: 'Terlambat', color: '#F2C96C' },
@@ -79,11 +95,32 @@ const disciplineSubText = (discipline: DashboardDiscipline | undefined): string 
   return `${discipline.records_month} catatan bulan ini • ${discipline.points_month} poin terakumulasi • ${discipline.new_records} rekaman baru.`;
 };
 
-const staffSubText = (data: DashboardData | undefined): string => {
+const staffSubText = (data: DashboardDataWithBreakdown | undefined): string => {
   if (data?.active_students === undefined) {
     return 'Detail jumlah pendidik & siswa aktif tersedia untuk peran admin.';
   }
   return `${data.active_students} siswa aktif terdaftar pada sistem.`;
+};
+
+/**
+ * Employment-type breakdown line for the "Guru & PTK" card, straight from
+ * GET /dashboard → active_teachers_breakdown (permanent/honorary/staff_tu;
+ * unknown counts teachers whose employment_type_id is still NULL).
+ *
+ * @param breakdown - Optional breakdown block from the dashboard payload.
+ * @returns Indonesian summary, or null while the server has no breakdown.
+ */
+const employmentBreakdownText = (
+  breakdown: TeacherEmploymentBreakdown | undefined,
+): string | null => {
+  if (breakdown === undefined) {
+    return null;
+  }
+  const unknownSuffix =
+    breakdown.unknown > 0 ? ` • ${String(breakdown.unknown)} Belum ditentukan` : '';
+  return `${String(breakdown.permanent)} Tetap • ${String(breakdown.honorary)} Honorer • ${String(
+    breakdown.staff_tu,
+  )} Staf TU${unknownSuffix}`;
 };
 
 const dutySubText = (isAdmin: boolean, duties: DutyAssignment[]): string => {
@@ -158,7 +195,7 @@ function DashboardClassFilter(props: { value: string; onChange: (value: string) 
  * @returns KPI card grid.
  */
 function DashboardKpiGrid(props: {
-  data: DashboardData | undefined;
+  data: DashboardDataWithBreakdown | undefined;
   kpi: AttendanceKpi | null;
   duties: DutyAssignment[];
   isAdmin: boolean;
@@ -215,7 +252,11 @@ function DashboardKpiGrid(props: {
           )}
         </div>
         <p className="text-[11px] text-emerald-100/80">{staffSubText(props.data)}</p>
-        {/* shortcut: no backend breakdown of tetap/honorer/staf TU — server counts stay aggregate */}
+        {employmentBreakdownText(props.data?.active_teachers_breakdown) === null ? null : (
+          <p className="mt-1 text-[11px] font-semibold text-[#F2C96C]">
+            {employmentBreakdownText(props.data?.active_teachers_breakdown)}
+          </p>
+        )}
       </div>
 
       {/* KPI 3: Pos Piket Gerbang */}

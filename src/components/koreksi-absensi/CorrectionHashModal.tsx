@@ -1,15 +1,41 @@
-import { ArrowRight, CheckCircle2, Fingerprint, X } from 'lucide-react';
+import { ArrowRight, Check, CheckCircle2, Copy, Fingerprint, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import { attendanceStatusStyles } from '@/components/koreksi-absensi/statusStyles';
-// shortcut: no backend integrity-hash endpoint for the ledger, keep mock hash display
-import { mockAuditLedgerHash } from '@/data/mockAttendanceCorrection';
-import { toTrailEntry, useAttendanceRecord } from '@/lib/api/koreksi-absensi';
+import { shortHash, toTrailEntry, useAttendanceRecord } from '@/lib/api/koreksi-absensi';
 import type { CorrectionRow } from '@/lib/api/koreksi-absensi';
+
+/**
+ * Copy a hash to the clipboard and flash the copied state for two seconds.
+ * @param key - Row key whose copy button should flash.
+ * @param hash - Evidence hash text to copy.
+ * @param onCopied - Sets the currently flashing row key.
+ * @param onExpired - Clears the flash unless another row took over.
+ */
+async function copyHashToClipboard(
+  key: string,
+  hash: string,
+  onCopied: (key: string) => void,
+  onExpired: (key: string) => void,
+): Promise<void> {
+  try {
+    await navigator.clipboard.writeText(hash);
+  } catch {
+    return;
+  }
+  onCopied(key);
+  window.setTimeout(() => {
+    onExpired(key);
+  }, 2000);
+}
 
 /**
  * Immutable ledger modal wired to GET /attendance/records/:id: shows the
  * record header plus the full correction trail (old → new status, reason,
- * timestamp) recorded by the backend.
+ * timestamp) recorded by the backend. Every trail row carries the
+ * server-computed `evidence_hash` (sha256 over the correction payload,
+ * migration 000014) shown read-only with a copy button — the client never
+ * computes hashes itself.
  *
  * @param props - Audit row (record id) and close handler.
  * @returns Ledger modal.
@@ -19,6 +45,14 @@ export function CorrectionHashModal(props: { row: CorrectionRow; onClose: () => 
   const detailQuery = useAttendanceRecord(props.row.recordId);
   const corrections = (detailQuery.data?.corrections ?? []).map(toTrailEntry);
   const latest = corrections.at(-1);
+  const latestHash = latest?.evidenceHash ?? null;
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+
+  const copyHash = (key: string, hash: string) => {
+    void copyHashToClipboard(key, hash, setCopiedKey, (rowKey) => {
+      setCopiedKey((current) => (current === rowKey ? null : current));
+    });
+  };
 
   return (
     <div
@@ -114,48 +148,102 @@ export function CorrectionHashModal(props: { row: CorrectionRow; onClose: () => 
                 Riwayat koreksi ({corrections.length})
               </p>
               <ul className="space-y-2">
-                {corrections.map((entry) => (
-                  <li
-                    key={entry.id}
-                    className="rounded-xl border border-border-subtle bg-surface-container-low/60 p-3"
-                  >
-                    <p className="flex items-center gap-1.5 text-[10px] font-bold text-foreground">
-                      <span
-                        className={`rounded-md border px-1.5 py-0.5 ${attendanceStatusStyles[entry.fromStatus]}`}
-                      >
-                        {t(`status_${entry.fromStatus}`)}
-                      </span>
-                      <ArrowRight className="size-3 text-muted-foreground" />
-                      <span
-                        className={`rounded-md border px-1.5 py-0.5 ${attendanceStatusStyles[entry.toStatus]}`}
-                      >
-                        {t(`status_${entry.toStatus}`)}
-                      </span>
-                      <span className="ml-auto font-medium text-muted-foreground">
-                        {entry.loggedDate}, {entry.loggedTime}
-                      </span>
-                    </p>
-                    <p className="mt-1 text-[10px] leading-relaxed text-foreground/80">
-                      {entry.reason}
-                    </p>
-                    <p className="mt-0.5 text-[9px] text-muted-foreground">{entry.officerName}</p>
-                  </li>
-                ))}
+                {corrections.map((entry) => {
+                  const entryHash = entry.evidenceHash;
+                  return (
+                    <li
+                      key={entry.id}
+                      className="rounded-xl border border-border-subtle bg-surface-container-low/60 p-3"
+                    >
+                      <p className="flex items-center gap-1.5 text-[10px] font-bold text-foreground">
+                        <span
+                          className={`rounded-md border px-1.5 py-0.5 ${attendanceStatusStyles[entry.fromStatus]}`}
+                        >
+                          {t(`status_${entry.fromStatus}`)}
+                        </span>
+                        <ArrowRight className="size-3 text-muted-foreground" />
+                        <span
+                          className={`rounded-md border px-1.5 py-0.5 ${attendanceStatusStyles[entry.toStatus]}`}
+                        >
+                          {t(`status_${entry.toStatus}`)}
+                        </span>
+                        <span className="ml-auto font-medium text-muted-foreground">
+                          {entry.loggedDate}, {entry.loggedTime}
+                        </span>
+                      </p>
+                      <p className="mt-1 text-[10px] leading-relaxed text-foreground/80">
+                        {entry.reason}
+                      </p>
+                      <p className="mt-0.5 text-[9px] text-muted-foreground">{entry.officerName}</p>
+                      {entryHash !== null && (
+                        <div className="mt-1.5 flex items-center justify-between gap-2 rounded-lg bg-surface-container-low px-2 py-1">
+                          <span
+                            title={entryHash}
+                            className="flex items-center gap-1 font-mono text-[9px] break-all text-muted-foreground"
+                          >
+                            <Fingerprint className="size-3 shrink-0" />
+                            {shortHash(entryHash)}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              copyHash(entry.id, entryHash);
+                            }}
+                            aria-label="Salin hash bukti"
+                            className="flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-pine-light hover:text-pine-deep"
+                          >
+                            {copiedKey === entry.id ? (
+                              <Check className="size-3 text-pine-deep" />
+                            ) : (
+                              <Copy className="size-3" />
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
 
-          <div>
-            <p className="mb-1 text-[10px] text-muted-foreground">{t('ledger_hash')}</p>
-            <p className="rounded-xl border border-border-subtle bg-surface-container-low p-3 font-mono text-[10px] leading-relaxed break-all text-foreground/80">
-              {mockAuditLedgerHash}
-            </p>
-          </div>
+          {corrections.length > 0 && (
+            <div>
+              <p className="mb-1 text-[10px] text-muted-foreground">{t('ledger_hash')}</p>
+              {latestHash === null ? (
+                <p className="rounded-xl border border-border-subtle bg-surface-container-low p-3 text-[10px] text-muted-foreground">
+                  Hash bukti belum tersedia untuk koreksi lama ini.
+                </p>
+              ) : (
+                <div className="flex items-start gap-2">
+                  <p className="flex-1 rounded-xl border border-border-subtle bg-surface-container-low p-3 font-mono text-[10px] leading-relaxed break-all text-foreground/80 select-all">
+                    {latestHash}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      copyHash('latest', latestHash);
+                    }}
+                    aria-label="Salin hash bukti"
+                    className="mt-1 flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-border-control bg-card text-muted-foreground transition-colors hover:bg-pine-light hover:text-pine-deep"
+                  >
+                    {copiedKey === 'latest' ? (
+                      <Check className="size-3.5 text-pine-deep" />
+                    ) : (
+                      <Copy className="size-3.5" />
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
-          <p className="inline-flex items-center gap-1.5 rounded-full bg-pine-light px-2.5 py-1 text-[10px] font-bold text-pine-deep">
-            <CheckCircle2 className="size-3" />
-            {t('ledger_integrity')}
-          </p>
+          {latestHash !== null && (
+            <p className="inline-flex items-center gap-1.5 rounded-full bg-pine-light px-2.5 py-1 text-[10px] font-bold text-pine-deep">
+              <CheckCircle2 className="size-3" />
+              {t('ledger_integrity')}
+            </p>
+          )}
         </div>
 
         <div className="border-t border-border-subtle px-5 py-4">

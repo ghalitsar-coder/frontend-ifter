@@ -2,6 +2,7 @@
 
 import { CheckCircle2, X } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { mockPicketPosts } from '@/data/mockMasterGuru';
 import type { Teacher } from '@/lib/api/dto';
 import {
@@ -11,19 +12,23 @@ import {
   saveBlob,
   useCreateTeacher,
   useDutyAssignments,
+  useEmploymentTypes,
   useMasterGuruTeachers,
   useTeacherAccounts,
   useUpdateTeacherStatus,
 } from '@/lib/api/master-guru';
 import type { NewTeacherDraft, TeacherAccount } from '@/lib/api/master-guru';
 import { useClassList } from '@/lib/api/queries';
-import type { EmploymentStatus, RoleFilter } from '@/types/masterGuru';
+import { can } from '@/lib/api/rbac';
+import type { RoleFilter, TeacherProfile } from '@/types/masterGuru';
 import { MasterGuruAddModal } from './MasterGuruAddModal';
 import { MasterGuruHeader } from './MasterGuruHeader';
 import { MasterGuruImportModal } from './MasterGuruImportModal';
 import { MasterGuruPiketDrawer } from './MasterGuruPiketDrawer';
 import { MasterGuruTable } from './MasterGuruTable';
 import { MasterGuruToolbar } from './MasterGuruToolbar';
+import { useCredentialReset } from './useCredentialReset';
+import { useTeacherEdit } from './useTeacherEdit';
 
 /**
  * Index linked system accounts by teacher id for table badges.
@@ -48,6 +53,32 @@ function buildAccountsByTeacher(
 }
 
 /**
+ * Client-side filter for the role tabs and the employment type, which the
+ * backend cannot query (GET /teachers has no role join or type filter).
+ * @param teacher - Enriched profile row.
+ * @param selectedRole - Active tab ('all' accepts everything).
+ * @param selectedEmploymentTypeId - Type id ('' accepts everything).
+ * @returns Whether the row belongs on the active tab.
+ */
+function matchesTabFilters(
+  teacher: TeacherProfile,
+  selectedRole: RoleFilter,
+  selectedEmploymentTypeId: string,
+): boolean {
+  if (selectedRole === 'homeroom' && !teacher.homeroomClass) {
+    return false;
+  }
+  if (selectedRole === 'picket' && !teacher.picketDuty) {
+    return false;
+  }
+  if (selectedRole === 'admin' && teacher.accessLevel !== 'admin') {
+    return false;
+  }
+
+  return selectedEmploymentTypeId === '' || teacher.employmentTypeId === selectedEmploymentTypeId;
+}
+
+/**
  * Coordinator component orchestrating Master Data Guru & Penugasan state,
  * filtering, and modals. Teacher records come from GET /teachers and are
  * enriched with /classes (homeroom) and /duty-assignments (picket) joins.
@@ -57,11 +88,15 @@ function buildAccountsByTeacher(
 export function MasterGuruManager() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState<RoleFilter>('all');
-  const [selectedStatus, setSelectedStatus] = useState<'all' | EmploymentStatus>('all');
+  const [selectedEmploymentTypeId, setSelectedEmploymentTypeId] = useState('');
   const [isPiketDrawerOpen, setIsPiketDrawerOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
+  const { requestReset, credentialModal } = useCredentialReset();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const { roles: authRoles } = useAuth();
+  const isAdmin = can(authRoles, 'admin');
 
   const trimmedSearch = searchQuery.trim();
   const teachersQuery = useMasterGuruTeachers(
@@ -69,6 +104,8 @@ export function MasterGuruManager() {
   );
   const classesQuery = useClassList({ status: 'active' });
   const dutiesQuery = useDutyAssignments();
+  const employmentTypesQuery = useEmploymentTypes();
+  const employmentTypes = employmentTypesQuery.data ?? [];
 
   const teachers = teachersQuery.data?.data ?? [];
   const linkedUserIds = teachers
@@ -97,10 +134,12 @@ export function MasterGuruManager() {
     }, 4000);
   };
 
+  const { requestEdit, editModal } = useTeacherEdit(employmentTypes, showToast);
+
   const handleResetFilters = () => {
     setSearchQuery('');
     setSelectedRole('all');
-    setSelectedStatus('all');
+    setSelectedEmploymentTypeId('');
   };
 
   const handleAddTeacher = (draft: NewTeacherDraft) => {
@@ -153,31 +192,16 @@ export function MasterGuruManager() {
     void run();
   };
 
-  // Client-side filters for tabs the backend cannot query (role joins and the
-  // employment-status column, which the Teacher DTO does not model).
-  const filteredTeachers = profiles.filter((teacher) => {
-    if (selectedRole === 'homeroom' && !teacher.homeroomClass) {
-      return false;
-    }
-    if (selectedRole === 'picket' && !teacher.picketDuty) {
-      return false;
-    }
-    if (selectedRole === 'admin' && teacher.accessLevel !== 'admin') {
-      return false;
-    }
-
-    if (selectedStatus !== 'all' && teacher.employmentStatus !== selectedStatus) {
-      return false;
-    }
-
-    return true;
-  });
+  const filteredTeachers = profiles.filter((teacher) =>
+    matchesTabFilters(teacher, selectedRole, selectedEmploymentTypeId),
+  );
 
   const homeroomCount = profiles.filter((t) => t.homeroomClass).length;
   const picketCount = profiles.filter((t) => t.picketDuty).length;
   const adminCount = profiles.filter((t) => t.accessLevel === 'admin').length;
   const activePicketCount = picketPosts.filter((p) => p.isCheckedIn).length;
-  const isFilterActive = searchQuery !== '' || selectedRole !== 'all' || selectedStatus !== 'all';
+  const isFilterActive =
+    searchQuery !== '' || selectedRole !== 'all' || selectedEmploymentTypeId !== '';
 
   return (
     <div className="w-full">
@@ -233,8 +257,9 @@ export function MasterGuruManager() {
         onSearchChange={setSearchQuery}
         selectedRole={selectedRole}
         onRoleChange={setSelectedRole}
-        selectedStatus={selectedStatus}
-        onStatusChange={setSelectedStatus}
+        selectedEmploymentTypeId={selectedEmploymentTypeId}
+        onEmploymentTypeIdChange={setSelectedEmploymentTypeId}
+        employmentTypes={employmentTypes}
         totalTeachers={profiles.length}
         homeroomCount={homeroomCount}
         picketCount={picketCount}
@@ -272,12 +297,12 @@ export function MasterGuruManager() {
         onToggleStatus={(teacherId, name, next) => {
           handleToggleStatus(teacherId, name, next);
         }}
-        onEditTeacher={(teacher) => {
-          showToast(`Mengedit data guru: ${teacher.name}`);
-        }}
+        onEditTeacher={requestEdit}
         onAssignHomeroom={(teacher) => {
           showToast(`Mengatur kelas wali untuk: ${teacher.name}`);
         }}
+        canResetPassword={isAdmin}
+        onResetPassword={requestReset}
       />
 
       {/* Add Teacher Modal */}
@@ -288,8 +313,12 @@ export function MasterGuruManager() {
         }}
         onSubmit={handleAddTeacher}
         availableClasses={(classesQuery.data ?? []).map((cls) => ({ id: cls.id, name: cls.name }))}
+        employmentTypes={employmentTypes}
         isSubmitting={createTeacher.isPending}
       />
+
+      {/* Edit Teacher Modal (PUT /teachers/:id — owned by useTeacherEdit) */}
+      {editModal}
 
       {/* Excel Bulk Import & Validation Modal */}
       <MasterGuruImportModal
@@ -299,6 +328,9 @@ export function MasterGuruManager() {
         }}
         onImportSuccess={handleImportSuccess}
       />
+
+      {/* Credential reset modal (POST /users/:id/credential-reset — admin only) */}
+      {credentialModal(accountsByTeacher, showToast)}
     </div>
   );
 }

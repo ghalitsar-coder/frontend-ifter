@@ -9,8 +9,8 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
-import type { NewTeacherDraft } from '@/lib/api/master-guru';
-import type { AccessLevel, EmploymentStatus } from '@/types/masterGuru';
+import type { EmploymentType, NewTeacherDraft } from '@/lib/api/master-guru';
+import type { AccessLevel } from '@/types/masterGuru';
 
 /** Dropdown day ↔ ISO weekday (Senin=1 … Minggu=7) used by /duty-assignments. */
 const WEEKDAY_BY_NAME: Record<string, number> = {
@@ -34,6 +34,8 @@ export function MasterGuruAddModal(props: {
   onClose: () => void;
   onSubmit: (draft: NewTeacherDraft) => void;
   availableClasses: { id: string; name: string }[];
+  /** Active employment types (GET /employment-types) for the kepegawaian dropdown. */
+  employmentTypes: EmploymentType[];
   isSubmitting: boolean;
 }) {
   const t = useTranslations('MasterGuruPage');
@@ -47,7 +49,7 @@ export function MasterGuruAddModal(props: {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
 
-  const [employmentStatus, setEmploymentStatus] = useState<EmploymentStatus>('PNS');
+  const [employmentTypeId, setEmploymentTypeId] = useState('');
   const [subject, setSubject] = useState('');
   const [teachingHours, setTeachingHours] = useState(24);
 
@@ -72,7 +74,7 @@ export function MasterGuruAddModal(props: {
       return;
     }
 
-    // shortcut: nuptk/nik/gender/employmentStatus/subject/teachingHours/rfid have
+    // shortcut: nuptk/nik/gender/subject/teachingHours/rfid have
     // no fields on the backend Teacher DTO, so they are not submitted.
     const draft: NewTeacherDraft = {
       fullName: name.trim(),
@@ -83,6 +85,7 @@ export function MasterGuruAddModal(props: {
       createAccount: true,
       homeroomClassId: isHomeroom && selectedClassId !== '' ? selectedClassId : undefined,
       dutyWeekday: isPicket ? WEEKDAY_BY_NAME[picketDay] : undefined,
+      employmentTypeId: employmentTypeId === '' ? undefined : employmentTypeId,
     };
 
     props.onSubmit(draft);
@@ -124,7 +127,8 @@ export function MasterGuruAddModal(props: {
         <form onSubmit={handleSubmit} className="max-h-[80vh] space-y-6 overflow-y-auto p-6">
           <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] leading-relaxed text-amber-800">
             Catatan: NUPTK, NIK, mata pelajaran, jam mengajar, dan kartu RFID belum diterima API
-            server — hanya nama, NIP, email, telepon, tingkat akses, dan penugasan yang disimpan.
+            server — hanya nama, NIP, email, telepon, jenis kepegawaian, tingkat akses, dan
+            penugasan yang disimpan.
           </p>
 
           {/* Section 1: Identitas Personal & NIP */}
@@ -278,20 +282,24 @@ export function MasterGuruAddModal(props: {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
                 <label className="text-text-primary mb-1 block text-xs font-semibold">
-                  {t('field_employment_status_label')} *
+                  {t('field_employment_status_label')}
                 </label>
                 <select
-                  value={employmentStatus}
+                  aria-label="Jenis kepegawaian"
+                  value={employmentTypeId}
                   onChange={(e) => {
-                    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
-                    setEmploymentStatus(e.target.value as EmploymentStatus);
+                    setEmploymentTypeId(e.target.value);
                   }}
                   className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 >
-                  <option value="PNS">PNS</option>
-                  <option value="PPPK">PPPK</option>
-                  <option value="Guru Honorer">Guru Honorer</option>
-                  <option value="GTY">GTY (Guru Tetap Yayasan)</option>
+                  <option value="">Belum ditentukan</option>
+                  {props.employmentTypes
+                    .filter((employmentType) => employmentType.is_active)
+                    .map((employmentType) => (
+                      <option key={employmentType.id} value={employmentType.id}>
+                        {employmentType.name}
+                      </option>
+                    ))}
                 </select>
               </div>
 

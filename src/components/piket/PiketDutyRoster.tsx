@@ -6,28 +6,33 @@ import { useAuth } from '@/components/auth/AuthProvider';
 import { ApiError } from '@/lib/api/client';
 import {
   DUTY_WEEKDAY_LABELS,
+  activeSubstitutionsForAssignment,
   groupDutyAssignmentsByWeekday,
   isDutyActiveOn,
   isoWeekdayFromDate,
   todayIsoDate,
   useCreateDutyAssignment,
   useDutyAssignments,
+  useDutyRotations,
   useEndDutyAssignment,
 } from '@/lib/api/piket';
 import { useTeacherOptions } from '@/lib/api/queries';
 
 /**
  * Duty roster panel wired to the real backend:
- * GET /duty-assignments (roster), POST /duty-assignments (assign) and
- * PUT /duty-assignments/:id/end (end assignment). All three endpoints are
- * admin-only on the backend, so the whole panel renders only for admins.
- * Domain labels are hard-coded Indonesian (no new locale keys allowed).
+ * GET /duty-assignments (roster), POST /duty-assignments (assign),
+ * PUT /duty-assignments/:id/end (end assignment) and GET /duty-rotations?date
+ * (today's substitutions, joined client-side by duty_assignment_id — the
+ * backend does not embed substitutions[] in /duty-assignments). All
+ * duty-assignment endpoints are admin-only, so the panel renders only for
+ * admins. Domain labels are hard-coded Indonesian (no new locale keys allowed).
  * @param props - `onToast` reuses the manager's floating toast feedback.
  * @returns Rendered duty roster card, or null for non-admin roles.
  */
 export function PiketDutyRoster(props: { onToast: (title: string, desc: string) => void }) {
   const { roles } = useAuth();
   const assignmentsQuery = useDutyAssignments();
+  const rotationsQuery = useDutyRotations({ date: todayIsoDate() });
   const teachersQuery = useTeacherOptions({ status: 'active', limit: 100 });
   const createDuty = useCreateDutyAssignment();
   const endDuty = useEndDutyAssignment();
@@ -138,6 +143,10 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
                 {group.assignments.map((assignment) => {
                   const stillOpen = assignment.end_date === undefined || assignment.end_date === '';
                   const activeToday = isDutyActiveOn(assignment, today);
+                  const substitutions =
+                    rotationsQuery.data === undefined
+                      ? []
+                      : activeSubstitutionsForAssignment(rotationsQuery.data, assignment.id, today);
 
                   return (
                     <span
@@ -155,6 +164,15 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
                         {assignment.start_date}
                         {stillOpen ? '' : ` → ${assignment.end_date}`}
                       </span>
+                      {substitutions.map((rotation) => (
+                        <span
+                          key={rotation.id}
+                          className="rounded-md bg-amber-surface px-1.5 py-0.5 text-[10px] font-medium text-amber-dark"
+                          title={`Alasan: ${rotation.reason}`}
+                        >
+                          hari ini digantikan {rotation.substitute_teacher_name}
+                        </span>
+                      ))}
                       {stillOpen && (
                         <button
                           aria-label={`Akhiri penugasan ${assignment.teacher_name}`}
