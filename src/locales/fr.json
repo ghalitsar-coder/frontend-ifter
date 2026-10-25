@@ -19,10 +19,7 @@
   },
   "DashboardLayout": {
     "meta_title": "Tableau de bord",
-    "meta_description": "Gérez votre compte depuis le tableau de bord.",
-    "dashboard_link": "Tableau de bord",
-    "user_profile_link": "Gérer votre compte",
-    "sign_out": "Se déconnecter"
+    "meta_description": "Gérez votre compte depuis le tableau de bord."
   },
   "LocaleSwitcher": {
     "change_language": "Changer de langue"

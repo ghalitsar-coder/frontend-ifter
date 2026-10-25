@@ -19,10 +19,7 @@
   },
   "DashboardLayout": {
     "meta_title": "Dashboard",
-    "meta_description": "Manage your account from the dashboard.",
-    "dashboard_link": "Dashboard",
-    "user_profile_link": "Manage your account",
-    "sign_out": "Sign out"
+    "meta_description": "Manage your account from the dashboard."
   },
   "LocaleSwitcher": {
     "change_language": "Change language"
