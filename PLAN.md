@@ -38,10 +38,10 @@
 
 | ID | Item | Status | Catatan |
 |----|------|------|---------|
-| B1 | Manajemen pengguna via UI: `GET/POST /users`, `PUT /users/:id/roles`, `PATCH /users/:id/status` — akun guru dibuat terselubung lewat master-guru, tapi belum ada halaman kelola user/role | PARTIAL | keputusan needed: in scope atau tidak |
-| B2 | Tahun ajaran & semester: edit semester (`PUT /terms/:id`) belum jelas punya UI | PARTIAL | perlu verifikasi pemakaian `/academic-years` vs halaman Pengaturan |
-| B3 | Update akun siswa (`PATCH /students/:id/account`) tersedia di backend, frontend baru POST/GET/DELETE | PARTIAL | kecil, opsional |
-| B4 | Dashboard/beranda publik masih sebagian data mock | PARTIAL | perlu daftar bagian yang harus live |
+| B1 | Manajemen pengguna via UI: `GET/POST /users`, `PUT /users/:id/roles`, `PATCH /users/:id/status` — akun guru dibuat terselubung lewat master-guru, tapi belum ada halaman kelola user/role | DONE | 2026-10-25 — KEPUTUSAN scope: hanya endpoint + modal yang ada (provision guru/siswa, credential-reset, activate); tanpa halaman kelola user/role terpisah |
+| B2 | Tahun ajaran & semester: edit semester (`PUT /terms/:id`) belum jelas punya UI | DONE | 2026-10-25 — KEPUTUSAN scope: HIDDEN; pemakaian read-only sebagai filter (master-siswa/kedisiplinan/rekap), ubah semester cukup lewat API |
+| B3 | Update akun siswa (`PATCH /students/:id/account`) tersedia di backend, frontend baru POST/GET/DELETE | DONE | 2026-10-25 — KEPUTUSAN scope: hanya endpoint; ubah akun memakai pola revoke→provision (DELETE+POST), tanpa UI edit |
+| B4 | Dashboard/beranda publik masih sebagian data mock | DONE | 2026-10-25 — semua kartu sudah server-data; satu-satunya sisa: jam piket tanpa endpoint log check-in → tetap placeholder "—" (tanpa angka palsu), sampai backend punya endpointnya |
 
 ## C. TODO lintas-cutting (gerbang mutu)
 
