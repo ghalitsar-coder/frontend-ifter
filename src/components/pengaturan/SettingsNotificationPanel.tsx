@@ -17,7 +17,7 @@ const SAMPLE_VALUES: Record<string, string> = {
  * @param template - Raw WhatsApp template.
  * @returns Template with placeholders substituted.
  */
-export function renderPreview(template: string) {
+function renderPreview(template: string) {
   let text = template;
 
   for (const [token, value] of Object.entries(SAMPLE_VALUES)) {
