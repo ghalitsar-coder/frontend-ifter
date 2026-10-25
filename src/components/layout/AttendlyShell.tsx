@@ -1,10 +1,10 @@
 'use client';
 
 import {
-  Bell,
   Calendar,
   ChartColumn,
   CheckCircle2,
+  Cpu,
   FileHeart,
   FilePenLine,
   GraduationCap,
@@ -24,7 +24,7 @@ import {
   X,
 } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
 import { can, isStudentOnly, useRolesCatalog } from '@/lib/api/rbac';
@@ -47,6 +47,80 @@ type NavSection = {
 };
 
 /**
+ * Active-route test that keeps `/dashboard/presensi` from also matching
+ * `/dashboard/presensi-guru` (prefix matches must end at a path boundary).
+ *
+ * @param pathname - Locale-less pathname from next-intl navigation.
+ * @param href - Menu target.
+ * @returns True when the current route is the menu target or a nested page.
+ */
+const isActivePath = (pathname: string, href: string): boolean =>
+  href === '/dashboard'
+    ? pathname === '/dashboard' || pathname === '/dashboard/'
+    : pathname === href || pathname.startsWith(`${href}/`);
+
+const navLinkClass = (isActive: boolean): string =>
+  `flex min-h-11 items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 sm:text-sm ${
+    isActive
+      ? 'bg-[#173F36] text-white shadow-xs'
+      : 'text-[#414846] hover:bg-[#E9F0EE] hover:text-[#173F36]'
+  }`;
+
+/**
+ * Sidebar navigation shared by the desktop rail and the mobile drawer.
+ *
+ * @param props - RBAC-filtered sections, current pathname, optional close hook.
+ * @returns Grouped navigation links with `aria-current` on the active route.
+ */
+function ShellNav(props: { sections: NavSection[]; pathname: string; onNavigate?: () => void }) {
+  return (
+    <>
+      {props.sections.map((section) => (
+        <div key={section.title} className="space-y-1">
+          <span className="block px-3 text-[10px] font-bold tracking-wider text-[#6E7A76] uppercase">
+            {section.title}
+          </span>
+          <div className="space-y-0.5">
+            {section.items.map((item) => {
+              const isActive = isActivePath(props.pathname, item.href);
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  onClick={props.onNavigate}
+                  className={navLinkClass(isActive)}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Icon
+                      className={`size-4 sm:size-4.5 ${
+                        isActive ? 'text-[#F2C96C]' : 'text-[#6E7A76]'
+                      }`}
+                    />
+                    <span>{item.label}</span>
+                  </div>
+                  {item.badge && (
+                    <span
+                      className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                        isActive ? 'bg-white/20 text-white' : 'bg-[#E9F0EE] text-[#173F36]'
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+/**
  * Attendly school management responsive application shell.
  * Replaces default boilerplate template with modern Pine & Amber layout.
  *
@@ -54,16 +128,43 @@ type NavSection = {
  * `can(roles, capability)`; student-only accounts see no staff menu at all
  * and are redirected to the `/dashboard/murid` portal.
  *
- * @param props - Layout properties containing page children.
+ * @param props - Layout properties containing page children and date labels.
  * @returns Shell JSX layout.
  */
-export function AttendlyShell(props: { children: React.ReactNode }) {
+export function AttendlyShell(props: {
+  children: React.ReactNode;
+  todayLabel: string;
+  periodLabel: string;
+}) {
   const t = useTranslations('DashboardLayout');
   const auth = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const locale = useLocale();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Drawer modal behaviour: move focus inside, lock background scroll, and
+  // close on Escape while open.
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    if (isMobileMenuOpen) {
+      closeButtonRef.current?.focus();
+      document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMobileMenuOpen]);
 
   // Dynamic role catalog (GET /roles, admin-only endpoint; disabled otherwise).
   const roleCatalog = useRolesCatalog(auth.roles);
@@ -161,6 +262,14 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
           capability: 'master_data',
         },
         {
+          // Hard-coded domain label: no new locale keys allowed for FR-C04.
+          label: 'Kelas',
+          href: '/dashboard/kelas',
+          icon: School,
+          badge: 'FR-C04',
+          capability: 'authenticated',
+        },
+        {
           label: t('tatib_link'),
           href: '/dashboard/aturan',
           icon: Scale,
@@ -176,6 +285,14 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
           label: t('audit_link'),
           href: '/dashboard/audit-log',
           icon: ScrollText,
+          badge: 'Admin',
+          capability: 'admin',
+        },
+        {
+          // Hard-coded domain label: no new locale keys allowed for the device registry.
+          label: 'Perangkat',
+          href: '/dashboard/perangkat',
+          icon: Cpu,
           badge: 'Admin',
           capability: 'admin',
         },
@@ -210,6 +327,13 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F8F9F8] text-[#111816] selection:bg-[#F2C96C] selection:text-[#173F36]">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-50 focus:rounded-xl focus:bg-[#173F36] focus:px-4 focus:py-2.5 focus:text-sm focus:font-semibold focus:text-white focus:shadow-lg"
+      >
+        {t('skip_to_content')}
+      </a>
+
       {/* Top Header Bar */}
       <header className="sticky top-0 z-40 flex h-16 w-full items-center justify-between border-b border-[#E4E8E6] bg-white/95 px-4 shadow-xs backdrop-blur-md sm:px-6 lg:px-8">
         {/* Left: Mobile Toggle & Brand */}
@@ -219,13 +343,18 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
             onClick={() => {
               setIsMobileMenuOpen(!isMobileMenuOpen);
             }}
-            className="cursor-pointer rounded-xl p-2 text-[#6E7A76] transition-colors hover:bg-[#E9F0EE] hover:text-[#173F36] lg:hidden"
-            aria-label="Toggle navigasi mobile"
+            className="cursor-pointer rounded-xl p-2 text-[#6E7A76] transition-colors outline-none hover:bg-[#E9F0EE] hover:text-[#173F36] focus-visible:ring-2 focus-visible:ring-[#173F36] lg:hidden"
+            aria-label={t('toggle_navigation')}
+            aria-controls="mobile-navigation"
+            aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
           </button>
 
-          <Link href="/dashboard" className="flex items-center gap-2.5">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2.5 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2"
+          >
             <div className="flex size-9 items-center justify-center rounded-xl bg-[#173F36] font-bold text-white shadow-xs">
               <School className="size-5 text-[#F2C96C]" />
             </div>
@@ -244,26 +373,14 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
         <div className="hidden items-center gap-3 md:flex">
           <div className="inline-flex items-center gap-2 rounded-full border border-[#D4DAD7] bg-[#E9F0EE] px-3 py-1 text-xs font-semibold text-[#173F36]">
             <Calendar className="size-3.5 text-[#173F36]" />
-            <span>T.A. 2026/2027 Ganjil</span>
+            <span>{props.periodLabel}</span>
             <span className="size-1.5 rounded-full bg-[#173F36]" />
-            <span className="text-[#6E7A76]">Rabu, 21 Okt 2026</span>
+            <span className="text-[#6E7A76]">{props.todayLabel}</span>
           </div>
         </div>
 
-        {/* Right: Quick Controls, Locale & Profile */}
+        {/* Right: Locale & Profile */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Notification Button */}
-          <button
-            type="button"
-            className="relative cursor-pointer rounded-xl p-2 text-[#6E7A76] transition-colors hover:bg-[#E9F0EE] hover:text-[#173F36]"
-            aria-label="Pemberitahuan sistem"
-          >
-            <Bell className="size-4 sm:size-5" />
-            <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-red-500 ring-2 ring-white" />
-          </button>
-
-          <div className="h-6 w-px bg-[#E4E8E6]" />
-
           {/* Locale Switcher */}
           <LocaleSwitcher />
 
@@ -275,7 +392,7 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
             onClick={() => {
               void auth.logout();
             }}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-transparent px-3 py-1.5 text-xs font-semibold text-[#6E7A76] transition-colors hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-transparent px-3 py-1.5 text-xs font-semibold text-[#6E7A76] transition-colors outline-none hover:border-red-200 hover:bg-red-50 hover:text-red-700 focus-visible:ring-2 focus-visible:ring-red-700"
             title={t('sign_out')}
           >
             <LogOut className="size-3.5" />
@@ -287,71 +404,28 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
       {/* Main Body with Sidebar + Content */}
       <div className="flex w-full flex-1">
         {/* Desktop Fixed Sidebar */}
-        <aside className="hidden w-64 shrink-0 flex-col justify-between border-r border-[#E4E8E6] bg-white p-4 lg:flex xl:w-72">
+        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 shrink-0 flex-col justify-between overflow-y-auto border-r border-[#E4E8E6] bg-white p-4 lg:flex xl:w-72">
           <div className="space-y-6">
             {/* Academic Cycle Status Card */}
             <div className="rounded-xl border border-[#F2C96C]/40 bg-[#FDF8ED] p-3 shadow-xs">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-[#785a00]" />
-                  <span className="text-xs font-bold text-[#785a00]">2026/2027 Ganjil</span>
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <CheckCircle2 className="size-4 shrink-0 text-[#785a00]" />
+                  <span className="truncate text-xs font-bold text-[#785a00]">
+                    {props.periodLabel}
+                  </span>
                 </div>
-                <span className="rounded-full bg-[#F2C96C] px-2 py-0.5 text-[10px] font-extrabold text-[#173F36]">
-                  Aktif
+                <span className="shrink-0 rounded-full bg-[#F2C96C] px-2 py-0.5 text-[10px] font-extrabold text-[#173F36]">
+                  {t('active')}
                 </span>
               </div>
-              <p className="mt-1 text-[11px] leading-snug text-[#6E7A76]">
-                Semester gasal aktif • 18 Rombongan belajar
-              </p>
+              <p className="mt-1 text-[11px] leading-snug text-[#6E7A76]">{t('semester_active')}</p>
             </div>
 
             {/* Navigation Menus */}
-            {visibleSections.map((section) => (
-              <div key={section.title} className="space-y-1">
-                <span className="block px-3 text-[10px] font-bold tracking-wider text-[#6E7A76] uppercase">
-                  {section.title}
-                </span>
-                <div className="space-y-0.5">
-                  {section.items.map((item) => {
-                    const isActive =
-                      item.href === '/dashboard'
-                        ? pathname === '/dashboard' || pathname === '/dashboard/'
-                        : pathname.startsWith(item.href);
-                    const Icon = item.icon;
-
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-xs font-semibold transition-all sm:text-sm ${
-                          isActive
-                            ? 'bg-[#173F36] text-white shadow-xs'
-                            : 'text-[#414846] hover:bg-[#E9F0EE] hover:text-[#173F36]'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <Icon
-                            className={`size-4 sm:size-4.5 ${
-                              isActive ? 'text-[#F2C96C]' : 'text-[#6E7A76]'
-                            }`}
-                          />
-                          <span>{item.label}</span>
-                        </div>
-                        {item.badge && (
-                          <span
-                            className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                              isActive ? 'bg-white/20 text-white' : 'bg-[#E9F0EE] text-[#173F36]'
-                            }`}
-                          >
-                            {item.badge}
-                          </span>
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
+            <nav aria-label={t('navigation')}>
+              <ShellNav pathname={pathname} sections={visibleSections} />
+            </nav>
           </div>
 
           {/* Bottom System Health Status */}
@@ -400,98 +474,67 @@ export function AttendlyShell(props: { children: React.ReactNode }) {
               }}
               aria-hidden="true"
             />
-            <div className="relative z-10 flex h-full w-72 max-w-[85vw] animate-in flex-col justify-between bg-white p-4 shadow-2xl duration-200 slide-in-from-left">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between border-b border-[#E4E8E6] pb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="flex size-8 items-center justify-center rounded-lg bg-[#173F36] font-bold text-white">
-                      <School className="size-4 text-[#F2C96C]" />
-                    </div>
-                    <span className="text-base font-bold text-[#173F36]">Attendly</span>
+            <dialog
+              id="mobile-navigation"
+              open
+              aria-modal="true"
+              aria-label={t('navigation')}
+              className="relative z-10 m-0 flex h-full w-72 max-w-[85vw] animate-in flex-col bg-white p-4 shadow-2xl duration-200 slide-in-from-left"
+            >
+              <div className="flex shrink-0 items-center justify-between border-b border-[#E4E8E6] pb-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-[#173F36] font-bold text-white">
+                    <School className="size-4 text-[#F2C96C]" />
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="rounded-lg p-1 text-[#6E7A76] hover:bg-[#E9F0EE]"
-                    aria-label="Tutup menu"
-                  >
-                    <X className="size-5" />
-                  </button>
+                  <span className="text-base font-bold text-[#173F36]">Attendly</span>
                 </div>
-
-                {visibleSections.map((section) => (
-                  <div key={section.title} className="space-y-1">
-                    <span className="block px-3 text-[10px] font-bold tracking-wider text-[#6E7A76] uppercase">
-                      {section.title}
-                    </span>
-                    <div className="space-y-0.5">
-                      {section.items.map((item) => {
-                        const isActive =
-                          item.href === '/dashboard'
-                            ? pathname === '/dashboard' || pathname === '/dashboard/'
-                            : pathname.startsWith(item.href);
-                        const Icon = item.icon;
-
-                        return (
-                          <Link
-                            key={item.href}
-                            href={item.href}
-                            onClick={() => {
-                              setIsMobileMenuOpen(false);
-                            }}
-                            className={`flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-semibold transition-all ${
-                              isActive
-                                ? 'bg-[#173F36] text-white shadow-xs'
-                                : 'text-[#414846] hover:bg-[#E9F0EE] hover:text-[#173F36]'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2.5">
-                              <Icon
-                                className={`size-4.5 ${
-                                  isActive ? 'text-[#F2C96C]' : 'text-[#6E7A76]'
-                                }`}
-                              />
-                              <span>{item.label}</span>
-                            </div>
-                            {item.badge && (
-                              <span
-                                className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                                  isActive
-                                    ? 'bg-white/20 text-white'
-                                    : 'bg-[#E9F0EE] text-[#173F36]'
-                                }`}
-                              >
-                                {item.badge}
-                              </span>
-                            )}
-                          </Link>
-                        );
-                      })}
-                    </div>
-                  </div>
-                ))}
+                <button
+                  ref={closeButtonRef}
+                  type="button"
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="cursor-pointer rounded-lg p-1.5 text-[#6E7A76] outline-none hover:bg-[#E9F0EE] focus-visible:ring-2 focus-visible:ring-[#173F36]"
+                  aria-label={t('close_navigation')}
+                >
+                  <X className="size-5" />
+                </button>
               </div>
 
-              <div className="border-t border-[#E4E8E6] pt-3">
+              <div className="min-h-0 flex-1 overflow-y-auto py-4">
+                <div className="space-y-6">
+                  <ShellNav
+                    pathname={pathname}
+                    sections={visibleSections}
+                    onNavigate={() => {
+                      setIsMobileMenuOpen(false);
+                    }}
+                  />
+                </div>
+              </div>
+
+              <div className="shrink-0 border-t border-[#E4E8E6] pt-3">
                 <button
                   type="button"
                   onClick={() => {
                     void auth.logout();
                   }}
-                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-700 transition-colors hover:bg-red-100"
+                  className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-red-50 px-3 py-2.5 text-xs font-bold text-red-700 transition-colors outline-none hover:bg-red-100 focus-visible:ring-2 focus-visible:ring-red-700"
                 >
                   <LogOut className="size-4" />
                   <span>{t('sign_out')}</span>
                 </button>
               </div>
-            </div>
+            </dialog>
           </div>
         )}
 
         {/* Main Content Workspace Container */}
-        <main className="min-w-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        <main
+          id="main-content"
+          tabIndex={-1}
+          className="min-w-0 flex-1 overflow-y-auto p-4 outline-none sm:p-6 lg:p-8"
+        >
           <div className="mx-auto w-full max-w-7xl">{props.children}</div>
         </main>
       </div>
