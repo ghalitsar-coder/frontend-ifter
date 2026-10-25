@@ -28,15 +28,6 @@ const TODAY_UI_STATUS: Record<string, string> = {
   absent: 'Alpa',
 };
 
-const STATUS_BADGE_KEYS: Record<
-  StudentProfile['status'],
-  'status_badge_active' | 'status_badge_mutation' | 'status_badge_alumni'
-> = {
-  active: 'status_badge_active',
-  mutation: 'status_badge_mutation',
-  alumni: 'status_badge_alumni',
-};
-
 /**
  * Label shown in the "today" pill for a attendance record.
  * @param record - Today's history row, undefined when nothing recorded.
@@ -154,6 +145,11 @@ export function MasterSiswaQuickDetailModal(props: {
   onQuickStatusChange?: (student: StudentProfile) => void;
 }) {
   const t = useTranslations('MasterSiswaPage');
+  const statusBadgeLabels = {
+    active: t('status_badge_active'),
+    mutation: t('status_badge_mutation'),
+    alumni: t('status_badge_alumni'),
+  } as const;
 
   const studentId = props.student?.id ?? '';
   const today = new Date().toISOString().slice(0, 10);
@@ -228,7 +224,7 @@ export function MasterSiswaQuickDetailModal(props: {
             <div className="min-w-0 flex-1 pr-6 sm:pr-0">
               <div className="mb-1 flex flex-wrap items-center gap-1.5">
                 <span className="rounded-full bg-pine-light px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-pine-deep uppercase">
-                  {t(STATUS_BADGE_KEYS[student.status])}
+                  {statusBadgeLabels[student.status]}
                 </span>
                 <span className="text-text-muted text-xs">•</span>
                 <span className="rounded-full border border-border-control bg-surface-container-low px-2.5 py-0.5 text-[11px] font-bold text-pine-deep">

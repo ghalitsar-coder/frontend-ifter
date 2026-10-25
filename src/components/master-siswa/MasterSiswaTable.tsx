@@ -32,12 +32,6 @@ const statusBadgeClasses = {
   alumni: 'border border-gray-300 bg-gray-100 text-gray-800',
 } as const;
 
-const statusBadgeLabelKeys = {
-  active: 'status_badge_active',
-  mutation: 'status_badge_mutation',
-  alumni: 'status_badge_alumni',
-} as const;
-
 /**
  * Pill showing accumulated discipline points with stage coloring.
  * @param props - Points bucket inputs.
@@ -92,6 +86,11 @@ export function MasterSiswaTable(props: {
   onPageChange: (page: number) => void;
 }) {
   const t = useTranslations('MasterSiswaPage');
+  const statusBadgeLabels = {
+    active: t('status_badge_active'),
+    mutation: t('status_badge_mutation'),
+    alumni: t('status_badge_alumni'),
+  } as const;
 
   const isAllSelected =
     props.students.length > 0 &&
@@ -283,7 +282,7 @@ export function MasterSiswaTable(props: {
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${statusBadgeClasses[student.status]}`}
                       >
-                        {t(statusBadgeLabelKeys[student.status])}
+                        {statusBadgeLabels[student.status]}
                       </span>
                     </td>
 
