@@ -49,7 +49,8 @@
 |----|------|--------|---------|
 | C1 | Bersihkan 30 error lint repo-wide — semuanya di file wave-2 lama: `presensi-guru.ts/.test` (9), `DispensationQueueCard` (6), `izin-dispensasi.ts/.test` (3), `piket.ts/.test` (3), `SettingsSanctionsPanel` (2), `master-guru.test` (2), `PiketUniformForm`, `PiketRotationModal`, `SettingsGeofencePanel`, `CorrectionHashModal`, `master-siswa.test` (1 each) | DONE | 2026-10-25 — `npm run lint` exit 0 (0 errors + format oxfmt bersih di 10 file); types & 303 tests tetap hijau |
 | C2 | `npm run check:i18n` bersih total: hapus/rapikan key `PiketPage.rot_*` yang unused (warning, exit masih 0) | TODO | |
-| C3 | Review diff wave-2 frontend bersama user, lalu commit + push ke branch `ghal/feat-frontend-ifter` (NEVER main; tanya sebelum `--no-verify`) | BLOCKED | menunggu kesiapan review user |
+| C3 | Review diff wave-2 frontend bersama user, lalu commit + push ke branch `ghal/feat-frontend-ifter` (NEVER main; tanya sebelum `--no-verify`) | DONE | 2026-10-25 — review per fitur disetujui user; 3 commit (`e894cbb` api, `1e6caf8` ui, `a2a4780` PLAN.md), push branch `ghal/feat-frontend-ifter-ghal` lalu fast-forward merge ke `ghal/feat-frontend-ifter`. `--no-verify` dipakai atas izin user karena pre-commit knip sudah merah sejak HEAD (→ C4) |
+| C4 | Perbaiki `knip` (pre-commit hook): 58 unused files + unused deps/exports warisan template shadcn — sudah merah sejak sebelum wave-2 | TODO | opsi: bersihkan file template tak terpakai, atau longgarkan `knip.config.ts` |
 
 ## D. Backend — sisa wave-2 (repo isonade)
 
@@ -62,6 +63,6 @@
 ## E. Gate verifikasi (jalankan ulang sebelum commit)
 
 - `npm run check:types` — PASS (2026-10-25)
-- `npm test` (vitest) — 32 files / 301 tests PASS (2026-10-25)
+- `npm test` (vitest) — 32 files / 303 tests PASS (2026-10-25)
 - `npm run check:i18n` — exit 0, ada warning unused keys (→ C2)
 - `npm run lint` — exit 0, 0 warnings/0 errors, format bersih (2026-10-25) ✅
