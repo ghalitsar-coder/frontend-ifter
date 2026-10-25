@@ -67,3 +67,27 @@
 - `npm run check:i18n` — exit 0, bersih tanpa warning unused keys (2026-10-25) ✅
 - `npm run check:deps` (knip) — exit 0 (2026-10-25) ✅
 - `npm run lint` — exit 0, 0 warnings/0 errors, format bersih (2026-10-25) ✅
+
+## F. Roadmap pasca-MVP (keputusan user 2026-10-25: TANPA pengecualian, semua PRD §7 & §11 dikejar)
+
+Urutan kerja: Wave 3 → 4 → 5 → 6. Alasannya: Wave 3 menutup lubang acceptance-criteria MVP (§8) yang jadi prasyarat semua wave berikutnya; Wave 6 (multi-tenant) terakhir karena mengubah skema semua migrasi.
+
+| Wave | ID | Item | Status | Dependensi |
+|------|----|------|--------|------------|
+| 3 | F1 | FR-C04 UI manajemen kelas (CRUD + arsip + tingkat + wali kelas) | TODO | endpoint `/classes` sudah ada |
+| 3 | F2 | FR-E04 UI aturan absensi: kalender libur, tahun ajaran/semester, hari operasional | TODO | endpoint `/attendance/holidays`, `/academic-years` sudah ada |
+| 3 | F3 | FR-A02 UI aktif/nonaktif akun (`PATCH /users/:id/status`) | TODO | endpoint sudah ada |
+| 3 | F4 | FR-C03 catatan administratif siswa (skema BE + FE) | TODO | migrasi baru |
+| 3 | F5 | Bukti lampiran koreksi absensi (FE konsumsi `/corrections/:id/evidence`) | TODO | endpoint BE sudah ada |
+| 3 | F6 | Label tombol export presensi "PDF" → sesuai format asli (XLSX) | TODO | kosmetik |
+| 4 | F7 | Portal orang tua (`/parent/*`, tautan akun ortu → siswa) | TODO | F3, skema guardian-account |
+| 4 | F8 | Absensi per mata pelajaran (JP): skema jadwal + recording + rekap | TODO | migrasi besar |
+| 4 | F9 | Notifikasi otomatis web-push (subscription + kirim saat event) | TODO | — |
+| 4 | F10 | Manajemen perangkat (registry perangkat RFID/gate) | TODO | — |
+| 5 | F11 | Backend RFID tap (ingest tap + stream gate, konsumsi registry F10) | TODO | F10 + perangkat keras |
+| 5 | F12 | Integrasi WhatsApp (adapter provider di balik config; kredensial user needed) | TODO | akun Meta/Twilio |
+| 6 | F13 | API publik + webhook keluar | TODO | F10 |
+| 6 | F14 | Offline attendance (PWA service worker + antrean sync) | TODO | F11 |
+| 6 | F15 | Multi-tenant + subscription billing | TODO | terakhir — refactor skema |
+
+Catatan: F7/F9/F14 adalah item yang §7 dulu mengecualikan; karena user memutuskan tanpa pengecualian, §7 PRD secara praktis dianggap usang (revisi dokumen adalah tugas user, bukan agen).
