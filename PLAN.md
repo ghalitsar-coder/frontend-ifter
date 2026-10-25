@@ -56,9 +56,9 @@
 
 | ID | Item | Status | Catatan |
 |----|------|--------|---------|
-| D1 | #27 Verifikasi migrasi from-scratch (down-all + up-all) & penomoran | TODO | |
-| D2 | #28 Perluasan e2e suite untuk paket wave-2 | TODO | |
-| D3 | #29 Cek drift `docs/API_ADDENDUM.md` vs realita rute | TODO | |
+| D1 | #27 Verifikasi migrasi from-scratch (down-all + up-all) & penomoran | DONE | 2026-10-25 — DB scratch `isonade-mig-scratch` (postgres:16, port 5455): audit 000001–000015 lengkap (pasangan up/down, tanpa gap/duplikat), `down-all → up-all` 2× berturut-turut sukses; tidak ada file yang perlu diperbaiki. Catatan: port 5432 dipakai kontainer proyek lain |
+| D2 | #28 Perluasan e2e suite untuk paket wave-2 | DONE | 2026-10-25 — `e2e/tests/api.e2e.ts` diperluas ke grup wave-2 (20/20 pass 2 run beruntun), masuk commit `383f615` |
+| D3 | #29 Cek drift `docs/API_ADDENDUM.md` vs realita rute | DONE | 2026-10-25 — addendum divalidasi terhadap register_* internal/transport/http, commit `15c1dde` |
 
 ## E. Gate verifikasi (jalankan ulang sebelum commit)
 
