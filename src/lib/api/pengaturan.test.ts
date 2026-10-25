@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { defaultSystemSettings } from '@/data/mockSettings';
 import type { AttendanceSettings } from '@/lib/api/dto';
-import { presencePolicyToSettings, settingsToPresencePolicy } from '@/lib/api/pengaturan';
+import {
+  geofencePolicyToPayload,
+  geofenceToPolicy,
+  presencePolicyToSettings,
+  sanctionDraftsToRules,
+  sanctionRulesToDrafts,
+  settingsToPresencePolicy,
+} from '@/lib/api/pengaturan';
+import type { GeofenceDto, SanctionRuleDto } from '@/lib/api/pengaturan';
 
 const baseSettings: AttendanceSettings = {
   school_name: 'SMP Negeri 1 Harapan Bangsa',
@@ -89,5 +97,114 @@ describe('presence policy to attendance settings', () => {
     expect(mapped.gateOpen).toBe(policy.gateOpen);
     expect(mapped.onTimeUntil).toBe(policy.onTimeUntil);
     expect(mapped.gateClose).toBe(policy.gateClose);
+  });
+});
+
+const sanctionRule = (overrides?: Partial<SanctionRuleDto>): SanctionRuleDto => ({
+  id: 'rule-1',
+  name: 'Teguran Tertulis',
+  min_points: 30,
+  max_points: 49,
+  action: 'Surat peringatan orang tua',
+  level: 'SP1',
+  description: 'Tahap pertama pembinaan.',
+  is_active: true,
+  created_at: '2026-10-01T00:00:00Z',
+  updated_at: '2026-10-01T00:00:00Z',
+  ...overrides,
+});
+
+describe('sanction rule mappers (GET/PUT /sanction-rules)', () => {
+  it('maps backend rules to editable drafts', () => {
+    const [draft] = sanctionRulesToDrafts([sanctionRule()]);
+
+    expect(draft?.key).toBe('rule-1');
+    expect(draft?.min_points).toBe(30);
+    expect(draft?.max_points).toBe(49);
+    expect(draft?.level).toBe('SP1');
+    expect(draft?.is_active).toBeTruthy();
+  });
+
+  it('normalizes nullable level and description to empty strings', () => {
+    const [draft] = sanctionRulesToDrafts([
+      sanctionRule({ id: 'rule-2', level: null, description: null }),
+    ]);
+
+    expect(draft?.level).toBe('');
+    expect(draft?.description).toBe('');
+  });
+
+  it('builds the replace-all payload with null max kept open-ended', () => {
+    const drafts = sanctionRulesToDrafts([
+      sanctionRule({ max_points: null }),
+      sanctionRule({ id: 'rule-2', level: null, description: null }),
+    ]);
+    const payload = sanctionDraftsToRules(drafts);
+
+    expect(payload[0]?.max_points).toBeNull();
+    expect(payload[0]?.name).toBe('Teguran Tertulis');
+    expect(payload[1]?.level).toBeUndefined();
+    expect(payload[1]?.description).toBeUndefined();
+    expect(payload[1]?.max_points).toBe(49);
+  });
+
+  it('round-trips a rule through both mappers without data loss', () => {
+    const rule = sanctionRule();
+    const [payload] = sanctionDraftsToRules(sanctionRulesToDrafts([rule]));
+
+    expect(payload).toStrictEqual({
+      name: rule.name,
+      min_points: rule.min_points,
+      max_points: rule.max_points,
+      action: rule.action,
+      level: rule.level,
+      description: rule.description,
+      is_active: rule.is_active,
+    });
+  });
+});
+
+const geofenceConfig: GeofenceDto = {
+  latitude: -6.2,
+  longitude: 106.8,
+  radius_meters: 300,
+  is_enabled: true,
+};
+
+describe('geofence mappers (GET/PUT /geofence)', () => {
+  it('maps server config onto the panel policy and keeps mock flags from the fallback', () => {
+    const policy = geofenceToPolicy(geofenceConfig, defaultSystemSettings.geofence);
+
+    expect(policy.radiusMeters).toBe(300);
+    expect(policy.centerLat).toBe(-6.2);
+    expect(policy.centerLng).toBe(106.8);
+    expect(policy.detectFakeGps).toBe(defaultSystemSettings.geofence.detectFakeGps);
+    expect(policy.requireSelfieLiveness).toBe(defaultSystemSettings.geofence.requireSelfieLiveness);
+  });
+
+  it('builds a full-replace PUT body with an integer radius', () => {
+    const policy = {
+      ...defaultSystemSettings.geofence,
+      centerLat: -6.2,
+      centerLng: 106.8,
+      radiusMeters: 150.6,
+    };
+    const payload = geofencePolicyToPayload(policy, false);
+
+    expect(payload).toStrictEqual({
+      latitude: -6.2,
+      longitude: 106.8,
+      radius_meters: 151,
+      is_enabled: false,
+    });
+  });
+
+  it('round-trips config through both mappers', () => {
+    const payload = geofencePolicyToPayload(
+      geofenceToPolicy(geofenceConfig, defaultSystemSettings.geofence),
+      geofenceConfig.is_enabled,
+    );
+
+    expect(payload).toStrictEqual(geofenceConfig);
   });
 });

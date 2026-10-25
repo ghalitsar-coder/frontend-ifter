@@ -11,6 +11,7 @@ import {
 import type {
   ApiUser,
   Class,
+  CredentialIssue,
   CreateUserResponse,
   DataList,
   DutyAssignment,
@@ -37,6 +38,7 @@ export const masterGuruKeys = {
   teachers: (query?: MasterGuruTeacherQuery) => ['master-guru', 'teachers', query ?? {}] as const,
   dutyAssignments: ['master-guru', 'duty-assignments'] as const,
   userAccounts: (userIds: string[]) => ['master-guru', 'user-accounts', userIds] as const,
+  employmentTypes: ['master-guru', 'employment-types'] as const,
 };
 
 // ---------------------------------------------------------------------------
@@ -47,6 +49,30 @@ export type MasterGuruTeacherQuery = {
   status?: string;
   limit?: number;
   offset?: number;
+};
+
+/**
+ * Employment type master record (API_ADDENDUM §6.5, GET /employment-types).
+ * Local module type — the shared dto.ts is intentionally not extended here.
+ */
+export type EmploymentType = {
+  id: string;
+  code: string;
+  name: string;
+  description?: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+/**
+ * Backend `Teacher` as extended by the employment-type package: GET/POST/PUT
+ * /teachers additionally expose `employment_type_id` and
+ * `employment_type_name` (both null until migration 000013 data exists).
+ */
+export type TeacherWithEmployment = Teacher & {
+  employment_type_id?: string;
+  employment_type_name?: string;
 };
 
 /** Linked login account for a teacher record (GET /users/:id). */
@@ -78,6 +104,19 @@ export type NewTeacherDraft = {
   createAccount: boolean;
   homeroomClassId?: string;
   dutyWeekday?: number;
+  /** Selected GET /employment-types id; omitted leaves the backend NULL (= unknown). */
+  employmentTypeId?: string;
+};
+
+/** Everything the Edit-teacher modal submits (PUT /teachers/:id fields only). */
+export type EditTeacherDraft = {
+  teacherId: string;
+  userId?: string;
+  fullName: string;
+  employeeNumber: string;
+  email: string;
+  phone: string;
+  employmentTypeId?: string;
 };
 
 // ---------------------------------------------------------------------------
@@ -147,7 +186,7 @@ const buildRoleLabels = (vars: {
  * @returns Profile shaped for MasterGuruTable/Header.
  */
 export function mapTeacherToProfile(
-  teacher: Teacher,
+  teacher: TeacherWithEmployment,
   classes: Class[],
   duties: DutyAssignment[],
   accounts: Record<string, TeacherAccount>,
@@ -183,6 +222,7 @@ export function mapTeacherToProfile(
 
   return {
     id: teacher.id,
+    userId: teacher.user_id,
     nip: teacher.employee_number ?? '-',
     nuptk: undefined, // shortcut: no backend field, keep unset
     nik: undefined, // shortcut: no backend field, keep unset
@@ -190,7 +230,9 @@ export function mapTeacherToProfile(
     gender: 'L', // shortcut: no backend gender field on Teacher
     email: teacher.email ?? '',
     phone: teacher.phone ?? '',
-    employmentStatus: 'PNS', // shortcut: no backend employment-status field
+    employmentStatus: 'PNS', // shortcut: no legacy PNS/PPPK column on Teacher
+    employmentTypeId: teacher.employment_type_id,
+    employmentTypeName: teacher.employment_type_name,
     subject: '', // shortcut: no backend subject field on Teacher
     teachingHoursPerWeek: 0, // shortcut: no backend teaching-hours field
     roles,
@@ -226,7 +268,7 @@ export function mapTeacherToProfile(
  * @returns TeacherProfile list for the table/header.
  */
 export function buildTeacherProfiles(
-  teachers: Teacher[],
+  teachers: TeacherWithEmployment[],
   classes: Class[],
   duties: DutyAssignment[],
   accounts: Record<string, TeacherAccount>,
@@ -306,7 +348,7 @@ export const masterGuruTeachersOptions = (params?: MasterGuruTeacherQuery) =>
   queryOptions({
     queryKey: masterGuruKeys.teachers(params),
     queryFn: async () =>
-      await apiGet<Paginated<Teacher>>('/teachers', {
+      await apiGet<Paginated<TeacherWithEmployment>>('/teachers', {
         limit: 100,
         ...params,
       }),
@@ -314,6 +356,24 @@ export const masterGuruTeachersOptions = (params?: MasterGuruTeacherQuery) =>
 
 export const useMasterGuruTeachers = (params?: MasterGuruTeacherQuery) =>
   useQuery(masterGuruTeachersOptions(params));
+
+/**
+ * GET /employment-types — the employment-type master (API_ADDENDUM §6.5).
+ * Seeded codes: `permanent` (Tetap), `honorary` (Honorer), `staff_tu` (Staf TU).
+ * @returns Active list of employment types for the create/edit dropdown and
+ * the table filter (the backend has no server-side employment filter on
+ * GET /teachers, so filtering happens client-side on `employment_type_id`).
+ */
+export const employmentTypesOptions = () =>
+  queryOptions({
+    queryKey: masterGuruKeys.employmentTypes,
+    queryFn: async () => {
+      const result = await apiGet<DataList<EmploymentType>>('/employment-types');
+      return result.data;
+    },
+  });
+
+export const useEmploymentTypes = () => useQuery(employmentTypesOptions());
 
 export const dutyAssignmentsOptions = () =>
   queryOptions({
@@ -386,13 +446,16 @@ export const createTeacherProfile = async (
     }
   }
 
-  const { teacher } = await apiPost<{ teacher: Teacher }>('/teachers', {
+  const { teacher } = await apiPost<{ teacher: TeacherWithEmployment }>('/teachers', {
     full_name: draft.fullName,
     employee_number: draft.employeeNumber,
     email: draft.email,
     phone: draft.phone,
     status: 'active',
     ...(userId === undefined ? {} : { user_id: userId }),
+    ...(draft.employmentTypeId === undefined || draft.employmentTypeId === ''
+      ? {}
+      : { employment_type_id: draft.employmentTypeId }),
   });
 
   let homeroomAssigned = false;
@@ -435,6 +498,48 @@ export const useCreateTeacher = () => {
 };
 
 /**
+ * PUT /teachers/:id — updates the teacher master record (name, NIP, contacts
+ * and the optional `employment_type_id`). The backend overwrites the row from
+ * the payload, so every field is submitted; omitted `employment_type_id`
+ * clears it back to NULL (= unknown in the dashboard breakdown).
+ * @param draft - UI draft from the Edit Teacher modal.
+ * @returns The updated teacher record.
+ */
+export const updateTeacherProfile = async (
+  draft: EditTeacherDraft,
+): Promise<TeacherWithEmployment> => {
+  const { teacher } = await apiPut<{ teacher: TeacherWithEmployment }>(
+    `/teachers/${draft.teacherId}`,
+    {
+      full_name: draft.fullName,
+      employee_number: draft.employeeNumber,
+      email: draft.email,
+      phone: draft.phone,
+      ...(draft.userId === undefined ? {} : { user_id: draft.userId }),
+      ...(draft.employmentTypeId === undefined || draft.employmentTypeId === ''
+        ? {}
+        : { employment_type_id: draft.employmentTypeId }),
+    },
+  );
+  return teacher;
+};
+
+/**
+ * PUT /teachers/:id as a mutation; invalidates the teacher caches.
+ * @returns Mutation over EditTeacherDraft.
+ */
+export const useUpdateTeacher = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (draft: EditTeacherDraft) => await updateTeacherProfile(draft),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: masterGuruKeys.teachers() });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.teachers() });
+    },
+  });
+};
+
+/**
  * PATCH /teachers/:id/status — toggles active/inactive.
  * @returns Mutation with {id, status} variables.
  */
@@ -442,7 +547,7 @@ export const useUpdateTeacherStatus = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (vars: { id: string; status: 'active' | 'inactive' }) =>
-      await apiPatch<{ teacher: Teacher }>(`/teachers/${vars.id}/status`, {
+      await apiPatch<{ teacher: TeacherWithEmployment }>(`/teachers/${vars.id}/status`, {
         status: vars.status,
       }),
     onSuccess: () => {
@@ -541,3 +646,16 @@ export const downloadTeacherExport = async () => await downloadFile('/exports/te
  */
 export const apiErrorMessage = (error: unknown, fallback: string): string =>
   error instanceof ApiError ? error.message : fallback;
+
+/**
+ * POST /users/:id/credential-reset — mint a fresh one-time password reset
+ * token for an existing login account (admin only; 200 {credential}). The
+ * token only exists in this response; it invalidates previous unused tokens.
+ * @returns Mutation over the credential envelope.
+ */
+export function useResetUserCredential() {
+  return useMutation({
+    mutationFn: async (userId: string) =>
+      await apiPost<{ credential: CredentialIssue }>(`/users/${userId}/credential-reset`),
+  });
+}

@@ -5,12 +5,21 @@ import {
   useQueryClient,
   queryOptions,
 } from '@tanstack/react-query';
-import { apiGet, apiPatch, apiPost, apiPut, apiUpload, downloadFile } from '@/lib/api/client';
+import {
+  apiDelete,
+  apiGet,
+  apiPatch,
+  apiPost,
+  apiPut,
+  apiUpload,
+  downloadFile,
+} from '@/lib/api/client';
 import type {
   AcademicYear,
   AttendanceSummaryItem,
   AttendanceSummaryResponse,
   Class,
+  CreateUserResponse,
   HistoryRecord,
   ImportConfirmResponse,
   ImportErrorRow,
@@ -353,6 +362,7 @@ const masterSiswaKeys = {
   history: (id: string, range: DateRange, limit: number) =>
     ['master-siswa', 'history', id, range, limit] as const,
   classCounts: (id: string) => ['master-siswa', 'class-counts', id] as const,
+  account: (id: string) => ['master-siswa', 'account', id] as const,
 };
 
 function invalidateAfterWrite(queryClient: ReturnType<typeof useQueryClient>): void {
@@ -669,4 +679,101 @@ export async function downloadStudentsExport(params: MasterSiswaListParams): Pro
     status: params.status,
   });
   triggerBlobDownload(file.blob, file.filename);
+}
+
+// ---------------------------------------------------------------------------
+// Login accounts (POST/GET/DELETE /students/:id/account — admin only)
+// ---------------------------------------------------------------------------
+
+/** GET /students/:id/account → linked account view; every field null when unlinked. */
+export type StudentAccountView = {
+  user_id: string | null;
+  username: string | null;
+  status: string | null;
+  last_login_at: string | null;
+};
+
+/** Raw input of the provision form; blank fields are dropped before sending. */
+export type ProvisionAccountInput = { username?: string; email?: string };
+
+/**
+ * Build the POST /students/:id/account body: empty strings are omitted so the
+ * backend applies its own fallbacks (username = student number).
+ * @param input - Form values (username, email), optionally blank.
+ * @returns Wire payload with only the non-blank keys.
+ */
+export function buildProvisionAccountBody(input: ProvisionAccountInput): ProvisionAccountInput {
+  const body: ProvisionAccountInput = {};
+  const username = input.username?.trim() ?? '';
+  const email = input.email?.trim() ?? '';
+  if (username !== '') {
+    body.username = username;
+  }
+  if (email !== '') {
+    body.email = email;
+  }
+  return body;
+}
+
+/**
+ * Query options for GET /students/:id/account.
+ * @param id - Student id ('' disables the query).
+ * @returns queryOptions resolving to the nullable account view.
+ */
+export function studentAccountOptions(id: string) {
+  return queryOptions({
+    queryKey: masterSiswaKeys.account(id),
+    queryFn: async () => {
+      const result = await apiGet<{ account: StudentAccountView }>(`/students/${id}/account`);
+      return result.account;
+    },
+    enabled: id !== '',
+  });
+}
+
+/**
+ * GET /students/:id/account hook (admin only; non-admins get 403).
+ * @param id - Student id ('' disables the query).
+ * @returns Query state over StudentAccountView.
+ */
+export function useStudentAccount(id: string) {
+  return useQuery(studentAccountOptions(id));
+}
+
+/**
+ * POST /students/:id/account — mint a student login and its one-time invite
+ * token (201). The token is only present in this response; surface it to the
+ * admin immediately.
+ * @returns Mutation over {user, credential}.
+ */
+export function useProvisionStudentAccount() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (vars: { id: string; input: ProvisionAccountInput }) =>
+      await apiPost<CreateUserResponse>(
+        `/students/${vars.id}/account`,
+        buildProvisionAccountBody(vars.input),
+      ),
+    onSuccess: (_result, vars) => {
+      void queryClient.invalidateQueries({ queryKey: masterSiswaKeys.account(vars.id) });
+      invalidateAfterWrite(queryClient);
+    },
+  });
+}
+
+/**
+ * DELETE /students/:id/account (204) — withdraw the login: clears the link,
+ * revokes sessions and the unused invite.
+ * @returns Mutation resolving to void.
+ */
+export function useDeactivateStudentAccount() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      await apiDelete<null>(`/students/${id}/account`);
+    },
+    onSuccess: (_result, id) => {
+      void queryClient.invalidateQueries({ queryKey: masterSiswaKeys.account(id) });
+    },
+  });
 }

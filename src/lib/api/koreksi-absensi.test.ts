@@ -9,6 +9,7 @@ import {
   historyQueryFor,
   isoDayToday,
   pageMeta,
+  shortHash,
   sourceLabel,
   statusNote,
   toBackendStatus,
@@ -194,6 +195,8 @@ describe('row mapper (GET /attendance/history)', () => {
 });
 
 describe('trail mapper (record corrections)', () => {
+  const evidenceHash = '9b74f9b9ff50a5bdd7d45d1e1b1c4a72e2d0c9e5f6a7b8c9d0e1f2a3b4c5d6e7';
+
   it('maps a backend correction into a ledger trail entry', () => {
     const entry = toTrailEntry(baseCorrection);
 
@@ -205,6 +208,7 @@ describe('trail mapper (record corrections)', () => {
       loggedDate: entry.loggedDate,
       loggedTime: entry.loggedTime,
       officerName: entry.officerName,
+      evidenceHash: entry.evidenceHash,
     }).toStrictEqual({
       fromStatus: 'alpa',
       toStatus: 'sakit',
@@ -213,11 +217,31 @@ describe('trail mapper (record corrections)', () => {
       loggedDate: '24 Okt 2026',
       loggedTime: '09.15',
       officerName: 'Operator c123',
+      // pre-migration rows omit evidence_hash on the wire → null in the view-model
+      evidenceHash: null,
     });
+  });
+
+  it('carries the server-computed evidence_hash through untouched', () => {
+    expect(toTrailEntry({ ...baseCorrection, evidence_hash: evidenceHash }).evidenceHash).toBe(
+      evidenceHash,
+    );
+    expect(toTrailEntry({ ...baseCorrection, evidence_hash: null }).evidenceHash).toBeNull();
   });
 
   it('notes late targets', () => {
     expect(toTrailEntry({ ...baseCorrection, new_status: 'late' }).toNote).toBe('Hadir Terlambat');
+  });
+});
+
+describe(shortHash, () => {
+  it('truncates long hashes keeping head and tail', () => {
+    expect(shortHash('9b74f9b9ff50a5bdd7d45d1e1b1c4a72')).toBe('9b74f9b9…1b1c4a72');
+  });
+
+  it('leaves short strings untouched', () => {
+    expect(shortHash('abc123')).toBe('abc123');
+    expect(shortHash('1234567890123456')).toBe('1234567890123456');
   });
 });
 

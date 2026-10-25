@@ -2,13 +2,71 @@ import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/r
 import { defaultSystemSettings } from '@/data/mockSettings';
 import { apiGet, apiPut } from '@/lib/api/client';
 import type { AttendanceSchedule, AttendanceSettings } from '@/lib/api/dto';
-import type { PresencePolicy } from '@/types/settings';
+import type { GeofencePolicy, PresencePolicy } from '@/types/settings';
 
 // ---------------------------------------------------------------------------
 // Query keys (module-local, extends the foundation `queryKeys` convention)
 // ---------------------------------------------------------------------------
 export const pengaturanQueryKeys = {
   attendanceSettings: ['attendance', 'settings'] as const,
+  sanctionRules: ['sanction-rules'] as const,
+  geofence: ['geofence'] as const,
+};
+
+// ---------------------------------------------------------------------------
+// Wave-2 DTOs (sanction rules + school geofence). Defined here because
+// src/lib/api/dto.ts is a frozen shared file. Shapes mirror
+// internal/sanctionrules/types.go (`Rule`) and internal/teacherpresence
+// (`GeofenceConfig`) in the backend repo.
+// ---------------------------------------------------------------------------
+
+/** One row of GET /sanction-rules → { "data": [...] }. */
+export type SanctionRuleDto = {
+  id: string;
+  name: string;
+  min_points: number;
+  max_points: number | null;
+  action: string;
+  level: string | null;
+  description: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+/** Envelope returned by GET/PUT /sanction-rules. */
+export type SanctionRuleListDto = { data: SanctionRuleDto[] };
+
+/** One rule inside the PUT /sanction-rules replace-all body `{ rules: [...] }`. */
+export type SanctionRuleInputDto = {
+  name: string;
+  min_points: number;
+  max_points?: number | null;
+  action: string;
+  level?: string;
+  description?: string;
+  is_active?: boolean;
+};
+
+/** Body/response of GET/PUT /geofence (full replace, admin write). */
+export type GeofenceDto = {
+  latitude: number;
+  longitude: number;
+  radius_meters: number;
+  is_enabled: boolean;
+};
+
+/** Editable UI row for the sanction-rule table (draft state before PUT). */
+export type SanctionRuleDraft = {
+  key: string;
+  id?: string;
+  name: string;
+  min_points: number;
+  max_points: number | null;
+  action: string;
+  level: string;
+  description: string;
+  is_active: boolean;
 };
 
 // ---------------------------------------------------------------------------
@@ -38,6 +96,73 @@ export const useUpdateAttendanceSettings = () => {
       await apiPut<AttendanceSettings>('/attendance/settings', input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: pengaturanQueryKeys.attendanceSettings });
+    },
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Sanction rules hooks — GET/PUT /sanction-rules (backend: internal/sanctionrules)
+// ---------------------------------------------------------------------------
+export const sanctionRulesOptions = () =>
+  queryOptions({
+    queryKey: pengaturanQueryKeys.sanctionRules,
+    queryFn: async () => {
+      const result = await apiGet<SanctionRuleListDto>('/sanction-rules');
+      return result.data;
+    },
+  });
+
+/**
+ * GET /sanction-rules → sanction tier list (admin + discipline readers).
+ * @returns React Query result with `SanctionRuleDto[]`.
+ */
+export const useSanctionRules = () => useQuery(sanctionRulesOptions());
+
+/**
+ * PUT /sanction-rules → replace the whole rule set in one transaction
+ * (admin only; overlapping active ranges are rejected with 409).
+ * @returns Mutation accepting the full `SanctionRuleInputDto[]` rule list.
+ */
+export const useReplaceSanctionRules = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (rules: SanctionRuleInputDto[]) =>
+      await apiPut<SanctionRuleListDto>('/sanction-rules', { rules }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: pengaturanQueryKeys.sanctionRules });
+    },
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Geofence hooks — GET/PUT /geofence (backend: internal/teacherpresence).
+// The attendance settings payload has NO school-location fields, so the
+// panels read/write this dedicated config surface instead.
+// ---------------------------------------------------------------------------
+export const geofenceOptions = () =>
+  queryOptions({
+    queryKey: pengaturanQueryKeys.geofence,
+    queryFn: async () => await apiGet<GeofenceDto>('/geofence'),
+  });
+
+/**
+ * GET /geofence → school center coordinates, radius and enabled flag.
+ * @returns React Query result with `GeofenceDto`.
+ */
+export const useGeofence = () => useQuery(geofenceOptions());
+
+/**
+ * PUT /geofence → full-replace of the school location config (admin only).
+ * @returns Mutation accepting a complete `GeofenceDto` body.
+ */
+export const useUpdateGeofence = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: GeofenceDto) => await apiPut<GeofenceDto>('/geofence', input),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: pengaturanQueryKeys.geofence });
     },
   });
 };
@@ -131,3 +256,83 @@ export const presencePolicyToSettings = (
     schedules,
   };
 };
+
+/**
+ * Mapper: backend sanction rule → editable table draft.
+ * `level`/`description` arrive nullable and are edited as plain strings
+ * ('' = none). `description` is not shown in the table but round-trips so a
+ * replace-all never wipes notes written from other surfaces.
+ *
+ * @param rules - Rows returned by GET /sanction-rules.
+ * @returns Draft rows for the sanctions table.
+ */
+export const sanctionRulesToDrafts = (rules: SanctionRuleDto[]): SanctionRuleDraft[] =>
+  rules.map((rule) => ({
+    key: rule.id,
+    id: rule.id,
+    name: rule.name,
+    min_points: rule.min_points,
+    max_points: rule.max_points,
+    action: rule.action,
+    level: rule.level ?? '',
+    description: rule.description ?? '',
+    is_active: rule.is_active,
+  }));
+
+/**
+ * Mapper: draft rows → PUT /sanction-rules replace-all payload.
+ * `max_points: null` keeps the range open-ended upward; empty `level`/
+ * `description` strings are omitted so the backend stores NULL.
+ *
+ * @param drafts - Current table rows.
+ * @returns Rules array for the collection PUT.
+ */
+export const sanctionDraftsToRules = (drafts: SanctionRuleDraft[]): SanctionRuleInputDto[] =>
+  drafts.map((draft) => ({
+    name: draft.name,
+    min_points: draft.min_points,
+    max_points: draft.max_points,
+    action: draft.action,
+    level: draft.level === '' ? undefined : draft.level,
+    description: draft.description === '' ? undefined : draft.description,
+    is_active: draft.is_active,
+  }));
+
+/**
+ * Mapper: GET /geofence config → panel policy. The anti-spoofing flags
+ * (`detectFakeGps`, `requireSelfieLiveness`) have no backend fields, so
+ * they are preserved from the given fallback policy.
+ *
+ * @param config - Server geofence configuration.
+ * @param fallback - Local policy supplying the mock-only flags.
+ * @returns Geofence policy for the panel.
+ */
+export const geofenceToPolicy = (
+  config: GeofenceDto,
+  fallback: GeofencePolicy,
+): GeofencePolicy => ({
+  radiusMeters: config.radius_meters,
+  centerLat: config.latitude,
+  centerLng: config.longitude,
+  detectFakeGps: fallback.detectFakeGps, // shortcut: no backend field, keep mock
+  requireSelfieLiveness: fallback.requireSelfieLiveness, // shortcut: no backend field, keep mock
+});
+
+/**
+ * Mapper: edited geofence policy (+ enabled flag, which `GeofencePolicy`
+ * does not carry) → PUT /geofence full-replace body. Radius is rounded to
+ * whole meters per the backend `radius_meters` int32 field.
+ *
+ * @param policy - Policy values from the panel editor.
+ * @param isEnabled - Current `is_enabled` server flag (or local toggle).
+ * @returns Complete geofence body (backend rejects partial payloads).
+ */
+export const geofencePolicyToPayload = (
+  policy: GeofencePolicy,
+  isEnabled: boolean,
+): GeofenceDto => ({
+  latitude: policy.centerLat,
+  longitude: policy.centerLng,
+  radius_meters: Math.round(policy.radiusMeters),
+  is_enabled: isEnabled,
+});

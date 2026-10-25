@@ -60,6 +60,16 @@ export const login = async (username: string, password: string): Promise<ApiUser
 };
 
 /**
+ * POST /auth/activate — public, rate-limited. Sets the password of a pending
+ * account using a one-time invite or reset token. 204 on success.
+ * @param token - One-time credential token handed out by an admin.
+ * @param password - New password (backend requires at least 12 characters).
+ */
+export const activateAccount = async (token: string, password: string): Promise<void> => {
+  await apiPost<null>('/auth/activate', { token, password });
+};
+
+/**
  * GET /auth/me. Refreshes the stored user snapshot.
  * @returns The current user.
  */

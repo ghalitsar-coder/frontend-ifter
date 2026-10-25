@@ -1,5 +1,5 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiGet, apiPost } from '@/lib/api/client';
+import { apiGet, apiPatch, apiPost } from '@/lib/api/client';
 import type {
   DisciplineRecord,
   DisciplineRecordDetail,
@@ -58,6 +58,12 @@ export type CreateDisciplineRecordInput = {
 export type CreateFollowupInput = {
   status: string;
   notes?: string;
+};
+
+/** PATCH /discipline/records/:id/points body (admin only; reason mandatory). */
+export type UpdatePointsInput = {
+  points: number;
+  reason: string;
 };
 
 /**
@@ -172,6 +178,28 @@ export const useAddDisciplineFollowup = (recordId: string) => {
     mutationFn: async (input: CreateFollowupInput) =>
       await apiPost<DisciplineRecordDetail>(
         `/discipline/records/${encodeURIComponent(recordId)}/followups`,
+        input,
+      ),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: kedisiplinanQueryKeys.root });
+    },
+  });
+};
+
+/**
+ * PATCH /discipline/records/:id/points → admin correction of a record's points
+ * (reason is required and logged). Returns the full updated detail and
+ * refreshes every discipline query on success.
+ * @param recordId - Record whose points are corrected.
+ * @returns Mutation taking `UpdatePointsInput`.
+ */
+export const useUpdateDisciplinePoints = (recordId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: UpdatePointsInput) =>
+      await apiPatch<DisciplineRecordDetail>(
+        `/discipline/records/${encodeURIComponent(recordId)}/points`,
         input,
       ),
     onSuccess: async () => {

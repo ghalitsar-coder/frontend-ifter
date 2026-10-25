@@ -12,6 +12,7 @@ import {
   createTeacherProfile,
   mapImportPreview,
   mapTeacherToProfile,
+  updateTeacherProfile,
 } from './master-guru';
 
 const baseTeacher: Teacher = {
@@ -94,6 +95,28 @@ describe('teacher profile mapping', () => {
     const profiles = buildTeacherProfiles([baseTeacher, { ...baseTeacher, id: 't-2' }], [], [], {});
     expect(profiles.map((profile) => profile.id)).toStrictEqual(['t-1', 't-2']);
   });
+
+  it('carries employment_type_id/name from the teacher payload into the profile', () => {
+    const profile = mapTeacherToProfile(
+      {
+        ...baseTeacher,
+        employment_type_id: 'et-2',
+        employment_type_name: 'Honorer',
+      },
+      [],
+      [],
+      {},
+    );
+
+    expect(profile.employmentTypeId).toBe('et-2');
+    expect(profile.employmentTypeName).toBe('Honorer');
+  });
+
+  it('leaves employment fields undefined when the teacher has no type (NULL = unknown)', () => {
+    const profile = mapTeacherToProfile(baseTeacher, [], [], {});
+    expect(profile.employmentTypeId).toBeUndefined();
+    expect(profile.employmentTypeName).toBeUndefined();
+  });
 });
 
 describe('import preview mapping', () => {
@@ -120,6 +143,24 @@ describe('import preview mapping', () => {
     expect(rows[1]?.note).toContain('phone');
     expect(rows[3]?.statusLabel).toBe('Duplikat');
     expect(rows[3]?.note).toBe('NIP sudah terdaftar');
+  });
+
+  it('tolerates the new employment_type column in backend changed_fields', () => {
+    const rows = mapImportPreview(
+      [
+        {
+          row_number: 1,
+          action: 'update',
+          key: '19780412',
+          name: 'Agus',
+          changed_fields: ['employment_type'],
+        },
+      ],
+      [],
+    );
+
+    expect(rows[0]?.validationStatus).toBe('valid');
+    expect(rows[0]?.note).toBe('Perubahan: employment_type');
   });
 });
 
@@ -194,5 +235,103 @@ describe('create teacher orchestration', () => {
 
     expect(result).toMatchObject({ accountCreated: false, teacher: { id: 't-9' } });
     expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('submits employment_type_id on create when a kepegawaian type is picked', async () => {
+    const fetchMock = vi.fn<typeof globalThis.fetch>();
+    vi.stubGlobal('fetch', fetchMock);
+    setAccessToken('tok');
+
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse(201, {
+        teacher: { ...baseTeacher, id: 't-9', employment_type_id: 'et-2' },
+      }),
+    );
+
+    await createTeacherProfile({
+      fullName: 'Joko',
+      employeeNumber: '19900101',
+      email: 'joko@sekolah.sch.id',
+      phone: '+62812',
+      accessLevel: 'teacher',
+      createAccount: false,
+      employmentTypeId: 'et-2',
+    });
+
+    const teacherBody = fetchMock.mock.calls[0]?.[1]?.body;
+    if (typeof teacherBody !== 'string') {
+      throw new TypeError('expected the teacher POST body to be a JSON string');
+    }
+    expect(JSON.parse(teacherBody)).toMatchObject({ employment_type_id: 'et-2' });
+  });
+
+  it('omits employment_type_id from the create body when left unset', async () => {
+    const fetchMock = vi.fn<typeof globalThis.fetch>();
+    vi.stubGlobal('fetch', fetchMock);
+    setAccessToken('tok');
+
+    fetchMock.mockResolvedValueOnce(jsonResponse(201, { teacher: { ...baseTeacher, id: 't-9' } }));
+
+    await createTeacherProfile({
+      fullName: 'Joko',
+      employeeNumber: '19900101',
+      email: 'joko@sekolah.sch.id',
+      phone: '+62812',
+      accessLevel: 'teacher',
+      createAccount: false,
+    });
+
+    const teacherBody = fetchMock.mock.calls[0]?.[1]?.body;
+    if (typeof teacherBody !== 'string') {
+      throw new TypeError('expected the teacher POST body to be a JSON string');
+    }
+    expect(JSON.parse(teacherBody)).not.toHaveProperty('employment_type_id');
+  });
+});
+
+describe('edit teacher (PUT /teachers/:id)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
+    setAccessToken(null);
+  });
+
+  it('sends the full update payload including employment_type_id', async () => {
+    const fetchMock = vi.fn<typeof globalThis.fetch>();
+    vi.stubGlobal('fetch', fetchMock);
+    setAccessToken('tok');
+
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse(200, {
+        teacher: { ...baseTeacher, employment_type_id: 'et-1', employment_type_name: 'Tetap' },
+      }),
+    );
+
+    const teacher = await updateTeacherProfile({
+      teacherId: 't-1',
+      userId: 'u-1',
+      fullName: 'Drs. Agus Subagyo, M.Pd.',
+      employeeNumber: '19780412',
+      email: 'agus@sekolah.sch.id',
+      phone: '+62812',
+      employmentTypeId: 'et-1',
+    });
+
+    expect(teacher.employment_type_name).toBe('Tetap');
+    const [request, init] = fetchMock.mock.calls[0] ?? [];
+    if (typeof request !== 'string') {
+      throw new TypeError('expected the teacher PUT URL to be a string');
+    }
+    expect(request).toContain('/api/v1/teachers/t-1');
+    expect(init?.method).toBe('PUT');
+    const teacherBody = init?.body;
+    if (typeof teacherBody !== 'string') {
+      throw new TypeError('expected the teacher PUT body to be a JSON string');
+    }
+    expect(JSON.parse(teacherBody)).toMatchObject({
+      full_name: 'Drs. Agus Subagyo, M.Pd.',
+      user_id: 'u-1',
+      employment_type_id: 'et-1',
+    });
   });
 });

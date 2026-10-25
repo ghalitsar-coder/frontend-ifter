@@ -4,7 +4,9 @@
  * Wired endpoints (relative to /api/v1):
  *   GET  /attendance/history                     — correction audit list (filters + pagination)
  *   GET  /attendance/records/:id                 — single record + corrections trail
- *   POST /attendance/records/:id/corrections     — submit a correction (reason mandatory)
+ *   POST /attendance/records/:id/corrections     — submit a correction (reason mandatory);
+ *                                                  each returned correction carries the
+ *                                                  server-computed `evidence_hash`
  *   GET  /exports/attendance                     — XLSX audit export
  *
  * Also exposes the small DTO→UI mapper helpers used by the koreksi-absensi
@@ -282,6 +284,21 @@ export function filterRowsBySearch(rows: CorrectionRow[], query: string): Correc
 // Correction trail (record detail)
 // ---------------------------------------------------------------------------
 
+/**
+ * Backend correction as it arrives on the wire since wave 2 (migration 000014):
+ * the shared `AttendanceCorrection` DTO plus the server-computed canonical
+ * sha256 `evidence_hash`. The backend OMITS the key for rows created before
+ * the migration (Go `*string` with `omitempty`), so it is optional here.
+ */
+export type WireCorrection = AttendanceCorrection & {
+  evidence_hash?: string | null;
+};
+
+/** Record detail with the wave-2 correction shape (evidence_hash included). */
+export type CorrectionRecordDetail = Omit<AttendanceRecordDetail, 'corrections'> & {
+  corrections: WireCorrection[];
+};
+
 /** One correction entry shown in the ledger modal. */
 export type CorrectionTrailEntry = {
   id: string;
@@ -292,6 +309,8 @@ export type CorrectionTrailEntry = {
   loggedDate: string;
   loggedTime: string;
   officerName: string;
+  /** Server-computed sha256 over the correction payload; null for pre-migration rows. */
+  evidenceHash: string | null;
 };
 
 /**
@@ -307,11 +326,13 @@ export function statusNote(status: string): string {
 /**
  * Map a backend AttendanceCorrection to a ledger trail entry.
  * The API only exposes `corrected_by_user_id` (no display name), so the
- * officer line shows the short user id.
+ * officer line shows the short user id. The `evidence_hash` is computed
+ * server-side (correction-evidence package); this mapper only carries it
+ * through — the UI never hashes anything itself.
  * @param correction - Raw correction from GET /attendance/records/:id.
  * @returns Trail view-model.
  */
-export function toTrailEntry(correction: AttendanceCorrection): CorrectionTrailEntry {
+export function toTrailEntry(correction: WireCorrection): CorrectionTrailEntry {
   return {
     id: correction.id,
     fromStatus: toUiStatus(correction.old_status),
@@ -322,7 +343,17 @@ export function toTrailEntry(correction: AttendanceCorrection): CorrectionTrailE
     loggedDate: formatDateId(correction.corrected_at),
     loggedTime: formatTimeId(correction.corrected_at),
     officerName: `Operator ${correction.corrected_by_user_id.length > 4 ? correction.corrected_by_user_id.slice(-4) : correction.corrected_by_user_id}`,
+    evidenceHash: correction.evidence_hash ?? null,
   };
+}
+
+/**
+ * Short display form of a sha256 evidence hash: first 8 and last 8 hex chars.
+ * @param hash - Full hash string from the backend.
+ * @returns Truncated label (`hash` unchanged when 16 chars or shorter).
+ */
+export function shortHash(hash: string): string {
+  return hash.length > 16 ? `${hash.slice(0, 8)}…${hash.slice(-8)}` : hash;
 }
 
 /**
@@ -332,8 +363,8 @@ export function toTrailEntry(correction: AttendanceCorrection): CorrectionTrailE
  * @returns Normalized record detail.
  */
 export function unwrapRecordDetail(
-  body: AttendanceRecordDetail & { record?: AttendanceRecordDetail },
-): AttendanceRecordDetail {
+  body: CorrectionRecordDetail & { record?: CorrectionRecordDetail },
+): CorrectionRecordDetail {
   const detail = body.record ?? body;
   return { ...detail, corrections: detail.corrections ?? [] };
 }
@@ -374,7 +405,7 @@ export const attendanceRecordOptions = (recordId: string) =>
     queryKey: correctionKeys.record(recordId),
     enabled: recordId !== '',
     queryFn: async () => {
-      const body = await apiGet<AttendanceRecordDetail & { record?: AttendanceRecordDetail }>(
+      const body = await apiGet<CorrectionRecordDetail & { record?: CorrectionRecordDetail }>(
         `/attendance/records/${recordId}`,
       );
       return unwrapRecordDetail(body);
@@ -382,9 +413,10 @@ export const attendanceRecordOptions = (recordId: string) =>
   });
 
 /**
- * GET /attendance/records/:id — record detail incl. the corrections trail.
+ * GET /attendance/records/:id — record detail incl. the corrections trail
+ * (each correction carries the server-computed `evidence_hash`).
  * @param recordId - Attendance record id (hook stays disabled when empty).
- * @returns React Query result with `AttendanceRecordDetail`.
+ * @returns React Query result with `CorrectionRecordDetail`.
  */
 export const useAttendanceRecord = (recordId: string) =>
   useQuery(attendanceRecordOptions(recordId));
@@ -468,6 +500,9 @@ export type CorrectionSubmitVariables = CorrectionInput & { studentLabel: string
 
 /**
  * Mutation submitting an attendance correction (reason mandatory upstream).
+ * The backend answers with the full record detail, every correction carrying
+ * the server-computed `evidence_hash`; the fresh detail is seeded into the
+ * record cache so the ledger modal shows the new hash immediately.
  * Invalidates the audit list, every cached record detail, and any other
  * module's `['attendance', ...]` caches on success.
  * @returns React Query mutation for `POST /attendance/records/:id/corrections`.
@@ -478,13 +513,18 @@ export function useSubmitCorrection() {
   return useMutation({
     mutationFn: async (variables: CorrectionSubmitVariables) => {
       const { recordId, studentLabel: _studentLabel, ...input } = variables;
-      return await apiPost<unknown>(`/attendance/records/${recordId}/corrections`, {
-        status: input.status,
-        notes: input.notes,
-        reason: input.reason,
-      });
+      const body = await apiPost<CorrectionRecordDetail & { record?: CorrectionRecordDetail }>(
+        `/attendance/records/${recordId}/corrections`,
+        {
+          status: input.status,
+          notes: input.notes,
+          reason: input.reason,
+        },
+      );
+      return unwrapRecordDetail(body);
     },
-    onSuccess: () => {
+    onSuccess: (detail, variables) => {
+      queryClient.setQueryData(correctionKeys.record(variables.recordId), detail);
       void queryClient.invalidateQueries({ queryKey: correctionKeys.all });
       void queryClient.invalidateQueries({ queryKey: ['attendance'] });
     },

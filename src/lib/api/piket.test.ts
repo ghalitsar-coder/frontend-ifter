@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest';
 import type { DutyAssignment } from '@/lib/api/dto';
 import {
+  activeSubstitutionsForAssignment,
+  buildUniformNote,
   groupDutyAssignmentsByWeekday,
   isDutyActiveOn,
   isoWeekdayFromDate,
   onDutyTeacherNames,
+  substitutableAssignmentsOn,
   toCreateDutyPayload,
+  toCreateRotationPayload,
+  toCreateUniformPayload,
   todayIsoDate,
 } from './piket';
+import type { DutyRotation } from './piket';
 
 const assignment = (overrides: Partial<DutyAssignment>): DutyAssignment => ({
   id: 'duty-1',
@@ -108,5 +114,136 @@ describe(toCreateDutyPayload, () => {
       start_date: '2026-11-03',
       end_date: '2026-12-01',
     });
+  });
+});
+
+const rotation = (overrides: Partial<DutyRotation>): DutyRotation => ({
+  id: 'rot-1',
+  duty_assignment_id: 'duty-1',
+  rotation_date: '2026-11-02',
+  weekday: 1,
+  original_teacher_id: 'teacher-1',
+  original_teacher_name: 'Sarah Rahma, S.Pd.',
+  substitute_teacher_id: 'teacher-2',
+  substitute_teacher_name: 'Budi Utomo, S.Pd.',
+  status: 'substituted',
+  reason: 'Sakit',
+  created_at: '2026-11-01T00:00:00Z',
+  ...overrides,
+});
+
+describe(toCreateRotationPayload, () => {
+  it('trims every field of the POST /duty-rotations body', () => {
+    expect(
+      toCreateRotationPayload({
+        duty_assignment_id: ' duty-1 ',
+        substitute_teacher_id: ' teacher-2 ',
+        date: ' 2026-11-02 ',
+        reason: '  Mengantar anak sekolah  ',
+      }),
+    ).toStrictEqual({
+      duty_assignment_id: 'duty-1',
+      substitute_teacher_id: 'teacher-2',
+      date: '2026-11-02',
+      reason: 'Mengantar anak sekolah',
+    });
+  });
+});
+
+describe(activeSubstitutionsForAssignment, () => {
+  it('matches assignment id + rotation date and hides cancelled rows', () => {
+    const rotations = [
+      rotation({ id: 'r1' }),
+      rotation({ id: 'r2', status: 'cancelled' }),
+      rotation({ id: 'r3', rotation_date: '2026-11-09' }),
+      rotation({ id: 'r4', duty_assignment_id: 'duty-other' }),
+    ];
+    expect(
+      activeSubstitutionsForAssignment(rotations, 'duty-1', '2026-11-02').map((r) => r.id),
+    ).toStrictEqual(['r1']);
+  });
+});
+
+describe(substitutableAssignmentsOn, () => {
+  it('only offers roster rows active on the date that are not yet substituted', () => {
+    const roster = [
+      assignment({ id: 'duty-1', weekday: 1, start_date: '2026-11-02' }),
+      assignment({ id: 'duty-2', weekday: 3, start_date: '2026-11-02' }),
+      assignment({ id: 'duty-3', weekday: 1, start_date: '2026-10-01' }),
+    ];
+    const rotations = [rotation({ duty_assignment_id: 'duty-3' })];
+    expect(
+      substitutableAssignmentsOn(roster, rotations, '2026-11-02').map((a) => a.id),
+    ).toStrictEqual(['duty-1']);
+  });
+});
+
+describe(toCreateUniformPayload, () => {
+  it('omits blank optional fields', () => {
+    expect(
+      toCreateUniformPayload({
+        for_date: ' 2026-11-02 ',
+        teacher_id: ' t1 ',
+        scope: 'teacher',
+        target_student_id: '',
+        note: '   ',
+      }),
+    ).toStrictEqual({ for_date: '2026-11-02', teacher_id: 't1', scope: 'teacher' });
+  });
+
+  it('drops target_student_id for teacher-scope notes even when filled', () => {
+    expect(
+      toCreateUniformPayload({
+        for_date: '2026-11-02',
+        teacher_id: 't1',
+        scope: 'teacher',
+        target_student_id: 's1',
+        note: 'Laporan guru',
+      }),
+    ).toStrictEqual({
+      for_date: '2026-11-02',
+      teacher_id: 't1',
+      scope: 'teacher',
+      note: 'Laporan guru',
+    });
+  });
+
+  it('keeps target_student_id for student-scope notes', () => {
+    expect(
+      toCreateUniformPayload({
+        for_date: '2026-11-02',
+        teacher_id: 't1',
+        scope: 'student',
+        target_student_id: ' s1 ',
+        note: 'Dasi tertinggal',
+      }),
+    ).toStrictEqual({
+      for_date: '2026-11-02',
+      teacher_id: 't1',
+      scope: 'student',
+      target_student_id: 's1',
+      note: 'Dasi tertinggal',
+    });
+  });
+});
+
+describe(buildUniformNote, () => {
+  it('combines catalog labels and the free note', () => {
+    expect(
+      buildUniformNote(['Dasi tidak dipakai', 'Sepatu bukan hitam'], 'Dasi tertinggal di rumah'),
+    ).toBe(
+      'Pelanggaran seragam: Dasi tidak dipakai, Sepatu bukan hitam. Catatan: Dasi tertinggal di rumah',
+    );
+  });
+
+  it('handles catalog-only and note-only input', () => {
+    expect(buildUniformNote(['Tanpa sepatu'], '  ')).toBe('Pelanggaran seragam: Tanpa sepatu');
+    expect(buildUniformNote([], ' Catatann ')).toBe('Catatann');
+  });
+
+  it('truncates to 500 characters (backend maxNoteRunes)', () => {
+    const note = buildUniformNote(['A'.repeat(300)], 'B'.repeat(300));
+    // oxlint-disable-next-line typescript/no-misused-spread -- code-point count mirrors the 500-rune backend cap
+    expect([...note].length).toBeLessThanOrEqual(500);
   });
 });

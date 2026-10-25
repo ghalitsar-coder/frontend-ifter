@@ -3,6 +3,7 @@ import type { Class, HistoryRecord, Student } from '@/lib/api/dto';
 import {
   attendanceCategoryFor,
   backendStatusToUi,
+  buildProvisionAccountBody,
   disciplineStageFor,
   gradeFromClass,
   mapClassToRombel,
@@ -260,5 +261,21 @@ describe('attendance history → timeline logs', () => {
       makeHistoryRecord('c', 'absent'),
     ]);
     expect(logs.map((log) => log.status)).toStrictEqual(['sakit', 'izin', 'alpa']);
+  });
+});
+
+describe('student account provision body', () => {
+  it('omits blank fields so the backend applies its NIS fallback', () => {
+    expect(buildProvisionAccountBody({ username: '  ', email: '' })).toStrictEqual({});
+    expect(buildProvisionAccountBody({})).toStrictEqual({});
+  });
+
+  it('trims and keeps only non-blank fields', () => {
+    expect(buildProvisionAccountBody({ username: ' ani01 ', email: ' ' })).toStrictEqual({
+      username: 'ani01',
+    });
+    expect(
+      buildProvisionAccountBody({ username: 'sac002.invited', email: 'budi@example.com' }),
+    ).toStrictEqual({ username: 'sac002.invited', email: 'budi@example.com' });
   });
 });
