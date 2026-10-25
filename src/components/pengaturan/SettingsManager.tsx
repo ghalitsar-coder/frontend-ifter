@@ -18,6 +18,7 @@ import { SettingsHeader } from './SettingsHeader';
 import { SettingsHolidayPanel } from './SettingsHolidayPanel';
 import { SettingsNotificationPanel } from './SettingsNotificationPanel';
 import { SettingsPresencePanel } from './SettingsPresencePanel';
+import { SettingsPushPanel } from './SettingsPushPanel';
 import { SettingsSanctionsPanel } from './SettingsSanctionsPanel';
 
 const TABS = [
@@ -176,18 +177,21 @@ export function SettingsManager() {
       {activeTab === 'sanctions' && <SettingsSanctionsPanel />}
 
       {activeTab === 'notifications' && (
-        <SettingsNotificationPanel
-          policy={settings.notifications}
-          onChange={(patch) => {
-            setSettings((current) => ({
-              ...current,
-              notifications: { ...current.notifications, ...patch },
-            }));
-          }}
-          onSendExample={(kind) => {
-            showToast(t('toast_example_sent', { kind: t(`template_${kind}`) }));
-          }}
-        />
+        <div className="space-y-4">
+          <SettingsPushPanel />
+          <SettingsNotificationPanel
+            policy={settings.notifications}
+            onChange={(patch) => {
+              setSettings((current) => ({
+                ...current,
+                notifications: { ...current.notifications, ...patch },
+              }));
+            }}
+            onSendExample={(kind) => {
+              showToast(t('toast_example_sent', { kind: t(`template_${kind}`) }));
+            }}
+          />
+        </div>
       )}
     </div>
   );

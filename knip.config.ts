@@ -5,6 +5,8 @@ const config: KnipConfig = {
   ignore: [
     'src/libs/I18n.ts',
     'src/types/I18n.ts',
+    // Registered at runtime via navigator.serviceWorker.register('/sw.js').
+    'public/sw.js',
     // Wave-2 integration layers: public API surface of the generated-style
     // data client (query keys, options hooks, DTO types, mock fixtures).
     // Not all exports are consumed yet; deleting them would shrink the
