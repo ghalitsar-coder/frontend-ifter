@@ -63,7 +63,7 @@
 ## E. Gate verifikasi (jalankan ulang sebelum commit)
 
 - `npm run check:types` — PASS (2026-10-25)
-- `npm test` (vitest) — 33 files / 345 tests PASS (2026-10-25, pohon ter-commit)
+- `npm test` (vitest) — 33 files / 352 tests PASS (2026-10-25, pohon ter-commit)
 - `npm run check:i18n` — exit 0, bersih tanpa warning unused keys (2026-10-25) ✅
 - `npm run check:deps` (knip) — exit 0 (2026-10-25) ✅
 - `npm run lint` — exit 0, 0 warnings/0 errors, format bersih (2026-10-25) ✅
