@@ -70,7 +70,7 @@ export const TestimonialsSection = () => (
               <div className="flex items-center gap-1 text-amber-gold">
                 <span className="sr-only">5 dari 5 bintang</span>
                 {Array.from({ length: 5 }, (_, index) => (
-                  <MaterialIcon className="text-[20px] fill-1" key={index} name="star" />
+                  <MaterialIcon className="fill-1 text-[20px]" key={index} name="star" />
                 ))}
               </div>
               <p className="font-body-lg text-body-lg leading-relaxed text-text-primary italic">

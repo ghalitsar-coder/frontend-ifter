@@ -53,19 +53,19 @@ export const HeroSection = () => (
 
     <div className="relative z-10 mx-auto flex max-w-7xl flex-col items-center text-center">
       <div className="mb-space-lg inline-flex items-center gap-space-xs rounded-full bg-pine-light px-space-md py-1.5 text-primary shadow-sm">
-        <MaterialIcon name="bolt" className="text-[16px] text-amber-gold fill-1" />
+        <MaterialIcon name="bolt" className="fill-1 text-[16px] text-amber-gold" />
         <span className="font-eyebrow text-eyebrow tracking-widest text-primary uppercase">
           ATTENDLY UNTUK SEKOLAH MODERN • EKOSISTEM PRESENSI TERINTEGRASI
         </span>
       </div>
 
-      <h1 className="max-w-4xl text-balance font-display-hero text-display-hero tracking-tight text-text-primary">
+      <h1 className="max-w-4xl font-display-hero text-display-hero tracking-tight text-balance text-text-primary">
         Presensi Siswa Jadi Lebih Mudah,
         <br />
         <span className="font-serif text-primary italic">Cepat, dan Tertib.</span>
       </h1>
 
-      <p className="mt-space-lg max-w-2xl text-balance font-body-lg text-body-lg leading-relaxed text-text-muted">
+      <p className="mt-space-lg max-w-2xl font-body-lg text-body-lg leading-relaxed text-balance text-text-muted">
         Catat kehadiran siswa dan guru dalam hitungan detik langsung dari ruang kelas, validasi
         otomatis via kode QR atau daftar murid terpadu, serta rekapitulasi poin kedisiplinan dan
         integrasi Dapodik tanpa kerumitan administrasi manual.
@@ -220,7 +220,9 @@ export const HeroSection = () => (
                     className={`w-full rounded-t-md transition-all hover:bg-amber-gold ${day.barClassName}`}
                     style={{ height: day.height }}
                   />
-                  <span className={`font-caption text-caption text-text-muted ${day.labelClassName}`}>
+                  <span
+                    className={`font-caption text-caption text-text-muted ${day.labelClassName}`}
+                  >
                     {day.day}
                   </span>
                 </div>
@@ -245,9 +247,7 @@ export const HeroSection = () => (
             {dailyStats.map((stat) => (
               <div className="rounded-xl bg-surface-card p-space-sm" key={stat.label}>
                 <span className="font-caption text-caption text-text-muted">{stat.label}</span>
-                <p
-                  className={`font-headline-sm text-headline-sm font-bold ${stat.valueClassName}`}
-                >
+                <p className={`font-headline-sm text-headline-sm font-bold ${stat.valueClassName}`}>
                   {stat.value}
                 </p>
               </div>
@@ -255,9 +255,7 @@ export const HeroSection = () => (
           </div>
           <div className="mt-space-md flex items-center justify-between rounded-xl border border-border-subtle bg-surface-card p-space-xs text-xs">
             <span className="text-text-muted">Kasus Hari Ini:</span>
-            <span className="font-semibold text-error">
-              Terlambat (1x) &amp; Atribut (1x)
-            </span>
+            <span className="font-semibold text-error">Terlambat (1x) &amp; Atribut (1x)</span>
           </div>
         </div>
       </div>

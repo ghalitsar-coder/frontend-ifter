@@ -53,7 +53,7 @@ export const LandingHeader = () => (
           Masuk Portal Presensi
         </a>
         <a
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-secondary-container px-space-lg font-label-md text-label-md font-semibold text-primary shadow-[0_4px_16px_rgba(242,201,108,0.25)] transition-all hover:bg-amber-hover hover:text-primary"
+          className="hover:bg-amber-hover inline-flex h-11 items-center justify-center rounded-xl bg-secondary-container px-space-lg font-label-md text-label-md font-semibold text-primary shadow-[0_4px_16px_rgba(242,201,108,0.25)] transition-all hover:text-primary"
           href="#daftar"
         >
           Daftar Sekolah

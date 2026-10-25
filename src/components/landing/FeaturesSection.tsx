@@ -77,9 +77,9 @@ export const FeaturesSection = () => (
           </h2>
         </div>
         <p className="max-w-md font-body-md text-body-md text-text-muted">
-          Dirancang khusus untuk manajemen operasional sekolah di Indonesia: mencakup absensi
-          murid di kelas, presensi kehadiran guru/staf, serta pembinaan kedisiplinan dan poin tata
-          tertib terpadu.
+          Dirancang khusus untuk manajemen operasional sekolah di Indonesia: mencakup absensi murid
+          di kelas, presensi kehadiran guru/staf, serta pembinaan kedisiplinan dan poin tata tertib
+          terpadu.
         </p>
       </div>
 
@@ -113,7 +113,10 @@ export const FeaturesSection = () => (
               </div>
               <div className="grid grid-cols-2 gap-space-xs border-t border-border-subtle pt-space-xs">
                 {card.stats.map((stat) => (
-                  <div className="rounded-xl bg-surface-container-low py-2 text-center" key={stat.title}>
+                  <div
+                    className="rounded-xl bg-surface-container-low py-2 text-center"
+                    key={stat.title}
+                  >
                     <p className="font-label-md text-label-md font-bold text-primary">
                       {stat.title}
                     </p>
@@ -177,7 +180,9 @@ export const FeaturesSection = () => (
                 }`}
                 key={row.label}
               >
-                <span className={index === exportRows.length - 1 ? '' : 'font-medium text-text-primary'}>
+                <span
+                  className={index === exportRows.length - 1 ? '' : 'font-medium text-text-primary'}
+                >
                   {row.label}
                 </span>
                 <span className={`font-bold ${row.valueClassName}`}>{row.value}</span>

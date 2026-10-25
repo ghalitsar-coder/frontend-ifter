@@ -57,8 +57,8 @@ export const LandingFooter = () => (
               Tersinkronisasi Resmi &amp; Terenkripsi ISO 27001
             </p>
             <p className="font-body-md text-body-md text-amber-dark">
-              Format data kehadiran, ketidakhadiran, dan buku catatan poin disiplin kompatibel
-              penuh dengan skema ekspor Kemendikbudristek Dapodik.
+              Format data kehadiran, ketidakhadiran, dan buku catatan poin disiplin kompatibel penuh
+              dengan skema ekspor Kemendikbudristek Dapodik.
             </p>
           </div>
         </div>
@@ -120,7 +120,11 @@ export const LandingFooter = () => (
         </p>
         <div className="flex items-center gap-space-lg">
           {legalLinks.map((link) => (
-            <a className="transition-colors hover:text-on-surface" href={link.href} key={link.label}>
+            <a
+              className="transition-colors hover:text-on-surface"
+              href={link.href}
+              key={link.label}
+            >
               {link.label}
             </a>
           ))}

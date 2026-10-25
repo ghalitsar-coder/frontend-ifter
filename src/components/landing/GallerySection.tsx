@@ -107,7 +107,9 @@ export const GallerySection = () => (
               >
                 <MaterialIcon name={pillar.icon} className="text-[24px]" />
               </div>
-              <h4 className="mb-1 font-headline-sm text-headline-sm text-primary">{pillar.title}</h4>
+              <h4 className="mb-1 font-headline-sm text-headline-sm text-primary">
+                {pillar.title}
+              </h4>
               <p className="font-body-md text-body-md text-text-muted">{pillar.description}</p>
             </div>
             <div

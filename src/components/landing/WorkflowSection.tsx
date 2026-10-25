@@ -34,7 +34,10 @@ const steps = [
 ];
 
 export const WorkflowSection = () => (
-  <section className="w-full scroll-mt-20 bg-surface-container-low px-margin py-space-3xl" id="alur-kerja">
+  <section
+    className="w-full scroll-mt-20 bg-surface-container-low px-margin py-space-3xl"
+    id="alur-kerja"
+  >
     <div className="mx-auto max-w-7xl">
       <div className="mx-auto mb-space-2xl max-w-2xl text-center">
         <span className="font-eyebrow text-eyebrow font-semibold tracking-widest text-primary uppercase">

@@ -11,16 +11,16 @@ export const CtaSection = () => (
           <MaterialIcon name="hourglass_top" className="text-[16px]" />
           <span>Penerapan Cepat Tanpa Mengganggu Jam Belajar Mengajar</span>
         </div>
-        <h2 className="text-balance font-headline-xl text-headline-xl font-extrabold tracking-tight text-on-primary">
+        <h2 className="font-headline-xl text-headline-xl font-extrabold tracking-tight text-balance text-on-primary">
           Siap memodernisasi presensi sekolah Anda mulai esok hari?
         </h2>
-        <p className="mt-space-md max-w-xl text-balance font-body-lg text-body-lg text-primary-fixed-dim">
+        <p className="mt-space-md max-w-xl font-body-lg text-body-lg text-balance text-primary-fixed-dim">
           Bergabunglah bersama 1.400+ sekolah cerdas di seluruh Indonesia. Dapatkan akses demo
           langsung dan panduan integrasi resmi Dapodik bersama tim konsultan pendidikan kami.
         </p>
         <div className="mt-space-xl flex flex-col items-center gap-space-md sm:flex-row">
           <a
-            className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-secondary-container px-space-xl font-label-md text-label-md font-bold text-primary shadow-lg transition-all hover:bg-amber-hover sm:w-auto"
+            className="hover:bg-amber-hover inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-secondary-container px-space-xl font-label-md text-label-md font-bold text-primary shadow-lg transition-all sm:w-auto"
             href="#daftar"
           >
             <span>Daftar Sekolah Sekarang</span>

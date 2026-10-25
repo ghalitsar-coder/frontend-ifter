@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import { Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { DemoBadge } from '@/components/DemoBadge';
 import { QueryProvider } from '@/components/QueryProvider';
