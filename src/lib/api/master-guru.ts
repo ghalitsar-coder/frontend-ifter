@@ -75,10 +75,14 @@ export type TeacherWithEmployment = Teacher & {
   employment_type_name?: string;
 };
 
+export type AccountStatus = 'active' | 'inactive';
+
 /** Linked login account for a teacher record (GET /users/:id). */
 export type TeacherAccount = {
   id: string;
   username: string;
+  /** Login-account status — unrelated to the teacher employment status. */
+  status: AccountStatus;
   roles: UserRole[];
 };
 
@@ -277,6 +281,22 @@ export function buildTeacherProfiles(
 }
 
 /**
+ * Indonesian label for a login-account status.
+ * @param status - Account status from GET /users/:id.
+ * @returns Badge / confirmation text.
+ */
+export const accountStatusLabel = (status: AccountStatus): string =>
+  status === 'active' ? 'Aktif' : 'Nonaktif';
+
+/**
+ * The status PATCH /users/:id/status should send next.
+ * @param status - Current account status.
+ * @returns The opposite status.
+ */
+export const nextAccountStatus = (status: AccountStatus): AccountStatus =>
+  status === 'active' ? 'inactive' : 'active';
+
+/**
  * Human label for a server preview action (`create` / `update` / `unchanged`).
  * @param action - ImportPreviewRow.action value.
  * @returns Indonesian column value for the modal preview table.
@@ -395,7 +415,12 @@ export const teacherAccountsOptions = (userIds: string[]) =>
           const response = await apiGet<{ user: ApiUser & { status: string } }>(`/users/${userId}`);
           return [
             response.user.id,
-            { id: response.user.id, username: response.user.username, roles: response.user.roles },
+            {
+              id: response.user.id,
+              username: response.user.username,
+              status: response.user.status === 'inactive' ? 'inactive' : 'active',
+              roles: response.user.roles,
+            },
           ] as const;
         }),
       );
@@ -553,6 +578,25 @@ export const useUpdateTeacherStatus = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: masterGuruKeys.teachers() });
       void queryClient.invalidateQueries({ queryKey: queryKeys.teachers() });
+    },
+  });
+};
+
+/**
+ * PATCH /users/:id/status — enables or disables the LOGIN ACCOUNT (admin
+ * only). Deactivation also revokes the user's refresh tokens; this does not
+ * change the teacher employment status (`PATCH /teachers/:id/status`).
+ * @returns Mutation over {userId, status}.
+ */
+export const useUpdateUserAccountStatus = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (vars: { userId: string; status: AccountStatus }) =>
+      await apiPatch<{ user: ApiUser & { status: string } }>(`/users/${vars.userId}/status`, {
+        status: vars.status,
+      }),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: masterGuruKeys.root });
     },
   });
 };

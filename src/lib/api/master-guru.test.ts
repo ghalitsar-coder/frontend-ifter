@@ -8,10 +8,12 @@ import type {
   Teacher,
 } from '@/lib/api/dto';
 import {
+  accountStatusLabel,
   buildTeacherProfiles,
   createTeacherProfile,
   mapImportPreview,
   mapTeacherToProfile,
+  nextAccountStatus,
   updateTeacherProfile,
 } from './master-guru';
 
@@ -60,7 +62,7 @@ describe('teacher profile mapping', () => {
       { ...baseTeacher, user_id: 'u-1' },
       [homeroomClass],
       [mondayDuty],
-      { 'u-1': { id: 'u-1', username: 'agus', roles: ['admin', 'teacher'] } },
+      { 'u-1': { id: 'u-1', username: 'agus', status: 'active', roles: ['admin', 'teacher'] } },
     );
 
     expect(profile).toMatchObject({
@@ -333,5 +335,17 @@ describe('edit teacher (PUT /teachers/:id)', () => {
       user_id: 'u-1',
       employment_type_id: 'et-1',
     });
+  });
+});
+
+describe('login-account status helpers (PATCH /users/:id/status)', () => {
+  it('labels both account states in Indonesian', () => {
+    expect(accountStatusLabel('active')).toBe('Aktif');
+    expect(accountStatusLabel('inactive')).toBe('Nonaktif');
+  });
+
+  it('flips the account status for the next PATCH call', () => {
+    expect(nextAccountStatus('active')).toBe('inactive');
+    expect(nextAccountStatus('inactive')).toBe('active');
   });
 });

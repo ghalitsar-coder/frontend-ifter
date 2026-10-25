@@ -27,6 +27,7 @@ import { MasterGuruImportModal } from './MasterGuruImportModal';
 import { MasterGuruPiketDrawer } from './MasterGuruPiketDrawer';
 import { MasterGuruTable } from './MasterGuruTable';
 import { MasterGuruToolbar } from './MasterGuruToolbar';
+import { useAccountStatus } from './useAccountStatus';
 import { useCredentialReset } from './useCredentialReset';
 import { useTeacherEdit } from './useTeacherEdit';
 
@@ -93,6 +94,7 @@ export function MasterGuruManager() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const { requestReset, credentialModal } = useCredentialReset();
+  const { requestAccountStatus, accountStatusModal } = useAccountStatus();
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const { roles: authRoles } = useAuth();
@@ -303,6 +305,10 @@ export function MasterGuruManager() {
         }}
         canResetPassword={isAdmin}
         onResetPassword={requestReset}
+        canManageAccount={isAdmin}
+        onToggleAccountStatus={(teacher, account) => {
+          requestAccountStatus(teacher, account);
+        }}
       />
 
       {/* Add Teacher Modal */}
@@ -331,6 +337,9 @@ export function MasterGuruManager() {
 
       {/* Credential reset modal (POST /users/:id/credential-reset — admin only) */}
       {credentialModal(accountsByTeacher, showToast)}
+
+      {/* Login-account status confirm (PATCH /users/:id/status — admin only) */}
+      {accountStatusModal(showToast)}
     </div>
   );
 }

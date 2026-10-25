@@ -9,8 +9,11 @@ import {
   MessageCircle,
   Phone,
   Settings,
+  UserCheck,
+  UserX,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { accountStatusLabel } from '@/lib/api/master-guru';
 import type { TeacherAccount } from '@/lib/api/master-guru';
 import type { TeacherProfile } from '@/types/masterGuru';
 
@@ -35,6 +38,113 @@ function roleBadgeTone(isAdmin: boolean, isHomeroom: boolean, isPiket: boolean):
 }
 
 /**
+ * Linked login account (username + active state) rendered under the teacher name.
+ * @param props - Account record from GET /users/:id.
+ * @returns Account badge.
+ */
+function TeacherAccountBadge(props: { account: TeacherAccount }) {
+  const { account } = props;
+  const isActive = account.status === 'active';
+
+  return (
+    <span
+      className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[10px] font-semibold"
+      title={`Akun login @${account.username} — status akun: ${accountStatusLabel(account.status)}`}
+    >
+      <span className="flex items-center gap-1 text-emerald-700">
+        <Link2 className="size-3 shrink-0" />@{account.username}
+      </span>
+      <span
+        className={`inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 ${
+          isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+        }`}
+      >
+        <span className={`size-1 rounded-full ${isActive ? 'bg-emerald-600' : 'bg-slate-500'}`} />
+        Akun: {accountStatusLabel(account.status)}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * Admin-only toggle for the LOGIN account (not the employment status).
+ * @param props - Account and the confirm-dialog trigger.
+ * @returns Icon button.
+ */
+function AccountStatusButton(props: { account: TeacherAccount; onToggle: () => void }) {
+  const isActive = props.account.status === 'active';
+  const label = isActive ? 'Nonaktifkan akun login' : 'Aktifkan akun login';
+
+  return (
+    <button
+      type="button"
+      onClick={props.onToggle}
+      className={`cursor-pointer rounded-lg p-1.5 transition-colors ${
+        isActive
+          ? 'text-text-muted hover:bg-rose-50 hover:text-rose-600'
+          : 'text-text-muted hover:bg-emerald-50 hover:text-emerald-700'
+      }`}
+      title={label}
+      aria-label={`${label} @${props.account.username}`}
+    >
+      {isActive ? <UserX className="size-4" /> : <UserCheck className="size-4" />}
+    </button>
+  );
+}
+
+/**
+ * Employment-status cell: a static badge or, for staff managers, a toggle.
+ * @param props - Teacher row plus the optional status toggle.
+ * @returns Status cell content.
+ */
+function TeacherStatusCell(props: {
+  teacher: TeacherProfile;
+  isStatusUpdating?: boolean;
+  onToggleStatus?: (teacherId: string, name: string, next: 'active' | 'inactive') => void;
+}) {
+  const t = useTranslations('MasterGuruPage');
+  const isActive = props.teacher.status === 'active';
+  const label = isActive ? t('status_badge_active') : t('status_badge_leave');
+  const dotClass = `size-1.5 rounded-full ${isActive ? 'bg-emerald-600' : 'bg-amber-600'}`;
+
+  if (props.onToggleStatus === undefined) {
+    return (
+      <span
+        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${
+          isActive ? 'bg-emerald-100/70 text-emerald-800' : 'bg-amber-100 text-amber-800'
+        }`}
+      >
+        <span className={dotClass} />
+        {label}
+      </span>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      disabled={props.isStatusUpdating ?? false}
+      title="Klik untuk mengubah status kepegawaian guru (bukan status akun login)"
+      onClick={() => {
+        props.onToggleStatus?.(
+          props.teacher.id,
+          props.teacher.name,
+          isActive ? 'inactive' : 'active',
+        );
+      }}
+      className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors disabled:opacity-50 ${
+        isActive
+          ? 'bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200/80'
+          : 'bg-amber-100 text-amber-800 hover:bg-amber-200/80'
+      }`}
+    >
+      <span className={dotClass} />
+      {label}
+    </button>
+  );
+}
+
+/**
  * Responsive table displaying educator records, homeroom classes, and picket assignments.
  *
  * @param props - Component properties.
@@ -49,6 +159,8 @@ export function MasterGuruTable(props: {
   onToggleStatus?: (teacherId: string, name: string, next: 'active' | 'inactive') => void;
   canResetPassword?: boolean;
   onResetPassword?: (teacher: TeacherProfile) => void;
+  canManageAccount?: boolean;
+  onToggleAccountStatus?: (teacher: TeacherProfile, account: TeacherAccount) => void;
 }) {
   const t = useTranslations('MasterGuruPage');
 
@@ -81,6 +193,7 @@ export function MasterGuruTable(props: {
           </thead>
           <tbody className="divide-y divide-border-subtle">
             {props.teachers.map((teacher) => {
+              const account = props.accounts?.[teacher.id];
               const initials = teacher.name
                 .replace(/^(Drs\.|Bpk\.|Ibu)\s+/iu, '')
                 .split(' ')
@@ -110,15 +223,7 @@ export function MasterGuruTable(props: {
                             {teacher.subject}
                           </span>
                         )}
-                        {props.accounts?.[teacher.id] !== undefined && (
-                          <span
-                            className="mt-0.5 flex items-center gap-1 text-[10px] font-semibold text-emerald-700"
-                            title={`Akun sistem terhubung: @${props.accounts[teacher.id]?.username}`}
-                          >
-                            <Link2 className="size-3 shrink-0" />@
-                            {props.accounts[teacher.id]?.username}
-                          </span>
-                        )}
+                        {account !== undefined && <TeacherAccountBadge account={account} />}
                       </div>
                     </div>
                   </td>
@@ -214,51 +319,11 @@ export function MasterGuruTable(props: {
 
                   {/* Status */}
                   <td className="px-4 py-4">
-                    {props.onToggleStatus === undefined ? (
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                          teacher.status === 'active'
-                            ? 'bg-emerald-100/70 text-emerald-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}
-                      >
-                        <span
-                          className={`size-1.5 rounded-full ${
-                            teacher.status === 'active' ? 'bg-emerald-600' : 'bg-amber-600'
-                          }`}
-                        />
-                        {teacher.status === 'active'
-                          ? t('status_badge_active')
-                          : t('status_badge_leave')}
-                      </span>
-                    ) : (
-                      <button
-                        type="button"
-                        disabled={props.isStatusUpdating ?? false}
-                        title="Klik untuk mengubah status aktif/nonaktif"
-                        onClick={() => {
-                          props.onToggleStatus?.(
-                            teacher.id,
-                            teacher.name,
-                            teacher.status === 'active' ? 'inactive' : 'active',
-                          );
-                        }}
-                        className={`inline-flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors disabled:opacity-50 ${
-                          teacher.status === 'active'
-                            ? 'bg-emerald-100/70 text-emerald-800 hover:bg-emerald-200/80'
-                            : 'bg-amber-100 text-amber-800 hover:bg-amber-200/80'
-                        }`}
-                      >
-                        <span
-                          className={`size-1.5 rounded-full ${
-                            teacher.status === 'active' ? 'bg-emerald-600' : 'bg-amber-600'
-                          }`}
-                        />
-                        {teacher.status === 'active'
-                          ? t('status_badge_active')
-                          : t('status_badge_leave')}
-                      </button>
-                    )}
+                    <TeacherStatusCell
+                      teacher={teacher}
+                      isStatusUpdating={props.isStatusUpdating}
+                      onToggleStatus={props.onToggleStatus}
+                    />
                   </td>
 
                   {/* Actions */}
@@ -296,6 +361,14 @@ export function MasterGuruTable(props: {
                       >
                         <MessageCircle className="size-4" />
                       </a>
+                      {props.canManageAccount === true && account !== undefined && (
+                        <AccountStatusButton
+                          account={account}
+                          onToggle={() => {
+                            props.onToggleAccountStatus?.(teacher, account);
+                          }}
+                        />
+                      )}
                       {props.canResetPassword === true && (
                         <button
                           type="button"
