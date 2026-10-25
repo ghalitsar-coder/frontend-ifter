@@ -363,6 +363,7 @@ const masterSiswaKeys = {
     ['master-siswa', 'history', id, range, limit] as const,
   classCounts: (id: string) => ['master-siswa', 'class-counts', id] as const,
   account: (id: string) => ['master-siswa', 'account', id] as const,
+  notes: (id: string) => ['students', 'notes', id] as const,
 };
 
 function invalidateAfterWrite(queryClient: ReturnType<typeof useQueryClient>): void {
@@ -774,6 +775,142 @@ export function useDeactivateStudentAccount() {
     },
     onSuccess: (_result, id) => {
       void queryClient.invalidateQueries({ queryKey: masterSiswaKeys.account(id) });
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Administrative notes (GET/POST/DELETE /students/:id/notes — admin, staff_tu)
+// ---------------------------------------------------------------------------
+
+/** One administrative note row; creator fields are absent when the user row is gone. */
+export type StudentNote = {
+  id: string;
+  student_id: string;
+  note: string;
+  created_by?: string;
+  created_by_name?: string;
+  created_at: string;
+};
+
+/** Backend cap on note length, counted in Unicode code points (Go runes). */
+export const STUDENT_NOTE_MAX_LENGTH = 2000;
+
+/**
+ * Trims a note draft the same way the backend does before validating length.
+ * @param note - Raw textarea value.
+ * @returns Text without leading/trailing whitespace.
+ */
+export function normalizeStudentNote(note: string): string {
+  return note.trim();
+}
+
+/**
+ * Note length in Unicode code points (matches the backend rune counter, so an
+ * emoji costs one character rather than two UTF-16 units).
+ * @param note - Raw or normalized note text.
+ * @returns Number of code points after trimming.
+ */
+export function studentNoteLength(note: string): number {
+  return (normalizeStudentNote(note).match(/./gu) ?? []).length;
+}
+
+/**
+ * Whether a note draft satisfies the backend rule (non-blank, 1..2000 chars).
+ * @param note - Raw textarea value.
+ * @returns True when the note can be submitted.
+ */
+export function isValidStudentNote(note: string): boolean {
+  const length = studentNoteLength(note);
+  return length >= 1 && length <= STUDENT_NOTE_MAX_LENGTH;
+}
+
+/**
+ * Builds the POST /students/:id/notes body from a draft.
+ * @param note - Raw textarea value.
+ * @returns Wire payload with the trimmed note.
+ */
+export function buildStudentNoteBody(note: string): { note: string } {
+  return { note: normalizeStudentNote(note) };
+}
+
+/**
+ * Formats a note timestamp for the detail modal.
+ * @param iso - RFC3339 timestamp from the API.
+ * @returns Indonesian date-time label, or an em dash when unparsable.
+ */
+export function formatStudentNoteDate(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return '—';
+  }
+  return date.toLocaleString('id-ID', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+}
+
+/**
+ * Query options for GET /students/:id/notes (newest first, non-paginated).
+ * @param id - Student id ('' disables the query).
+ * @returns queryOptions resolving to StudentNote[].
+ */
+export function studentNotesOptions(id: string) {
+  return queryOptions({
+    queryKey: masterSiswaKeys.notes(id),
+    queryFn: async () => {
+      const result = await apiGet<{ data: StudentNote[] }>(`/students/${id}/notes`);
+      return result.data;
+    },
+    enabled: id !== '',
+  });
+}
+
+/**
+ * GET /students/:id/notes hook (admin, staff_tu).
+ * @param id - Student id ('' disables the query).
+ * @returns Query state over StudentNote[].
+ */
+export function useStudentNotes(id: string) {
+  return useQuery(studentNotesOptions(id));
+}
+
+/**
+ * POST /students/:id/notes — append one note (201 {note}).
+ * @returns Mutation over the created StudentNote.
+ */
+export function useAddStudentNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (vars: { studentId: string; note: string }) => {
+      const result = await apiPost<{ note: StudentNote }>(
+        `/students/${vars.studentId}/notes`,
+        buildStudentNoteBody(vars.note),
+      );
+      return result.note;
+    },
+    onSuccess: (_result, vars) => {
+      void queryClient.invalidateQueries({ queryKey: masterSiswaKeys.notes(vars.studentId) });
+    },
+  });
+}
+
+/**
+ * DELETE /students/:id/notes/:noteId (204) — remove one note.
+ * @returns Mutation resolving to void.
+ */
+export function useDeleteStudentNote() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (vars: { studentId: string; noteId: string }) => {
+      await apiDelete<null>(`/students/${vars.studentId}/notes/${vars.noteId}`);
+    },
+    onSuccess: (_result, vars) => {
+      void queryClient.invalidateQueries({ queryKey: masterSiswaKeys.notes(vars.studentId) });
     },
   });
 }

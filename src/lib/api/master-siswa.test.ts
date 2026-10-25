@@ -4,12 +4,18 @@ import {
   attendanceCategoryFor,
   backendStatusToUi,
   buildProvisionAccountBody,
+  buildStudentNoteBody,
   disciplineStageFor,
+  formatStudentNoteDate,
   gradeFromClass,
+  isValidStudentNote,
   mapClassToRombel,
   mapHistoryToLogs,
   mapStudentToProfile,
+  normalizeStudentNote,
   profileToStudentInput,
+  studentNoteLength,
+  studentNotesOptions,
   uiStatusToBackend,
 } from '@/lib/api/master-siswa';
 
@@ -277,5 +283,56 @@ describe('student account provision body', () => {
     expect(
       buildProvisionAccountBody({ username: 'sac002.invited', email: 'budi@example.com' }),
     ).toStrictEqual({ username: 'sac002.invited', email: 'budi@example.com' });
+  });
+});
+
+describe('administrative note draft', () => {
+  it('trims surrounding whitespace', () => {
+    expect(normalizeStudentNote('  perlu konfirmasi wali  ')).toBe('perlu konfirmasi wali');
+    expect(buildStudentNoteBody('  perlu konfirmasi wali  ')).toStrictEqual({
+      note: 'perlu konfirmasi wali',
+    });
+  });
+
+  it('counts unicode code points like the backend rune cap', () => {
+    expect(studentNoteLength('  📝 arsip  ')).toBe(7);
+    expect(studentNoteLength('   ')).toBe(0);
+  });
+
+  it('accepts one to 2000 characters and rejects blank or overlong drafts', () => {
+    expect(isValidStudentNote('a')).toBeTruthy();
+    expect(isValidStudentNote('a'.repeat(2000))).toBeTruthy();
+    expect(isValidStudentNote('a'.repeat(2001))).toBeFalsy();
+    expect(isValidStudentNote('')).toBeFalsy();
+    expect(isValidStudentNote('   ')).toBeFalsy();
+  });
+
+  it('treats an emoji as a single character at the cap', () => {
+    expect(isValidStudentNote('📝'.repeat(2000))).toBeTruthy();
+    expect(isValidStudentNote('📝'.repeat(2001))).toBeFalsy();
+  });
+});
+
+describe('administrative note timestamp', () => {
+  it('returns an em dash for unparsable input', () => {
+    expect(formatStudentNoteDate('')).toBe('—');
+    expect(formatStudentNoteDate('not-a-date')).toBe('—');
+  });
+
+  it('formats an RFC3339 timestamp with the year', () => {
+    const label = formatStudentNoteDate('2026-10-01T08:15:00Z');
+    expect(label).not.toBe('—');
+    expect(label).toContain('2026');
+  });
+});
+
+describe('student notes query options', () => {
+  it('keys notes by student and disables the empty id', () => {
+    expect(studentNotesOptions('student-1').queryKey).toStrictEqual([
+      'students',
+      'notes',
+      'student-1',
+    ]);
+    expect(studentNotesOptions('').enabled).toBeFalsy();
   });
 });

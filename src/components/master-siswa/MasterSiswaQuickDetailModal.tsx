@@ -6,19 +6,47 @@ import {
   Edit,
   ExternalLink,
   FolderOpen,
+  Loader2,
   MessageCircle,
   PieChart,
   Radio,
+  StickyNote,
+  Trash2,
   TrendingUp,
   User,
   X,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { useState } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
+import { ApiError } from '@/lib/api/client';
 import type { AttendanceSummaryItem, HistoryRecord } from '@/lib/api/dto';
-import { mapHistoryToLogs, useStudentDetail, useStudentHistory } from '@/lib/api/master-siswa';
+import {
+  formatStudentNoteDate,
+  isValidStudentNote,
+  mapHistoryToLogs,
+  STUDENT_NOTE_MAX_LENGTH,
+  studentNoteLength,
+  useAddStudentNote,
+  useDeleteStudentNote,
+  useStudentDetail,
+  useStudentHistory,
+  useStudentNotes,
+} from '@/lib/api/master-siswa';
 import type { DateRange, StudentRowMetrics } from '@/lib/api/master-siswa';
+import { can } from '@/lib/api/rbac';
 import type { StudentProfile } from '@/types/masterSiswa';
+
+/**
+ * Human message for a failed note mutation.
+ * @param err - Thrown value.
+ * @param fallback - Indonesian fallback when the API gave no message.
+ * @returns Message text.
+ */
+function noteErrorMessage(err: unknown, fallback: string): string {
+  return err instanceof ApiError && err.message !== '' ? err.message : fallback;
+}
 
 const TODAY_UI_STATUS: Record<string, string> = {
   present: 'Hadir',
@@ -130,6 +158,201 @@ function logBadgeLabel(status: 'hadir' | 'sakit' | 'izin' | 'alpa'): string {
 }
 
 /**
+ * Administrative-notes panel for the quick-detail modal: newest-first list plus
+ * append/delete for admin and staff_tu (the server enforces the same roles).
+ * @param props - Student id whose notes are managed.
+ * @returns Notes section, or null when the signed-in roles cannot manage notes.
+ */
+function AdministrativeNotesSection(props: { studentId: string }) {
+  const { roles } = useAuth();
+  const canManageNotes = can(roles, 'master_data');
+  const notesQuery = useStudentNotes(canManageNotes ? props.studentId : '');
+  const addNote = useAddStudentNote();
+  const deleteNote = useDeleteStudentNote();
+  const [noteDraft, setNoteDraft] = useState('');
+  const [noteError, setNoteError] = useState<string | null>(null);
+  const [noteNotice, setNoteNotice] = useState<string | null>(null);
+  const [confirmDeleteNoteId, setConfirmDeleteNoteId] = useState<string | null>(null);
+
+  if (!canManageNotes) {
+    return null;
+  }
+
+  const notes = notesQuery.data ?? [];
+  const noteLength = studentNoteLength(noteDraft);
+  const canSubmitNote = isValidStudentNote(noteDraft) && !addNote.isPending;
+
+  const handleAddNote = () => {
+    setNoteError(null);
+    setNoteNotice(null);
+    addNote.mutate(
+      { studentId: props.studentId, note: noteDraft },
+      {
+        onSuccess: () => {
+          setNoteDraft('');
+          setNoteNotice('Catatan tersimpan.');
+        },
+        onError: (err) => {
+          setNoteError(noteErrorMessage(err, 'Gagal menyimpan catatan'));
+        },
+      },
+    );
+  };
+
+  const handleDeleteNote = (noteId: string) => {
+    setNoteError(null);
+    setNoteNotice(null);
+    deleteNote.mutate(
+      { studentId: props.studentId, noteId },
+      {
+        onSuccess: () => {
+          setConfirmDeleteNoteId(null);
+          setNoteNotice('Catatan dihapus.');
+        },
+        onError: (err) => {
+          setNoteError(noteErrorMessage(err, 'Gagal menghapus catatan'));
+        },
+      },
+    );
+  };
+
+  return (
+    <section className="space-y-2.5">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] font-bold tracking-wider text-pine-deep uppercase">
+          Catatan Administratif
+        </span>
+        <span className="text-text-muted text-[11px]">{notes.length} catatan</span>
+      </div>
+
+      <div className="bg-surface-card divide-y divide-border-subtle overflow-hidden rounded-2xl border border-border-control">
+        {notesQuery.isLoading && (
+          <p className="text-text-muted flex items-center justify-center gap-2 p-4 text-center text-xs">
+            <Loader2 className="size-3.5 animate-spin" /> Memuat catatan...
+          </p>
+        )}
+        {notesQuery.isError && (
+          <p className="p-4 text-center text-xs text-rose-600">Gagal memuat catatan.</p>
+        )}
+        {!notesQuery.isLoading && !notesQuery.isError && notes.length === 0 && (
+          <p className="text-text-muted p-4 text-center text-xs">
+            Belum ada catatan administratif.
+          </p>
+        )}
+        {notes.map((note) => (
+          <div key={note.id} className="p-3">
+            <div className="flex items-start justify-between gap-3">
+              <p className="text-text-primary text-xs leading-relaxed break-words whitespace-pre-wrap">
+                {note.note}
+              </p>
+              {confirmDeleteNoteId !== note.id && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirmDeleteNoteId(note.id);
+                  }}
+                  aria-label="Hapus catatan"
+                  className="shrink-0 cursor-pointer rounded-lg p-1.5 text-rose-500 transition-colors hover:bg-rose-50"
+                >
+                  <Trash2 className="size-3.5" />
+                </button>
+              )}
+            </div>
+            <div className="text-text-muted mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px]">
+              <Clock className="size-3" />
+              <span>{formatStudentNoteDate(note.created_at)}</span>
+              {note.created_by_name !== undefined && (
+                <>
+                  <span>•</span>
+                  <span className="font-semibold text-pine-deep">{note.created_by_name}</span>
+                </>
+              )}
+            </div>
+            {confirmDeleteNoteId === note.id && (
+              <div className="mt-2 flex items-center justify-end gap-1.5 rounded-lg bg-rose-50 px-2.5 py-1.5">
+                <span className="text-[10px] font-medium text-rose-800">Hapus catatan ini?</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleDeleteNote(note.id);
+                  }}
+                  disabled={deleteNote.isPending}
+                  className="cursor-pointer rounded-md bg-rose-600 px-2 py-0.5 text-[10px] font-bold text-white transition-colors hover:bg-rose-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {deleteNote.isPending ? 'Menghapus…' : 'Hapus'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setConfirmDeleteNoteId(null);
+                  }}
+                  className="text-text-muted cursor-pointer rounded-md px-2 py-0.5 text-[10px] font-semibold transition-colors hover:text-pine-deep"
+                >
+                  Batal
+                </button>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <form
+        className="rounded-2xl border border-border-control bg-surface-container-low/70 p-3"
+        onSubmit={(event) => {
+          event.preventDefault();
+          handleAddNote();
+        }}
+      >
+        <div className="mb-2 flex items-center gap-2">
+          <span className="flex size-6 items-center justify-center rounded-lg bg-pine-light text-pine-deep">
+            <StickyNote className="size-3.5" />
+          </span>
+          <span className="text-[11px] font-bold text-pine-deep">Tambah catatan</span>
+        </div>
+        <textarea
+          rows={3}
+          value={noteDraft}
+          onChange={(event) => {
+            setNoteDraft(event.target.value);
+            setNoteError(null);
+            setNoteNotice(null);
+          }}
+          placeholder="Tulis catatan administratif untuk siswa ini..."
+          aria-label="Catatan administratif baru"
+          className="text-text-primary placeholder:text-text-muted w-full resize-y rounded-xl border border-border-control bg-white p-2.5 text-xs leading-relaxed focus:border-pine-deep focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+        />
+        <div className="mt-1.5 flex items-center justify-between gap-3">
+          <span
+            className={`text-[10px] ${noteLength > STUDENT_NOTE_MAX_LENGTH ? 'font-bold text-rose-600' : 'text-text-muted'}`}
+          >
+            {noteLength}/{STUDENT_NOTE_MAX_LENGTH} karakter
+          </span>
+          <button
+            type="submit"
+            disabled={!canSubmitNote}
+            className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-pine-deep px-3 py-1.5 text-[11px] font-bold text-white shadow-xs transition-colors hover:bg-pine-hover disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {addNote.isPending ? (
+              <>
+                <Loader2 className="size-3 animate-spin" /> Menyimpan…
+              </>
+            ) : (
+              'Tambah catatan'
+            )}
+          </button>
+        </div>
+        {noteError !== null && (
+          <p className="mt-1.5 text-[10px] font-medium text-rose-600">{noteError}</p>
+        )}
+        {noteNotice !== null && (
+          <p className="mt-1.5 text-[10px] font-medium text-pine-deep">{noteNotice}</p>
+        )}
+      </form>
+    </section>
+  );
+}
+
+/**
  * Editorial inspection modal offering comprehensive academic, attendance, and guardian intelligence.
  * Enrollments, per-day history and discipline stats come from the real API while open.
  *
@@ -194,7 +417,7 @@ export function MasterSiswaQuickDetailModal(props: {
             type="button"
             onClick={props.onClose}
             aria-label={t('btn_close')}
-            className="hover:bg-surface-container text-text-muted absolute top-5 right-5 flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-container-low transition-colors hover:text-pine-deep"
+            className="text-text-muted hover:bg-surface-container absolute top-5 right-5 flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-container-low transition-colors hover:text-pine-deep"
           >
             <X className="size-4" />
           </button>
@@ -471,6 +694,9 @@ export function MasterSiswaQuickDetailModal(props: {
               )}
             </div>
           </section>
+
+          {/* Section 2c: Administrative notes (admin / staff_tu) */}
+          <AdministrativeNotesSection key={studentId} studentId={studentId} />
 
           {/* Section 3: Guardian Details & Homeroom Notes */}
           <section className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">

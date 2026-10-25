@@ -74,12 +74,12 @@ Urutan kerja: Wave 3 → 4 → 5 → 6. Alasannya: Wave 3 menutup lubang accepta
 
 | Wave | ID | Item | Status | Dependensi |
 |------|----|------|--------|------------|
-| 3 | F1 | FR-C04 UI manajemen kelas (CRUD + arsip + tingkat + wali kelas) | TODO | endpoint `/classes` sudah ada |
-| 3 | F2 | FR-E04 UI aturan absensi: kalender libur, tahun ajaran/semester, hari operasional | TODO | endpoint `/attendance/holidays`, `/academic-years` sudah ada |
-| 3 | F3 | FR-A02 UI aktif/nonaktif akun (`PATCH /users/:id/status`) | TODO | endpoint sudah ada |
-| 3 | F4 | FR-C03 catatan administratif siswa (skema BE + FE) | TODO | migrasi baru |
-| 3 | F5 | Bukti lampiran koreksi absensi (FE konsumsi `/corrections/:id/evidence`) | TODO | endpoint BE sudah ada |
-| 3 | F6 | Label tombol export presensi "PDF" → sesuai format asli (XLSX) | TODO | kosmetik |
+| 3 | F1 | FR-C04 UI manajemen kelas (CRUD + arsip + tingkat + wali kelas) | DONE | 2026-10-25 — halaman `/dashboard/kelas` + panel Kelas/Stats/Toolbar/Form/Homeroom/Siswa; tulis digating `master_data`; kapasitas sengaja tidak dipalsukan (tak ada field BE) |
+| 3 | F2 | FR-E04 UI aturan absensi: kalender libur, tahun ajaran/semester, hari operasional | DONE | 2026-10-25 — panel Kalender Libur + Tahun Ajaran/Semester di Pengaturan (hari operasional: belum ada field BE, tetap read-only) |
+| 3 | F3 | FR-A02 UI aktif/nonaktif akun (`PATCH /users/:id/status`) | DONE | 2026-10-25 — badge status akun + modal konfirmasi di master guru (admin saja) |
+| 3 | F4 | FR-C03 catatan administratif siswa (skema BE + FE) | DONE | 2026-10-25 — seksi "Catatan Administratif" di detail cepat siswa (admin/staff_tu), cap 2000 karakter |
+| 3 | F5 | Bukti lampiran koreksi absensi (FE konsumsi `/corrections/:id/evidence`) | DONE | 2026-10-25 — unggah setelah koreksi tersimpan + daftar/unduh/hapus bukti |
+| 3 | F6 | Label tombol export presensi "PDF" → sesuai format asli (XLSX) | DONE | 2026-10-25 — tombol & toast memakai label Excel/XLSX |
 | 4 | F7 | Portal orang tua (`/parent/*`, tautan akun ortu → siswa) | TODO | F3, skema guardian-account |
 | 4 | F8 | Absensi per mata pelajaran (JP): skema jadwal + recording + rekap | TODO | migrasi besar |
 | 4 | F9 | Notifikasi otomatis web-push (subscription + kirim saat event) | TODO | — |
