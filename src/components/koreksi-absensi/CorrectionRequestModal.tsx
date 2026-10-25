@@ -6,7 +6,15 @@ import { useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { attendanceStatusStyles } from '@/components/koreksi-absensi/statusStyles';
 import type { AttendanceStatus as BackendAttendanceStatus, HistoryRecord } from '@/lib/api/dto';
-import { correctionTargetOptions, toUiStatus, useRecordLookup } from '@/lib/api/koreksi-absensi';
+import {
+  correctionTargetOptions,
+  EVIDENCE_ACCEPT,
+  evidenceFileError,
+  formatFileSize,
+  MAX_EVIDENCE_FILE_BYTES,
+  toUiStatus,
+  useRecordLookup,
+} from '@/lib/api/koreksi-absensi';
 import { useStudentSearch } from '@/lib/api/queries';
 
 /** Payload lifted to the manager, which owns the POST corrections mutation. */
@@ -15,6 +23,8 @@ export type CorrectionRequestPayload = {
   studentLabel: string;
   status: BackendAttendanceStatus;
   reason: string;
+  /** Uploaded as record evidence right after the correction is stored. */
+  evidenceFile?: File | null;
 };
 
 type InitialTarget = { studentId: string; studentName: string; nis: string; date: string };
@@ -134,7 +144,8 @@ export function CorrectionRequestModal(props: {
   const [date, setDate] = useState(props.initial?.date ?? '');
   const [toStatus, setToStatus] = useState<BackendAttendanceStatus>('sick');
   const [reason, setReason] = useState('');
-  const [fileName, setFileName] = useState<string | null>(null);
+  const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
+  const [evidenceError, setEvidenceError] = useState<string | null>(null);
 
   const studentsQuery = useStudentSearch({
     search: appliedQuery === '' ? undefined : appliedQuery,
@@ -344,27 +355,41 @@ export function CorrectionRequestModal(props: {
               className="flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-border-control bg-surface-container-low/50 px-3 py-3 transition-colors hover:border-pine-deep/40 hover:bg-pine-light/40"
             >
               <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-pine-light text-pine-deep">
-                {fileName ? <Check className="size-4" /> : <CloudUpload className="size-4" />}
+                {evidenceFile ? <Check className="size-4" /> : <CloudUpload className="size-4" />}
               </span>
               <span className="min-w-0">
                 <span className="block truncate text-xs font-semibold text-foreground">
-                  {fileName ?? t('upload_prompt')}
+                  {evidenceFile
+                    ? `${evidenceFile.name} • ${formatFileSize(evidenceFile.size)}`
+                    : t('upload_prompt')}
                 </span>
-                {/* shortcut: no backend endpoint for correction evidence files, keep mock — the file is not sent */}
-                <span className="block text-[10px] text-muted-foreground">{t('upload_hint')}</span>
+                <span className="block text-[10px] text-muted-foreground">
+                  PDF, JPG, JPEG, atau PNG — maks {formatFileSize(MAX_EVIDENCE_FILE_BYTES)}
+                </span>
               </span>
               <input
                 id="correction-evidence"
                 type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
+                accept={EVIDENCE_ACCEPT}
                 className="sr-only"
                 onChange={(event) => {
-                  setFileName(event.target.files?.[0]?.name ?? null);
+                  const file = event.target.files?.[0] ?? null;
+                  if (file === null) {
+                    setEvidenceFile(null);
+                    setEvidenceError(null);
+                    return;
+                  }
+                  const error = evidenceFileError(file);
+                  setEvidenceError(error);
+                  setEvidenceFile(error === null ? file : null);
                 }}
               />
             </label>
+            {evidenceError !== null && (
+              <p className="mt-1 text-[10px] font-semibold text-red-600">{evidenceError}</p>
+            )}
             <p className="mt-1 text-[9px] text-muted-foreground">
-              Berkas pendukung belum dikirim ke server (belum ada endpoint unggah).
+              Berkas diunggah sebagai bukti tepat setelah koreksi tersimpan.
             </p>
           </div>
         </div>
@@ -393,6 +418,7 @@ export function CorrectionRequestModal(props: {
                     studentLabel,
                     status: toStatus,
                     reason: reason.trim(),
+                    evidenceFile,
                   });
                 }}
                 className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2.5 text-xs font-bold text-white shadow-sm transition-colors hover:bg-pine-hover disabled:cursor-not-allowed disabled:opacity-50"

@@ -13,7 +13,7 @@
  * components; backend JSON stays snake_case here and is reshaped at the edge.
  */
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { apiGet, apiPost, downloadFile } from '@/lib/api/client';
+import { apiDelete, apiGet, apiPost, apiUpload, downloadFile } from '@/lib/api/client';
 import type {
   AttendanceCorrection,
   AttendanceRecordDetail,
@@ -33,6 +33,7 @@ export const correctionKeys = {
   all: ['koreksi-absensi'] as const,
   history: (query?: HistoryQuery) => ['koreksi-absensi', 'history', query ?? {}] as const,
   record: (recordId: string) => ['koreksi-absensi', 'record', recordId] as const,
+  evidence: (recordId: string) => ['koreksi-absensi', 'evidence', recordId] as const,
 };
 
 // ---------------------------------------------------------------------------
@@ -527,6 +528,182 @@ export function useSubmitCorrection() {
       queryClient.setQueryData(correctionKeys.record(variables.recordId), detail);
       void queryClient.invalidateQueries({ queryKey: correctionKeys.all });
       void queryClient.invalidateQueries({ queryKey: ['attendance'] });
+    },
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Correction evidence (API_ADDENDUM §6.6)
+//   POST   /attendance/records/:id/corrections/evidence   (multipart)
+//   GET    /attendance/records/:id/corrections/evidence
+//   GET    /attendance/corrections/evidence/:id/download
+//   DELETE /attendance/corrections/evidence/:id
+// ---------------------------------------------------------------------------
+
+/** Backend default cap (IFTER_IMPORTS_MAX_FILE_SIZE); the server stays authoritative. */
+export const MAX_EVIDENCE_FILE_BYTES = 5 * 1024 * 1024;
+
+/** `accept` for the file picker — the backend validates extension + content type. */
+export const EVIDENCE_ACCEPT = '.pdf,.jpg,.jpeg,.png';
+
+/** One evidence attachment as returned by the backend (never the stored key). */
+export type CorrectionEvidence = {
+  id: string;
+  attendance_record_id: string;
+  correction_id: string | null;
+  file_name: string;
+  content_type: string;
+  size_bytes: number;
+  note: string | null;
+  uploaded_by: string;
+  created_at: string;
+};
+
+export type EvidenceUploadInput = {
+  recordId: string;
+  file: File;
+  note?: string;
+  /** Optional pin to a specific correction; empty links the newest one. */
+  correctionId?: string;
+};
+
+const evidenceNamePattern = /\.(pdf|jpe?g|png)$/iu;
+
+/**
+ * Human-readable file size for the evidence list.
+ * @param bytes - `size_bytes` from the backend.
+ * @returns e.g. `420 KB` / `1.4 MB`.
+ */
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024) {
+    return `${bytes} B`;
+  }
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} KB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/**
+ * Client-side guard mirroring the backend evidence rules.
+ * @param file - File picked by the user.
+ * @returns Indonesian error message, or null when the file is acceptable.
+ */
+export function evidenceFileError(file: File): string | null {
+  if (file.size === 0) {
+    return 'Berkas kosong — pilih berkas lain.';
+  }
+  if (file.size > MAX_EVIDENCE_FILE_BYTES) {
+    return `Ukuran berkas maksimal ${formatFileSize(MAX_EVIDENCE_FILE_BYTES)}.`;
+  }
+  if (!evidenceNamePattern.test(file.name)) {
+    return 'Format berkas harus PDF, JPG, JPEG, atau PNG.';
+  }
+  return null;
+}
+
+/**
+ * Build the multipart body for POST …/corrections/evidence.
+ * @param input - File plus optional note / correction id.
+ * @returns FormData with the `file` part and non-empty text fields.
+ */
+export function buildEvidenceFormData(input: Omit<EvidenceUploadInput, 'recordId'>): FormData {
+  const formData = new FormData();
+  formData.append('file', input.file);
+  if (input.note !== undefined && input.note.trim() !== '') {
+    formData.append('note', input.note.trim());
+  }
+  if (input.correctionId !== undefined && input.correctionId !== '') {
+    formData.append('correction_id', input.correctionId);
+  }
+  return formData;
+}
+
+/**
+ * Upload one evidence file for an attendance record.
+ * @param input - Record id, file and optional metadata.
+ * @returns The stored evidence item.
+ */
+export async function uploadCorrectionEvidence(
+  input: EvidenceUploadInput,
+): Promise<CorrectionEvidence> {
+  const { evidence } = await apiUpload<{ evidence: CorrectionEvidence }>(
+    `/attendance/records/${input.recordId}/corrections/evidence`,
+    buildEvidenceFormData(input),
+  );
+  return evidence;
+}
+
+/**
+ * GET /attendance/records/:id/corrections/evidence.
+ * @param recordId - Attendance record id (hook stays disabled when empty).
+ * @returns React Query result with the evidence list.
+ */
+export const correctionEvidenceOptions = (recordId: string) =>
+  queryOptions({
+    queryKey: correctionKeys.evidence(recordId),
+    enabled: recordId !== '',
+    queryFn: async () => {
+      const result = await apiGet<{ data: CorrectionEvidence[] }>(
+        `/attendance/records/${recordId}/corrections/evidence`,
+      );
+      return result.data;
+    },
+  });
+
+export const useCorrectionEvidence = (recordId: string) =>
+  useQuery(correctionEvidenceOptions(recordId));
+
+/**
+ * Mutation for POST …/corrections/evidence; refreshes the record's evidence list.
+ * @returns React Query mutation over EvidenceUploadInput.
+ */
+export function useUploadCorrectionEvidence() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: EvidenceUploadInput) => await uploadCorrectionEvidence(input),
+    onSuccess: (_evidence, input) => {
+      void queryClient.invalidateQueries({ queryKey: correctionKeys.evidence(input.recordId) });
+    },
+  });
+}
+
+/**
+ * Download a private evidence file (admin/teacher scope enforced server-side).
+ * @param evidenceId - Evidence id from the list.
+ * @returns Blob + filename from Content-Disposition.
+ */
+export async function downloadCorrectionEvidence(evidenceId: string) {
+  return await downloadFile(`/attendance/corrections/evidence/${evidenceId}/download`);
+}
+
+/**
+ * Trigger the browser save dialog for a downloaded evidence blob.
+ * @param blob - Response body returned by the download endpoint.
+ * @param filename - Suggested file name.
+ */
+export function saveDownloadedBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Mutation for DELETE /attendance/corrections/evidence/:id.
+ * @returns React Query mutation over {evidenceId, recordId}.
+ */
+export function useDeleteCorrectionEvidence() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (variables: { evidenceId: string; recordId: string }) =>
+      await apiDelete<null>(`/attendance/corrections/evidence/${variables.evidenceId}`),
+    onSuccess: (_result, variables) => {
+      void queryClient.invalidateQueries({ queryKey: correctionKeys.evidence(variables.recordId) });
     },
   });
 }

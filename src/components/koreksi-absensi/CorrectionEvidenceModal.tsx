@@ -1,17 +1,20 @@
 import { BadgeCheck, ShieldCheck, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useAuth } from '@/components/auth/AuthProvider';
 import type { CorrectionRow } from '@/lib/api/koreksi-absensi';
+import { can } from '@/lib/api/rbac';
+import { CorrectionEvidenceList } from './CorrectionEvidenceList';
 
 /**
- * Evidence/reason modal for an audit row.
- * shortcut: the backend stores no attachment metadata for attendance
- * corrections, so the modal shows the recorded reason/notes only.
+ * Evidence/reason modal for an audit row: recorded reason plus the uploaded
+ * correction evidence (GET /attendance/records/:id/corrections/evidence).
  *
  * @param props - Audit row and close handler.
  * @returns Evidence modal.
  */
 export function CorrectionEvidenceModal(props: { row: CorrectionRow; onClose: () => void }) {
   const t = useTranslations('AttendanceCorrectionPage');
+  const { roles } = useAuth();
 
   return (
     <div
@@ -58,6 +61,13 @@ export function CorrectionEvidenceModal(props: { row: CorrectionRow; onClose: ()
             <p className="mt-1 text-[10px] leading-relaxed text-amber-dark/90">
               {t('evidence_signature_desc')}
             </p>
+          </div>
+
+          <div className="rounded-2xl border border-border-subtle bg-surface-container-low/40 p-3.5">
+            <CorrectionEvidenceList
+              recordId={props.row.recordId}
+              canManage={can(roles, 'attendance_ops')}
+            />
           </div>
         </div>
 

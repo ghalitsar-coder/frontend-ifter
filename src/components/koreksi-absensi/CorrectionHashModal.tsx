@@ -1,9 +1,12 @@
 import { ArrowRight, Check, CheckCircle2, Copy, Fingerprint, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import { useAuth } from '@/components/auth/AuthProvider';
 import { attendanceStatusStyles } from '@/components/koreksi-absensi/statusStyles';
 import { shortHash, toTrailEntry, useAttendanceRecord } from '@/lib/api/koreksi-absensi';
 import type { CorrectionRow } from '@/lib/api/koreksi-absensi';
+import { can } from '@/lib/api/rbac';
+import { CorrectionEvidenceList } from './CorrectionEvidenceList';
 
 /**
  * Copy a hash to the clipboard and flash the copied state for two seconds.
@@ -42,6 +45,7 @@ async function copyHashToClipboard(
  */
 export function CorrectionHashModal(props: { row: CorrectionRow; onClose: () => void }) {
   const t = useTranslations('AttendanceCorrectionPage');
+  const { roles } = useAuth();
   const detailQuery = useAttendanceRecord(props.row.recordId);
   const corrections = (detailQuery.data?.corrections ?? []).map(toTrailEntry);
   const latest = corrections.at(-1);
@@ -62,7 +66,7 @@ export function CorrectionHashModal(props: { row: CorrectionRow; onClose: () => 
       aria-labelledby="correction-hash-title"
       className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/50 p-3 backdrop-blur-sm sm:p-6"
     >
-      <div className="relative my-10 w-full max-w-lg overflow-hidden rounded-3xl border border-border-subtle bg-card shadow-2xl">
+      <div className="relative my-10 w-full max-w-xl overflow-hidden rounded-3xl border border-border-subtle bg-card shadow-2xl">
         <div className="flex items-start justify-between gap-3 border-b border-border-subtle px-5 py-4">
           <div className="flex items-center gap-2">
             <span className="flex size-8 items-center justify-center rounded-full bg-amber-surface text-amber-dark">
@@ -244,6 +248,13 @@ export function CorrectionHashModal(props: { row: CorrectionRow; onClose: () => 
               {t('ledger_integrity')}
             </p>
           )}
+
+          <div className="border-t border-border-subtle pt-3">
+            <CorrectionEvidenceList
+              recordId={props.row.recordId}
+              canManage={can(roles, 'attendance_ops')}
+            />
+          </div>
         </div>
 
         <div className="border-t border-border-subtle px-5 py-4">

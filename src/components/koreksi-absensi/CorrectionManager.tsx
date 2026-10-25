@@ -16,6 +16,7 @@ import {
   toCorrectionRow,
   useAttendanceHistory,
   useSubmitCorrection,
+  useUploadCorrectionEvidence,
 } from '@/lib/api/koreksi-absensi';
 import { CorrectionAuditTable } from './CorrectionAuditTable';
 import { CorrectionEvidenceModal } from './CorrectionEvidenceModal';
@@ -55,6 +56,7 @@ export function CorrectionManager() {
 
   const historyQuery = useAttendanceHistory(historyQueryFor(filters, page));
   const submitCorrection = useSubmitCorrection();
+  const uploadEvidence = useUploadCorrectionEvidence();
 
   const showToast = (message: string, tone: 'success' | 'error' = 'success') => {
     setToast({ message, tone });
@@ -84,8 +86,31 @@ export function CorrectionManager() {
         const sent = t('toast_request_sent', { student: payload.studentLabel });
         // Server-computed evidence_hash of the correction just stored
         // (POST /attendance/records/:id/corrections returns the fresh trail).
-        const hash = detail.corrections.at(-1)?.evidence_hash;
+        const latest = detail.corrections.at(-1);
+        const hash = latest?.evidence_hash;
         showToast(hash === undefined || hash === null ? sent : `${sent} Hash: ${shortHash(hash)}`);
+
+        const file = payload.evidenceFile ?? null;
+        if (file !== null) {
+          uploadEvidence.mutate(
+            {
+              recordId: payload.recordId,
+              file,
+              correctionId: latest?.id,
+            },
+            {
+              onSuccess: () => {
+                showToast(`Bukti ${file.name} berhasil diunggah.`);
+              },
+              onError: (error) => {
+                showToast(
+                  `Koreksi tersimpan, tetapi bukti gagal diunggah: ${errorMessage(error)}`,
+                  'error',
+                );
+              },
+            },
+          );
+        }
       },
       onError: (error) => {
         showToast(errorMessage(error), 'error');

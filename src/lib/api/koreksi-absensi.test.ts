@@ -1,13 +1,19 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { setAccessToken } from '@/lib/api/client';
 import type { AttendanceCorrection, HistoryRecord } from '@/lib/api/dto';
 import {
+  buildEvidenceFormData,
   changeFilterToStatus,
   correctionTargetOptions,
+  EVIDENCE_ACCEPT,
+  evidenceFileError,
   filterRowsBySearch,
   formatDateId,
+  formatFileSize,
   formatTimeId,
   historyQueryFor,
   isoDayToday,
+  MAX_EVIDENCE_FILE_BYTES,
   pageMeta,
   shortHash,
   sourceLabel,
@@ -17,8 +23,9 @@ import {
   toTrailEntry,
   toUiStatus,
   unwrapRecordDetail,
+  uploadCorrectionEvidence,
 } from '@/lib/api/koreksi-absensi';
-import type { CorrectionHistoryFilters } from '@/lib/api/koreksi-absensi';
+import type { CorrectionHistoryFilters, CorrectionRecordDetail } from '@/lib/api/koreksi-absensi';
 
 const baseRecord: HistoryRecord = {
   id: 'rec-9f2a7c',
@@ -47,6 +54,28 @@ const baseCorrection: AttendanceCorrection = {
   reason: 'SKD menyusul dari RSUD',
   corrected_by_user_id: 'user-abc123',
   corrected_at: '2026-10-24T09:15:00+07:00',
+};
+
+/** Record-detail fixture (`GET /attendance/records/:id` carries extra audit ids). */
+const baseDetail: CorrectionRecordDetail = {
+  ...baseRecord,
+  enrollment_id: 'enr-1',
+  recorded_by_user_id: 'user-abc123',
+  updated_by_user_id: 'user-abc123',
+  corrections: [],
+};
+
+/**
+ * Reads the multipart `file` part without an unchecked assertion.
+ * @param form - Multipart body built by the API client.
+ * @returns The uploaded file part.
+ */
+const formFile = (form: FormData): File => {
+  const part = form.get('file');
+  if (!(part instanceof File)) {
+    throw new TypeError('expected the multipart file part');
+  }
+  return part;
 };
 
 describe('status mapping', () => {
@@ -247,21 +276,13 @@ describe(shortHash, () => {
 
 describe('record detail unwrap', () => {
   it('accepts the flat record body', () => {
-    const detail = unwrapRecordDetail(
-      // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- raw wire shape: UI history record lacks audit-only backend fields
-      { ...baseRecord, corrections: [baseCorrection] } as unknown as Parameters<
-        typeof unwrapRecordDetail
-      >[0],
-    );
+    const detail = unwrapRecordDetail({ ...baseDetail, corrections: [baseCorrection] });
 
     expect(detail.corrections).toHaveLength(1);
   });
 
   it('accepts a {record} wrapper and defaults missing corrections', () => {
-    // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- raw wire shape: wrapper-only body, no flat fields
-    const wrapped = unwrapRecordDetail({
-      record: { ...baseRecord },
-    } as unknown as Parameters<typeof unwrapRecordDetail>[0]);
+    const wrapped = unwrapRecordDetail({ ...baseDetail, record: { ...baseDetail } });
 
     expect(wrapped.corrections).toStrictEqual([]);
     expect(wrapped.id).toBe('rec-9f2a7c');
@@ -334,5 +355,118 @@ describe('client-side row search', () => {
     expect(filterRowsBySearch(rows, 'DIMAS')).toHaveLength(1);
     expect(filterRowsBySearch(rows, '00829103')).toHaveLength(1);
     expect(filterRowsBySearch(rows, 'zzz')).toHaveLength(0);
+  });
+});
+
+const evidenceFile = (name: string, size: number, type = 'application/pdf') =>
+  new File([new Uint8Array(size)], name, { type });
+
+describe('correction evidence helpers (§6.6)', () => {
+  it('accepts PDF/JPG/JPEG/PNG under the size limit', () => {
+    expect(evidenceFileError(evidenceFile('surat.pdf', 1024))).toBeNull();
+    expect(evidenceFileError(evidenceFile('foto.jpg', 1024))).toBeNull();
+    expect(evidenceFileError(evidenceFile('foto.JPEG', 1024))).toBeNull();
+    expect(evidenceFileError(evidenceFile('bukti.png', 1024))).toBeNull();
+  });
+
+  it('rejects empty, oversized, and unsupported files with Indonesian messages', () => {
+    expect(evidenceFileError(evidenceFile('kosong.pdf', 0))).toBe(
+      'Berkas kosong — pilih berkas lain.',
+    );
+    expect(evidenceFileError(evidenceFile('besar.pdf', MAX_EVIDENCE_FILE_BYTES + 1))).toBe(
+      'Ukuran berkas maksimal 5.0 MB.',
+    );
+    expect(evidenceFileError(evidenceFile('dokumen.docx', 128))).toBe(
+      'Format berkas harus PDF, JPG, JPEG, atau PNG.',
+    );
+  });
+
+  it('exposes the picker accept list used by both modals', () => {
+    expect(EVIDENCE_ACCEPT).toBe('.pdf,.jpg,.jpeg,.png');
+  });
+
+  it('formats evidence sizes', () => {
+    expect(formatFileSize(512)).toBe('512 B');
+    expect(formatFileSize(2048)).toBe('2 KB');
+    expect(formatFileSize(1_572_864)).toBe('1.5 MB');
+  });
+
+  it('builds multipart form data with optional note and correction id', () => {
+    const file = evidenceFile('surat.pdf', 64);
+    const form = buildEvidenceFormData({ file, note: '  SKD dokter  ', correctionId: 'corr-1' });
+
+    expect(formFile(form).name).toBe('surat.pdf');
+    expect(form.get('note')).toBe('SKD dokter');
+    expect(form.get('correction_id')).toBe('corr-1');
+  });
+
+  it('omits blank note and empty correction id from the multipart body', () => {
+    const form = buildEvidenceFormData({ file: evidenceFile('bukti.png', 8), note: '   ' });
+
+    expect(form.get('note')).toBeNull();
+    expect(form.get('correction_id')).toBeNull();
+  });
+});
+
+describe('upload correction evidence (POST …/corrections/evidence)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.clearAllMocks();
+    setAccessToken(null);
+  });
+
+  it('posts the multipart body and unwraps the evidence envelope', async () => {
+    const fetchMock = vi.fn<typeof globalThis.fetch>();
+    vi.stubGlobal('fetch', fetchMock);
+    setAccessToken('tok');
+
+    fetchMock.mockResolvedValueOnce(
+      Response.json(
+        {
+          evidence: {
+            id: 'ev-1',
+            attendance_record_id: 'rec-1',
+            correction_id: 'corr-1',
+            file_name: 'surat.pdf',
+            content_type: 'application/pdf',
+            size_bytes: 64,
+            note: 'SKD dokter',
+            uploaded_by: 'u-1',
+            created_at: '2026-10-01T00:00:00Z',
+          },
+        },
+        { status: 201, headers: { 'Content-Type': 'application/json' } },
+      ),
+    );
+
+    const evidence = await uploadCorrectionEvidence({
+      recordId: 'rec-1',
+      file: evidenceFile('surat.pdf', 64),
+      note: 'SKD dokter',
+      correctionId: 'corr-1',
+    });
+
+    expect(evidence.id).toBe('ev-1');
+    expect(evidence.file_name).toBe('surat.pdf');
+
+    const [request, init] = fetchMock.mock.calls[0] ?? [];
+    if (typeof request !== 'string') {
+      throw new TypeError('expected the evidence POST URL to be a string');
+    }
+    expect(request).toContain('/api/v1/attendance/records/rec-1/corrections/evidence');
+    expect(init?.method).toBe('POST');
+    const body = init?.body;
+    if (!(body instanceof FormData)) {
+      throw new TypeError('expected the evidence body to be FormData');
+    }
+    expect({
+      fileName: formFile(body).name,
+      note: body.get('note'),
+      correctionId: body.get('correction_id'),
+    }).toStrictEqual({
+      fileName: 'surat.pdf',
+      note: 'SKD dokter',
+      correctionId: 'corr-1',
+    });
   });
 });
