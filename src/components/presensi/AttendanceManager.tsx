@@ -238,8 +238,8 @@ export function AttendanceManager() {
     });
   };
 
-  const handleDownloadPdf = async () => {
-    triggerToast(t('toast_pdf_generating'));
+  const handleDownloadExcel = async () => {
+    triggerToast('Menyiapkan berkas Excel absensi (.xlsx)…');
     try {
       const { blob, filename } = await downloadAttendanceExport({
         class_id: selectedClassId,
@@ -339,8 +339,8 @@ export function AttendanceManager() {
               alpa: counts.alpa,
             }}
             onMarkAllPresent={handleMarkAllPresent}
-            onDownloadPdf={() => {
-              void handleDownloadPdf();
+            onDownloadExcel={() => {
+              void handleDownloadExcel();
             }}
             onSubmit={handleSubmit}
             onCloseDay={handleCloseDay}

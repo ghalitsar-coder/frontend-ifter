@@ -21,7 +21,7 @@ export function AttendanceToolbar(props: {
     alpa: number;
   };
   onMarkAllPresent: () => void;
-  onDownloadPdf: () => void;
+  onDownloadExcel: () => void;
   onSubmit: () => void;
   /** Finalizes the day via POST /attendance/close (optional; hides button when absent). */
   onCloseDay?: () => void;
@@ -163,8 +163,9 @@ export function AttendanceToolbar(props: {
 
           <button
             type="button"
-            onClick={props.onDownloadPdf}
-            title={t('download_pdf')}
+            onClick={props.onDownloadExcel}
+            title="Unduh Excel (XLSX)"
+            aria-label="Unduh Excel (XLSX)"
             className="flex size-10 items-center justify-center rounded-xl border border-border/50 bg-surface-container-low text-foreground transition-colors hover:bg-surface-container-high"
           >
             <Download className="size-4" />
