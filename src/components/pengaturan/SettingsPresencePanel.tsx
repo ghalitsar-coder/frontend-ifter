@@ -1,6 +1,26 @@
-import { Building2, Clock, DoorOpen, Globe2, LogOut, Timer, TriangleAlert } from 'lucide-react';
+import {
+  Building2,
+  CalendarDays,
+  Clock,
+  DoorOpen,
+  Globe2,
+  LogOut,
+  Timer,
+  TriangleAlert,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { toggleOperationalDay } from '@/lib/api/pengaturan';
 import type { PresencePolicy } from '@/types/settings';
+
+const OPERATIONAL_DAY_OPTIONS = [
+  { weekday: 1, label: 'Senin' },
+  { weekday: 2, label: 'Selasa' },
+  { weekday: 3, label: 'Rabu' },
+  { weekday: 4, label: 'Kamis' },
+  { weekday: 5, label: 'Jumat' },
+  { weekday: 6, label: 'Sabtu' },
+  { weekday: 7, label: 'Minggu' },
+] as const;
 
 /**
  * Gate attendance window editor with the morning timeline summary.
@@ -111,6 +131,42 @@ export function SettingsPresencePanel(props: {
           </p>
         </div>
       </div>
+
+      <fieldset className="mb-4 min-w-0 border-0 p-0">
+        <legend className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+          <CalendarDays className="size-3.5 text-muted-foreground" />
+          Hari Operasional
+        </legend>
+        <div className="flex flex-wrap gap-2">
+          {OPERATIONAL_DAY_OPTIONS.map(({ weekday, label }) => {
+            const active = props.policy.operationalDays.includes(weekday);
+
+            return (
+              <button
+                key={weekday}
+                type="button"
+                aria-pressed={active}
+                onClick={() => {
+                  props.onChange({
+                    operationalDays: toggleOperationalDay(props.policy.operationalDays, weekday),
+                  });
+                }}
+                className={`rounded-xl border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  active
+                    ? 'border-pine-deep bg-pine-light text-pine-deep'
+                    : 'border-border-control bg-surface-container-low text-muted-foreground hover:bg-surface-container-high'
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-1 text-[10px] text-muted-foreground">
+          Hanya hari yang dipilih yang dinilai absennya. Tanggal libur tetap dikecualikan lewat
+          panel Kalender Libur.
+        </p>
+      </fieldset>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {timeFields.map((field) => {

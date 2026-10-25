@@ -521,11 +521,41 @@ const toHHMM = (minutes: number): string => {
 // DTO ↔ UI mappers
 // ---------------------------------------------------------------------------
 /**
+ * ISO weekdays present in the schedule rows, sorted ascending.
+ * @param schedules - Server schedule rows.
+ * @returns Unique weekday numbers (1 = Monday … 7 = Sunday).
+ */
+export const operationalDaysFromSchedules = (schedules: { weekday: number }[]): number[] =>
+  [...new Set(schedules.map((schedule) => schedule.weekday))].toSorted((a, b) => a - b);
+
+/**
+ * Toggle one operational weekday, keeping at least one day selected.
+ * @param days - Current operational weekdays.
+ * @param weekday - Weekday to toggle (1 = Monday … 7 = Sunday).
+ * @returns New sorted weekday list (unchanged when removing the last day).
+ */
+export const toggleOperationalDay = (days: number[], weekday: number): number[] => {
+  const active = new Set(days);
+
+  if (active.has(weekday)) {
+    if (active.size === 1) {
+      return [...days].toSorted((a, b) => a - b);
+    }
+    active.delete(weekday);
+  } else {
+    active.add(weekday);
+  }
+
+  return [...active].toSorted((a, b) => a - b);
+};
+
+/**
  * Backend stores one schedule row per weekday plus an auto-close time; the
- * presence panel edits a single global gate window. Mapping uses the first
- * schedule row: gateOpen=start_time, onTimeUntil=start_time+late_tolerance,
- * gateClose=attendance_auto_close_time. lateToleranceMinutes and dismissal
- * times have no backend fields → kept from the factory defaults.
+ * presence panel edits a single global gate window plus which weekdays are
+ * operational. Mapping uses the first schedule row: gateOpen=start_time,
+ * onTimeUntil=start_time+late_tolerance, gateClose=attendance_auto_close_time.
+ * lateToleranceMinutes and dismissal times have no backend fields → kept from
+ * the factory defaults.
  * @param settings - Server configuration document.
  * @returns Presence policy for the panel.
  */
@@ -541,14 +571,18 @@ export const settingsToPresencePolicy = (settings: AttendanceSettings): Presence
     gateClose: settings.attendance_auto_close_time || defaultSystemSettings.presence.gateClose,
     dismissalWeekday: defaultSystemSettings.presence.dismissalWeekday, // shortcut: no backend field, keep mock
     dismissalFriday: defaultSystemSettings.presence.dismissalFriday, // shortcut: no backend field, keep mock
+    operationalDays:
+      settings.schedules.length > 0
+        ? operationalDaysFromSchedules(settings.schedules)
+        : [...WORKDAY_WEEKDAYS],
     schoolName: settings.school_name,
     timezone: settings.timezone,
   };
 };
 
 /**
- * Inverse of `settingsToPresencePolicy`: writes the edited gate window back to
- * every weekday schedule row (or creates Monday–Friday rows when none exist),
+ * Inverse of `settingsToPresencePolicy`: writes the edited gate window to one
+ * schedule row per operational weekday (Monday–Friday when none are selected),
  * sets attendance_auto_close_time, and preserves school_name, timezone and
  * holidays untouched.
  * @param current - Server configuration document to clone.
@@ -560,18 +594,15 @@ export const presencePolicyToSettings = (
   policy: PresencePolicy,
 ): AttendanceSettings => {
   const tolerance = Math.max(0, toMinutes(policy.onTimeUntil) - toMinutes(policy.gateOpen));
-  const schedules: AttendanceSchedule[] =
-    current.schedules.length > 0
-      ? current.schedules.map((schedule) => ({
-          ...schedule,
-          start_time: policy.gateOpen,
-          late_tolerance_minutes: tolerance,
-        }))
-      : WORKDAY_WEEKDAYS.map((weekday) => ({
-          weekday,
-          start_time: policy.gateOpen,
-          late_tolerance_minutes: tolerance,
-        }));
+  const operationalDays =
+    policy.operationalDays.length > 0
+      ? operationalDaysFromSchedules(policy.operationalDays.map((weekday) => ({ weekday })))
+      : WORKDAY_WEEKDAYS;
+  const schedules: AttendanceSchedule[] = operationalDays.map((weekday) => ({
+    weekday,
+    start_time: policy.gateOpen,
+    late_tolerance_minutes: tolerance,
+  }));
 
   return {
     ...current,

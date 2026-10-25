@@ -11,6 +11,7 @@ export const defaultSystemSettings: SystemSettings = {
     gateClose: '07:15',
     dismissalWeekday: '14:30',
     dismissalFriday: '11:30',
+    operationalDays: [1, 2, 3, 4, 5],
   },
   geofence: {
     radiusMeters: 150,

@@ -8,6 +8,8 @@ export type PresencePolicy = {
   gateClose: string;
   dismissalWeekday: string;
   dismissalFriday: string;
+  /** ISO weekdays (1 = Monday … 7 = Sunday) that count as school days. */
+  operationalDays: number[];
   /** School identity fields carried by the same attendance settings document. */
   schoolName?: string;
   timezone?: string;

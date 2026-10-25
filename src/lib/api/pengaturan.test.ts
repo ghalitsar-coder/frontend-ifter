@@ -13,6 +13,7 @@ import {
   settingsToPresencePolicy,
   sortHolidays,
   termInputError,
+  toggleOperationalDay,
 } from '@/lib/api/pengaturan';
 import type { GeofenceDto, SanctionRuleDto } from '@/lib/api/pengaturan';
 
@@ -53,12 +54,37 @@ describe('attendance settings to presence policy', () => {
     expect(policy.gateOpen).toBe(defaultSystemSettings.presence.gateOpen);
     expect(policy.onTimeUntil).toBe(defaultSystemSettings.presence.gateOpen);
   });
+
+  it('maps operational days from the schedule weekdays', () => {
+    expect(settingsToPresencePolicy(baseSettings).operationalDays).toStrictEqual([1, 2, 5]);
+  });
+
+  it('falls back to Monday-Friday operational days when schedules are empty', () => {
+    const empty = { ...baseSettings, schedules: [] };
+
+    expect(settingsToPresencePolicy(empty).operationalDays).toStrictEqual([1, 2, 3, 4, 5]);
+  });
+});
+
+describe('operational day toggle', () => {
+  it('adds a day and keeps the list sorted', () => {
+    expect(toggleOperationalDay([1, 3], 6)).toStrictEqual([1, 3, 6]);
+    expect(toggleOperationalDay([1, 5], 3)).toStrictEqual([1, 3, 5]);
+  });
+
+  it('removes a selected day', () => {
+    expect(toggleOperationalDay([1, 2, 3], 2)).toStrictEqual([1, 3]);
+  });
+
+  it('refuses to remove the last operational day', () => {
+    expect(toggleOperationalDay([4], 4)).toStrictEqual([4]);
+  });
 });
 
 describe('presence policy to attendance settings', () => {
   it('writes gate window back to every schedule row and preserves other fields', () => {
     const policy = {
-      ...defaultSystemSettings.presence,
+      ...settingsToPresencePolicy(baseSettings),
       gateOpen: '06:20',
       onTimeUntil: '06:50',
       gateClose: '07:20',
@@ -79,6 +105,20 @@ describe('presence policy to attendance settings', () => {
   it('creates Monday-Friday rows when the server has none', () => {
     const empty = { ...baseSettings, schedules: [] };
     const result = presencePolicyToSettings(empty, defaultSystemSettings.presence);
+
+    expect(result.schedules.map((schedule) => schedule.weekday)).toStrictEqual([1, 2, 3, 4, 5]);
+  });
+
+  it('writes one row per selected operational day only', () => {
+    const policy = { ...settingsToPresencePolicy(baseSettings), operationalDays: [1, 3, 6] };
+    const result = presencePolicyToSettings(baseSettings, policy);
+
+    expect(result.schedules.map((schedule) => schedule.weekday)).toStrictEqual([1, 3, 6]);
+  });
+
+  it('falls back to Monday-Friday when no operational day is selected', () => {
+    const policy = { ...settingsToPresencePolicy(baseSettings), operationalDays: [] };
+    const result = presencePolicyToSettings(baseSettings, policy);
 
     expect(result.schedules.map((schedule) => schedule.weekday)).toStrictEqual([1, 2, 3, 4, 5]);
   });
