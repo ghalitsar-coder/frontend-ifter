@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Inter } from 'next/font/google';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
@@ -6,6 +7,12 @@ import { DemoBadge } from '@/components/DemoBadge';
 import { QueryProvider } from '@/components/QueryProvider';
 import { routing } from '@/libs/I18nRouting';
 import '@/styles/global.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   icons: [
@@ -54,7 +61,14 @@ export default async function RootLayout(props: {
   setRequestLocale(locale);
 
   return (
-    <html lang={locale}>
+    <html className={inter.variable} lang={locale}>
+      <head>
+        {/* oxlint-disable-next-line next/no-page-custom-font -- Material Symbols isn't available via next/font */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body>
         <NextIntlClientProvider>
           <QueryProvider>{props.children}</QueryProvider>
