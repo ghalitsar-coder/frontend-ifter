@@ -1,7 +1,14 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { defaultSystemSettings } from '@/data/mockSettings';
-import { apiGet, apiPut } from '@/lib/api/client';
-import type { AttendanceSchedule, AttendanceSettings } from '@/lib/api/dto';
+import { apiDelete, apiGet, apiPost, apiPut } from '@/lib/api/client';
+import type {
+  AcademicYear,
+  AttendanceHoliday,
+  AttendanceSchedule,
+  AttendanceSettings,
+  Term,
+} from '@/lib/api/dto';
+import { academicYearsOptions, queryKeys, termsOptions } from '@/lib/api/queries';
 import type { GeofencePolicy, PresencePolicy } from '@/types/settings';
 
 // ---------------------------------------------------------------------------
@@ -9,6 +16,8 @@ import type { GeofencePolicy, PresencePolicy } from '@/types/settings';
 // ---------------------------------------------------------------------------
 export const pengaturanQueryKeys = {
   attendanceSettings: ['attendance', 'settings'] as const,
+  holidays: ['attendance', 'holidays'] as const,
+  academicYear: (id: string) => ['academic-years', id] as const,
   sanctionRules: ['sanction-rules'] as const,
   geofence: ['geofence'] as const,
 };
@@ -168,6 +177,318 @@ export const useUpdateGeofence = () => {
 };
 
 // ---------------------------------------------------------------------------
+// School holidays — GET /attendance/holidays (all staff),
+// POST/DELETE (admin). Backend: internal/attendance.
+// ---------------------------------------------------------------------------
+export type HolidayInput = {
+  holiday_date: string;
+  name: string;
+};
+
+export const MAX_HOLIDAY_NAME_LENGTH = 150;
+export const MAX_ACADEMIC_YEAR_NAME_LENGTH = 30;
+export const MAX_TERM_NAME_LENGTH = 30;
+/** Backend accepts term numbers 1-4 (internal/masterdata terms.go). */
+export const TERM_NUMBER_RANGE = { min: 1, max: 4 } as const;
+
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/u;
+
+/**
+ * Whether a value is a plain ISO day (`YYYY-MM-DD`).
+ * @param value - Candidate date string.
+ * @returns True for a syntactically valid ISO day.
+ */
+export const isIsoDay = (value: string): boolean => ISO_DATE_PATTERN.test(value);
+
+const monthAbbreviationsId = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'Mei',
+  'Jun',
+  'Jul',
+  'Agu',
+  'Sep',
+  'Okt',
+  'Nov',
+  'Des',
+] as const;
+
+/**
+ * Format an ISO day as `31 Des 2026` for the settings lists.
+ * @param iso - ISO day (`YYYY-MM-DD`).
+ * @returns Indonesian short-date label (`''` when unparsable).
+ */
+export const formatIsoDayId = (iso: string): string => {
+  const parts = /^(\d{4})-(\d{2})-(\d{2})/u.exec(iso);
+  if (parts === null) {
+    return '';
+  }
+  const month = monthAbbreviationsId[Number(parts[2]) - 1];
+  return `${Number(parts[3])} ${month ?? parts[2]} ${parts[1]}`;
+};
+
+/**
+ * Validate a holiday create payload against the backend rules
+ * (ISO date + name up to 150 chars).
+ * @param input - Form values.
+ * @returns Indonesian error message, or null when valid.
+ */
+export const holidayInputError = (input: HolidayInput): string | null => {
+  if (!isIsoDay(input.holiday_date)) {
+    return 'Tanggal libur wajib diisi.';
+  }
+  const name = input.name.trim();
+  if (name === '') {
+    return 'Nama hari libur wajib diisi.';
+  }
+  if (name.length > MAX_HOLIDAY_NAME_LENGTH) {
+    return `Nama hari libur maksimal ${MAX_HOLIDAY_NAME_LENGTH} karakter.`;
+  }
+  return null;
+};
+
+/**
+ * Sort holidays by date ascending without mutating the server response.
+ * @param holidays - Rows from GET /attendance/holidays.
+ * @returns New array ordered by `holiday_date`.
+ */
+export const sortHolidays = (holidays: AttendanceHoliday[]): AttendanceHoliday[] =>
+  holidays.toSorted((left, right) => left.holiday_date.localeCompare(right.holiday_date));
+
+export const holidaysOptions = () =>
+  queryOptions({
+    queryKey: pengaturanQueryKeys.holidays,
+    queryFn: async () => {
+      const result = await apiGet<{ data: AttendanceHoliday[] }>('/attendance/holidays');
+      return sortHolidays(result.data);
+    },
+  });
+
+/**
+ * GET /attendance/holidays → school holiday calendar (every signed-in staff role).
+ * @returns React Query result with sorted `AttendanceHoliday[]`.
+ */
+export const useHolidays = () => useQuery(holidaysOptions());
+
+/**
+ * POST /attendance/holidays → add one holiday (admin only; duplicate date = 409).
+ * @returns Mutation over `HolidayInput`.
+ */
+export const useCreateHoliday = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: HolidayInput) =>
+      await apiPost<AttendanceHoliday>('/attendance/holidays', input),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: pengaturanQueryKeys.holidays });
+      await queryClient.invalidateQueries({ queryKey: pengaturanQueryKeys.attendanceSettings });
+    },
+  });
+};
+
+/**
+ * DELETE /attendance/holidays/:date → remove one holiday by its ISO date
+ * (admin only; 204 on success).
+ * @returns Mutation over the holiday date.
+ */
+export const useDeleteHoliday = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (holidayDate: string) =>
+      await apiDelete<null>(`/attendance/holidays/${encodeURIComponent(holidayDate)}`),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: pengaturanQueryKeys.holidays });
+      await queryClient.invalidateQueries({ queryKey: pengaturanQueryKeys.attendanceSettings });
+    },
+  });
+};
+
+// ---------------------------------------------------------------------------
+// Academic years & terms — MasterData group (admin + staff_tu).
+// Reads reuse the foundation options in queries.ts; the write hooks live here
+// because the settings page owns the UI.
+// ---------------------------------------------------------------------------
+export type AcademicYearInput = {
+  name: string;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+};
+
+export type TermInput = {
+  term_number: number;
+  name: string;
+  start_date: string;
+  end_date: string;
+};
+
+/**
+ * Validate an academic-year create/update payload (name ≤30, strict start<end).
+ * @param input - Form values.
+ * @returns Indonesian error message, or null when valid.
+ */
+export const academicYearInputError = (input: AcademicYearInput): string | null => {
+  const name = input.name.trim();
+  if (name === '') {
+    return 'Nama tahun ajaran wajib diisi.';
+  }
+  if (name.length > MAX_ACADEMIC_YEAR_NAME_LENGTH) {
+    return `Nama tahun ajaran maksimal ${MAX_ACADEMIC_YEAR_NAME_LENGTH} karakter.`;
+  }
+  if (!isIsoDay(input.start_date) || !isIsoDay(input.end_date)) {
+    return 'Tanggal mulai dan selesai tahun ajaran wajib diisi.';
+  }
+  if (input.end_date <= input.start_date) {
+    return 'Tanggal selesai harus setelah tanggal mulai.';
+  }
+  return null;
+};
+
+/**
+ * Validate a term create/update payload and, when a parent year is given,
+ * that the term window stays inside that year (backend rejects both cases).
+ * @param input - Form values.
+ * @param year - Parent academic year (optional).
+ * @returns Indonesian error message, or null when valid.
+ */
+export const termInputError = (input: TermInput, year?: AcademicYear): string | null => {
+  const name = input.name.trim();
+  if (name === '') {
+    return 'Nama semester wajib diisi.';
+  }
+  if (name.length > MAX_TERM_NAME_LENGTH) {
+    return `Nama semester maksimal ${MAX_TERM_NAME_LENGTH} karakter.`;
+  }
+  if (
+    !Number.isInteger(input.term_number) ||
+    input.term_number < TERM_NUMBER_RANGE.min ||
+    input.term_number > TERM_NUMBER_RANGE.max
+  ) {
+    return 'Nomor semester harus antara 1 dan 4.';
+  }
+  if (!isIsoDay(input.start_date) || !isIsoDay(input.end_date)) {
+    return 'Tanggal mulai dan selesai semester wajib diisi.';
+  }
+  if (input.end_date <= input.start_date) {
+    return 'Tanggal selesai harus setelah tanggal mulai.';
+  }
+  if (
+    year !== undefined &&
+    (input.start_date < year.start_date || input.end_date > year.end_date)
+  ) {
+    return 'Rentang semester harus berada di dalam rentang tahun ajaran.';
+  }
+  return null;
+};
+
+export const academicYearDetailOptions = (id: string) =>
+  queryOptions({
+    queryKey: pengaturanQueryKeys.academicYear(id),
+    queryFn: async () => {
+      const result = await apiGet<{ academic_year: AcademicYear }>(`/academic-years/${id}`);
+      return result.academic_year;
+    },
+    enabled: id !== '',
+  });
+
+/**
+ * GET /academic-years → every academic year (admin + staff_tu).
+ * @returns React Query result with `AcademicYear[]`.
+ */
+export const useAcademicYears = () => useQuery(academicYearsOptions());
+
+/**
+ * GET /academic-years/:id → one academic year, used by the editor to load the
+ * freshest row before a PUT.
+ * @param id - Academic year id (hook stays disabled when empty).
+ * @returns React Query result with `AcademicYear`.
+ */
+export const useAcademicYear = (id: string) => useQuery(academicYearDetailOptions(id));
+
+/**
+ * GET /academic-years/:id/terms → terms of one academic year.
+ * @param academicYearId - Parent academic year id.
+ * @returns React Query result with `Term[]`.
+ */
+export const useTerms = (academicYearId: string) => useQuery(termsOptions(academicYearId));
+
+/**
+ * POST /academic-years → create one academic year (admin + staff_tu; an active
+ * year deactivates the previous one server-side).
+ * @returns Mutation over `AcademicYearInput`.
+ */
+export const useCreateAcademicYear = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: AcademicYearInput) =>
+      await apiPost<{ academic_year: AcademicYear }>('/academic-years', input),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.academicYears });
+    },
+  });
+};
+
+/**
+ * PUT /academic-years/:id → replace one academic year (also the activation
+ * path: `is_active: true` deactivates every other year).
+ * @returns Mutation over `{ id } & AcademicYearInput`.
+ */
+export const useUpdateAcademicYear = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (variables: { id: string } & AcademicYearInput) => {
+      const { id, ...input } = variables;
+      return await apiPut<{ academic_year: AcademicYear }>(`/academic-years/${id}`, input);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['academic-years'] });
+    },
+  });
+};
+
+/**
+ * POST /academic-years/:id/terms → add one term to a year.
+ * @param academicYearId - Parent academic year id.
+ * @returns Mutation over `TermInput`.
+ */
+export const useCreateTerm = (academicYearId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: TermInput) =>
+      await apiPost<{ term: Term }>(`/academic-years/${academicYearId}/terms`, input),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.terms(academicYearId) });
+    },
+  });
+};
+
+/**
+ * PUT /terms/:id → update one term (dates/name/number; full payload required).
+ * @param academicYearId - Parent id, used to refresh the term list.
+ * @returns Mutation over `{ id } & TermInput`.
+ */
+export const useUpdateTerm = (academicYearId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (variables: { id: string } & TermInput) => {
+      const { id, ...input } = variables;
+      return await apiPut<{ term: Term }>(`/terms/${id}`, input);
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.terms(academicYearId) });
+    },
+  });
+};
+
+// ---------------------------------------------------------------------------
 // Time helpers
 // ---------------------------------------------------------------------------
 const WORKDAY_WEEKDAYS = [1, 2, 3, 4, 5];
@@ -220,6 +541,8 @@ export const settingsToPresencePolicy = (settings: AttendanceSettings): Presence
     gateClose: settings.attendance_auto_close_time || defaultSystemSettings.presence.gateClose,
     dismissalWeekday: defaultSystemSettings.presence.dismissalWeekday, // shortcut: no backend field, keep mock
     dismissalFriday: defaultSystemSettings.presence.dismissalFriday, // shortcut: no backend field, keep mock
+    schoolName: settings.school_name,
+    timezone: settings.timezone,
   };
 };
 
@@ -252,6 +575,8 @@ export const presencePolicyToSettings = (
 
   return {
     ...current,
+    school_name: policy.schoolName ?? current.school_name,
+    timezone: policy.timezone ?? current.timezone,
     attendance_auto_close_time: policy.gateClose,
     schedules,
   };

@@ -8,6 +8,9 @@ export type PresencePolicy = {
   gateClose: string;
   dismissalWeekday: string;
   dismissalFriday: string;
+  /** School identity fields carried by the same attendance settings document. */
+  schoolName?: string;
+  timezone?: string;
 };
 
 /**

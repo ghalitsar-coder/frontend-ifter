@@ -1,4 +1,4 @@
-import { Clock, DoorOpen, LogOut, Timer, TriangleAlert } from 'lucide-react';
+import { Building2, Clock, DoorOpen, Globe2, LogOut, Timer, TriangleAlert } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { PresencePolicy } from '@/types/settings';
 
@@ -55,6 +55,60 @@ export function SettingsPresencePanel(props: {
             {t('timeline_late')}
           </div>
           <div className="flex-1 bg-rose-200 px-2 py-1.5 text-rose-800">{t('timeline_closed')}</div>
+        </div>
+      </div>
+
+      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label
+            htmlFor="presence-school-name"
+            className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-foreground"
+          >
+            <Building2 className="size-3.5 text-muted-foreground" />
+            Nama Sekolah
+          </label>
+          <input
+            id="presence-school-name"
+            type="text"
+            maxLength={150}
+            value={props.policy.schoolName ?? ''}
+            onChange={(e) => {
+              props.onChange({ schoolName: e.target.value });
+            }}
+            className="h-10 w-full rounded-xl border border-border-control bg-surface-container-low px-3 text-xs text-foreground focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+          />
+          <p className="mt-1 text-[10px] text-muted-foreground">
+            Tampil pada dokumen dan rekap absensi sekolah.
+          </p>
+        </div>
+
+        <div>
+          <label
+            htmlFor="presence-timezone"
+            className="mb-1 flex items-center gap-1.5 text-xs font-semibold text-foreground"
+          >
+            <Globe2 className="size-3.5 text-muted-foreground" />
+            Zona Waktu
+          </label>
+          <input
+            id="presence-timezone"
+            type="text"
+            list="presence-timezone-options"
+            value={props.policy.timezone ?? ''}
+            placeholder="Asia/Jakarta"
+            onChange={(e) => {
+              props.onChange({ timezone: e.target.value });
+            }}
+            className="h-10 w-full rounded-xl border border-border-control bg-surface-container-low px-3 text-xs text-foreground focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+          />
+          <datalist id="presence-timezone-options" aria-label="Pilihan zona waktu Indonesia">
+            <option value="Asia/Jakarta">WIB — Asia/Jakarta</option>
+            <option value="Asia/Makassar">WITA — Asia/Makassar</option>
+            <option value="Asia/Jayapura">WIT — Asia/Jayapura</option>
+          </datalist>
+          <p className="mt-1 text-[10px] text-muted-foreground">
+            Nama zona IANA, dipakai server saat menilai jam absensi.
+          </p>
         </div>
       </div>
 

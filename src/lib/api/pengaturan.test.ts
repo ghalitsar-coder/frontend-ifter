@@ -1,13 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { defaultSystemSettings } from '@/data/mockSettings';
-import type { AttendanceSettings } from '@/lib/api/dto';
+import type { AttendanceHoliday, AttendanceSettings, AcademicYear } from '@/lib/api/dto';
 import {
+  academicYearInputError,
+  formatIsoDayId,
   geofencePolicyToPayload,
   geofenceToPolicy,
+  holidayInputError,
   presencePolicyToSettings,
   sanctionDraftsToRules,
   sanctionRulesToDrafts,
   settingsToPresencePolicy,
+  sortHolidays,
+  termInputError,
 } from '@/lib/api/pengaturan';
 import type { GeofenceDto, SanctionRuleDto } from '@/lib/api/pengaturan';
 
@@ -206,5 +211,185 @@ describe('geofence mappers (GET/PUT /geofence)', () => {
     );
 
     expect(payload).toStrictEqual(geofenceConfig);
+  });
+});
+
+const holiday = (overrides?: Partial<AttendanceHoliday>): AttendanceHoliday => ({
+  holiday_date: '2026-12-25',
+  name: 'Hari Raya Natal',
+  created_at: '2026-10-01T00:00:00Z',
+  ...overrides,
+});
+
+describe('school holiday helpers (GET/POST/DELETE /attendance/holidays)', () => {
+  it('formats ISO days for the holiday list', () => {
+    expect(formatIsoDayId('2026-12-31')).toBe('31 Des 2026');
+    expect(formatIsoDayId('2026-01-05')).toBe('5 Jan 2026');
+  });
+
+  it('returns an empty label for unparsable dates', () => {
+    expect(formatIsoDayId('25-12-2026')).toBe('');
+  });
+
+  it('rejects missing date, blank name, and names over the backend limit', () => {
+    expect(holidayInputError({ holiday_date: '', name: 'Libur' })).toBe(
+      'Tanggal libur wajib diisi.',
+    );
+    expect(holidayInputError({ holiday_date: '2026-12-25', name: '   ' })).toBe(
+      'Nama hari libur wajib diisi.',
+    );
+    expect(holidayInputError({ holiday_date: '2026-12-25', name: 'x'.repeat(151) })).toBe(
+      'Nama hari libur maksimal 150 karakter.',
+    );
+  });
+
+  it('accepts a valid holiday payload', () => {
+    expect(holidayInputError({ holiday_date: '2026-12-25', name: 'Natal' })).toBeNull();
+  });
+
+  it('sorts holidays by date without mutating the server array', () => {
+    const input = [
+      holiday({ holiday_date: '2026-12-25' }),
+      holiday({ holiday_date: '2026-01-01', name: 'Tahun Baru' }),
+      holiday({ holiday_date: '2026-05-01', name: 'Hari Buruh' }),
+    ];
+
+    expect(sortHolidays(input).map((row) => row.holiday_date)).toStrictEqual([
+      '2026-01-01',
+      '2026-05-01',
+      '2026-12-25',
+    ]);
+    expect(input.map((row) => row.holiday_date)).toStrictEqual([
+      '2026-12-25',
+      '2026-01-01',
+      '2026-05-01',
+    ]);
+  });
+});
+
+const academicYear: AcademicYear = {
+  id: 'ay-1',
+  name: '2026/2027',
+  start_date: '2026-07-01',
+  end_date: '2027-06-30',
+  is_active: true,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+};
+
+describe('academic year & term validation (MasterData)', () => {
+  it('accepts a valid academic year', () => {
+    expect(
+      academicYearInputError({
+        name: '2026/2027',
+        start_date: '2026-07-01',
+        end_date: '2027-06-30',
+        is_active: true,
+      }),
+    ).toBeNull();
+  });
+
+  it('rejects blank names, dates that are not ISO, and end <= start', () => {
+    expect(
+      academicYearInputError({
+        name: ' ',
+        start_date: '2026-07-01',
+        end_date: '2027-06-30',
+        is_active: false,
+      }),
+    ).toBe('Nama tahun ajaran wajib diisi.');
+    expect(
+      academicYearInputError({
+        name: '2026/2027',
+        start_date: '',
+        end_date: '2027-06-30',
+        is_active: false,
+      }),
+    ).toBe('Tanggal mulai dan selesai tahun ajaran wajib diisi.');
+    expect(
+      academicYearInputError({
+        name: '2026/2027',
+        start_date: '2027-06-30',
+        end_date: '2027-06-30',
+        is_active: false,
+      }),
+    ).toBe('Tanggal selesai harus setelah tanggal mulai.');
+  });
+
+  it('accepts a term inside its parent year', () => {
+    expect(
+      termInputError(
+        {
+          term_number: 1,
+          name: 'Semester 1',
+          start_date: '2026-07-01',
+          end_date: '2026-12-31',
+        },
+        academicYear,
+      ),
+    ).toBeNull();
+  });
+
+  it('rejects out-of-range term numbers', () => {
+    expect(
+      termInputError(
+        { term_number: 5, name: 'Semester 5', start_date: '2026-07-01', end_date: '2026-12-31' },
+        academicYear,
+      ),
+    ).toBe('Nomor semester harus antara 1 dan 4.');
+  });
+
+  it('rejects terms that fall outside the parent academic year', () => {
+    expect(
+      termInputError(
+        { term_number: 2, name: 'Semester 2', start_date: '2027-01-01', end_date: '2027-07-15' },
+        academicYear,
+      ),
+    ).toBe('Rentang semester harus berada di dalam rentang tahun ajaran.');
+  });
+
+  it('skips the parent-year check when no year is given', () => {
+    expect(
+      termInputError({
+        term_number: 2,
+        name: 'Semester 2',
+        start_date: '2027-01-01',
+        end_date: '2027-07-15',
+      }),
+    ).toBeNull();
+  });
+});
+
+describe('presence policy school identity', () => {
+  it('exposes school_name and timezone from the server settings', () => {
+    const policy = settingsToPresencePolicy(baseSettings);
+
+    expect(policy.schoolName).toBe(baseSettings.school_name);
+    expect(policy.timezone).toBe(baseSettings.timezone);
+  });
+
+  it('writes edited school_name/timezone and preserves holidays', () => {
+    const policy = {
+      ...defaultSystemSettings.presence,
+      schoolName: 'SMP Negeri 2 Harapan Bangsa',
+      timezone: 'Asia/Makassar',
+    };
+    const result = presencePolicyToSettings(baseSettings, policy);
+
+    expect(result.school_name).toBe('SMP Negeri 2 Harapan Bangsa');
+    expect(result.timezone).toBe('Asia/Makassar');
+    expect(result.holidays).toStrictEqual(baseSettings.holidays);
+  });
+
+  it('keeps the server identity when the edited policy omits it', () => {
+    const policy = {
+      ...defaultSystemSettings.presence,
+      schoolName: undefined,
+      timezone: undefined,
+    };
+    const result = presencePolicyToSettings(baseSettings, policy);
+
+    expect(result.school_name).toBe(baseSettings.school_name);
+    expect(result.timezone).toBe(baseSettings.timezone);
   });
 });

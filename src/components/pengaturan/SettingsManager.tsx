@@ -12,8 +12,10 @@ import {
   useUpdateAttendanceSettings,
 } from '@/lib/api/pengaturan';
 import type { PresencePolicy, SettingsTab, SystemSettings } from '@/types/settings';
+import { SettingsAcademicYearPanel } from './SettingsAcademicYearPanel';
 import { SettingsGeofencePanel } from './SettingsGeofencePanel';
 import { SettingsHeader } from './SettingsHeader';
+import { SettingsHolidayPanel } from './SettingsHolidayPanel';
 import { SettingsNotificationPanel } from './SettingsNotificationPanel';
 import { SettingsPresencePanel } from './SettingsPresencePanel';
 import { SettingsSanctionsPanel } from './SettingsSanctionsPanel';
@@ -162,6 +164,11 @@ export function SettingsManager() {
                 showToast(t('toast_calibrated'));
               }}
             />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <SettingsHolidayPanel />
+            <SettingsAcademicYearPanel />
           </div>
         </div>
       )}
