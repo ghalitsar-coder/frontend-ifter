@@ -13,7 +13,10 @@
   },
   "DashboardLayout": {
     "meta_title": "Tableau de bord",
-    "meta_description": "Gérez votre compte depuis le tableau de bord."
+    "meta_description": "Gérez votre compte depuis le tableau de bord.",
+    "menu_profile": "Profil Saya",
+    "menu_settings": "Pengaturan Akun",
+    "menu_sign_out": "Keluar"
   },
   "LocaleSwitcher": {
     "change_language": "Changer de langue"
@@ -414,6 +417,7 @@
     "error_unreachable": "Layanan presensi tidak dapat dihubungi. Coba lagi sebentar.",
     "error_generic": "Terjadi kesalahan pada layanan presensi. Coba lagi.",
     "nav_register": "Daftarkan Sekolah",
+    "nav_login": "Masuk Portal",
     "login_eyebrow": "Sistem Presensi Presisi",
     "login_date_stamp": "Hari ini, Semester Genap",
     "login_quote_lead": "Student attendance,",
@@ -747,5 +751,16 @@
     "description": "Fitur ini sedang dikembangkan. Gunakan navigasi lain atau kembali ke dashboard.",
     "back": "Kembali ke Dashboard",
     "fallback_item": "Ini"
+  },
+  "NotFoundPage": {
+    "code": "404",
+    "title": "Halaman tidak ditemukan",
+    "description": "Alamat yang Anda tuju tidak tersedia. Periksa kembali tautannya atau lanjutkan dari tautan cepat di bawah.",
+    "home_cta": "Kembali ke Beranda",
+    "login_cta": "Masuk Portal Presensi",
+    "quick_heading": "Tautan cepat",
+    "quick_presensi": "Presensi Harian",
+    "quick_kedisiplinan": "Buku Kedisiplinan",
+    "quick_pendaftaran": "Daftarkan Sekolah"
   }
 }

@@ -218,7 +218,7 @@ export function PendaftaranOtpStep(props: {
                   <span />
                 )}
                 <button
-                  className="flex items-center gap-0.5 font-caption text-caption font-semibold text-pine-deep transition-colors hover:text-pine-hover disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex cursor-pointer items-center gap-0.5 rounded font-caption text-caption font-semibold text-pine-deep transition-colors hover:text-pine-hover focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={props.isSubmitting}
                   onClick={props.onBack}
                   type="button"
@@ -246,7 +246,7 @@ export function PendaftaranOtpStep(props: {
                 </div>
               </div>
               <button
-                className="inline-flex items-center justify-center gap-space-xs rounded-lg bg-surface-container-high px-space-md py-space-xs font-label-md text-label-md text-text-muted transition-colors hover:text-text-primary disabled:cursor-not-allowed disabled:opacity-70"
+                className="inline-flex cursor-pointer items-center justify-center gap-space-xs rounded-lg bg-surface-container-high px-space-md py-space-xs font-label-md text-label-md text-text-muted transition-colors hover:text-text-primary focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
                 disabled={secondsLeft > 0}
                 onClick={resend}
                 type="button"
@@ -267,7 +267,7 @@ export function PendaftaranOtpStep(props: {
                 </p>
               )}
               <button
-                className="flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-pine-deep font-label-md text-label-md font-semibold text-on-primary shadow-md transition-all hover:bg-pine-hover active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60"
+                className="flex h-12 w-full cursor-pointer items-center justify-center gap-space-sm rounded-xl bg-pine-deep font-label-md text-label-md font-semibold text-on-primary shadow-md transition-all hover:bg-pine-hover focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.99] disabled:pointer-events-none disabled:opacity-60"
                 disabled={!otpCodeComplete(code) || props.isSubmitting}
                 onClick={props.onVerified}
                 type="button"
@@ -281,13 +281,14 @@ export function PendaftaranOtpStep(props: {
                 <span className="font-caption text-caption text-text-muted">
                   {t('otp_not_received')}{' '}
                 </span>
-                {/* shortcut: alternative delivery channels have no route yet, so the link only points at itself */}
-                <a
-                  className="font-caption text-caption font-semibold text-pine-deep underline decoration-amber-gold underline-offset-4 transition-colors hover:text-pine-hover"
-                  href="#"
+                {/* shortcut: alternative delivery channels have no route yet, so the control is honestly disabled */}
+                <button
+                  className="cursor-not-allowed rounded font-caption text-caption font-semibold text-text-muted"
+                  disabled
+                  type="button"
                 >
                   {t('otp_alt_channel')}
-                </a>
+                </button>
               </div>
             </div>
 

@@ -234,7 +234,7 @@ function PendaftaranWorkspaceCard(props: {
         </div>
         <div className="flex w-full items-center gap-space-sm sm:w-auto">
           <button
-            className="flex items-center justify-center gap-space-xs rounded-lg bg-surface-container-lowest px-space-md py-space-xs font-label-md text-label-md text-text-primary shadow-sm transition-colors hover:bg-surface-container-high sm:w-auto"
+            className="flex cursor-pointer items-center justify-center gap-space-xs rounded-lg bg-surface-container-lowest px-space-md py-space-xs font-label-md text-label-md text-text-primary shadow-sm transition-colors hover:bg-surface-container-high focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98] sm:w-auto"
             onClick={() => props.onCopy(WORKSPACE_URL)}
             type="button"
           >
@@ -470,7 +470,7 @@ function PendaftaranActionDock(props: { onStart: () => void }) {
         <div className="flex w-full flex-col items-center gap-space-md sm:flex-row lg:w-auto">
           {/* The mock renders "Masuk ke Dashboard" as an in-app anchor; here it is the primary CTA, so the parent owns navigation via onStart rather than a Link. */}
           <button
-            className="flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md font-semibold text-on-primary shadow-md transition-all hover:scale-[1.02] hover:bg-pine-hover sm:w-auto"
+            className="flex h-12 w-full cursor-pointer items-center justify-center gap-space-sm rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md font-semibold text-on-primary shadow-md transition-all hover:scale-[1.02] hover:bg-pine-hover focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.99] sm:w-auto"
             onClick={props.onStart}
             type="button"
           >

@@ -21,14 +21,14 @@ export const CtaSection = () => (
         </p>
         <div className="mt-space-xl flex flex-col items-center gap-space-md sm:flex-row">
           <Link
-            className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-secondary-container px-space-xl font-label-md text-label-md font-bold text-primary shadow-lg transition-all hover:bg-amber-hover sm:w-auto"
+            className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-secondary-container px-space-xl font-label-md text-label-md font-bold text-primary shadow-lg transition-all hover:bg-amber-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep focus-visible:ring-offset-2 sm:w-auto"
             href="/pendaftaran"
           >
             <span>Daftar Sekolah Sekarang</span>
             <MaterialIcon name="arrow_forward" className="text-[18px]" />
           </Link>
           <a
-            className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-tertiary-container px-space-lg font-label-md text-label-md text-on-primary transition-all hover:bg-primary sm:w-auto"
+            className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-tertiary-container px-space-lg font-label-md text-label-md text-on-primary transition-all hover:bg-primary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-gold focus-visible:ring-offset-2 sm:w-auto"
             href="#demo"
           >
             <MaterialIcon name="headset_mic" className="text-[18px]" />

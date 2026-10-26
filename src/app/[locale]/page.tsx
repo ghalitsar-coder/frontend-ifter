@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
+import { AttendlyHeader } from '@/components/presensi/AttendlyHeader';
 import { CtaSection } from '@/components/landing/CtaSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
 import { GallerySection } from '@/components/landing/GallerySection';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { LandingHeader } from '@/components/landing/LandingHeader';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { TrustSection } from '@/components/landing/TrustSection';
 import { WorkflowSection } from '@/components/landing/WorkflowSection';
@@ -30,8 +30,11 @@ export default async function IndexPage(props: IndexPageProps) {
       id="beranda"
       lang="id"
     >
-      <LandingHeader />
-      <main className="min-h-[calc(100vh-20rem)] w-full bg-surface pt-20">
+      {/* Same token scope the portal header renders in, so landing and auth headers match exactly. */}
+      <div className="attendly">
+        <AttendlyHeader />
+      </div>
+      <main className="min-h-[calc(100vh-20rem)] w-full bg-surface pt-16">
         <div className="flex w-full flex-col overflow-hidden">
           <HeroSection />
           <TrustSection />

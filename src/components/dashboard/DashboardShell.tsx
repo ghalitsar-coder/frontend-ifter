@@ -5,8 +5,8 @@ import { useState } from 'react';
 import { MaterialIcon } from '@/components/landing/MaterialIcon';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Link, usePathname, useRouter } from '@/libs/I18nNavigation';
-import { signOut } from '@/services/presensiApi';
+import { Link, usePathname } from '@/libs/I18nNavigation';
+import { ProfileMenu } from './ProfileMenu';
 import { dashboardRoles, roleConfigs } from './navigation';
 import type { DashboardRole, NavBadgeTone, NavItem, RoleCallout } from './navigation';
 
@@ -32,7 +32,7 @@ const NavItemRow = (props: {
   activeClassName: string;
   activeIconClassName: string;
 }) => {
-  const rowClassName = `flex items-center rounded-xl py-2 font-label-md text-label-md transition-colors ${
+  const rowClassName = `flex items-center rounded-xl py-2 font-label-md text-label-md transition-colors active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-amber-gold/60 focus-visible:outline-none ${
     props.collapsed ? 'justify-center px-0' : 'justify-between px-3'
   } ${
     props.active
@@ -152,7 +152,6 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
   const config = roleConfigs[role];
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
 
   // The shell rebuilds its nav from ?role=, so every navigation has to carry it.
   const withRole = (href: string) =>
@@ -165,11 +164,6 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
     item.href
       ? pathname === item.href.split('?')[0]
       : pathname === '/dashboard/segera' && searchParams.get('item') === item.label;
-
-  const handleSignOut = async () => {
-    await signOut();
-    router.replace('/sign-in');
-  };
 
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
@@ -208,7 +202,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
               <button
                 aria-expanded={!collapsed}
                 aria-label="Perkecil atau perluas sidebar"
-                className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-pine-hover text-on-primary transition-colors hover:bg-pine-deep"
+                className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-pine-hover text-on-primary transition-colors hover:bg-pine-deep active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-gold/60"
                 onClick={() => {
                   setCollapsed(!collapsed);
                 }}
@@ -248,9 +242,13 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
           </div>
         </div>
 
-        <div
-          className={`flex items-center gap-2.5 bg-tertiary-container/40 p-3 ${
-            collapsed ? 'justify-center px-0' : ''
+        <ProfileMenu
+          align="start"
+          config={config}
+          role={role}
+          side="top"
+          triggerClassName={`flex w-full cursor-pointer items-center gap-2.5 bg-tertiary-container/40 p-3 transition-colors hover:bg-tertiary-container/70 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-gold/60 ${
+            collapsed ? 'justify-center px-0' : 'justify-start px-3'
           }`}
         >
           <div
@@ -268,7 +266,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
               </span>
             </div>
           )}
-        </div>
+        </ProfileMenu>
       </aside>
 
       <div
@@ -320,25 +318,21 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
             </div>
             <button
               aria-label="Notifikasi terkini"
-              className="relative flex size-10 items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light"
+              className="relative flex size-10 items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/30"
               type="button"
             >
               <MaterialIcon className="text-[20px]" name="notifications" />
               <span className="absolute top-2 right-2 size-2 rounded-full bg-amber-gold ring-2 ring-surface-card" />
             </button>
             <LocaleSwitcher />
-            <button
-              aria-label="Keluar"
-              className="flex size-10 items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light"
-              onClick={() => {
-                void handleSignOut();
-              }}
-              type="button"
-            >
-              <MaterialIcon className="text-[20px]" name="logout" />
-            </button>
             <div className="hidden h-8 w-px bg-border-subtle sm:block" />
-            <div className="flex items-center gap-3 pl-1">
+            <ProfileMenu
+              align="end"
+              config={config}
+              role={role}
+              side="bottom"
+              triggerClassName="flex cursor-pointer items-center gap-3 rounded-xl py-1 pl-3 transition-colors hover:bg-canvas-base active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/30"
+            >
               <div className="hidden flex-col text-right sm:flex">
                 <span className="text-sm leading-snug font-semibold text-text-primary">
                   {config.user.name}
@@ -348,7 +342,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
               <div className="flex size-8 items-center justify-center rounded-full bg-pine-deep shadow-sm">
                 <MaterialIcon className="text-[18px] text-on-primary" name="person" />
               </div>
-            </div>
+            </ProfileMenu>
           </div>
         </header>
 

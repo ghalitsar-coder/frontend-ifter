@@ -74,14 +74,14 @@ export const HeroSection = () => (
 
       <div className="mt-space-xl flex w-full flex-col items-center gap-space-md sm:w-auto sm:flex-row">
         <Link
-          className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md text-on-primary shadow-lg transition-all hover:bg-pine-hover hover:shadow-xl sm:w-auto"
+          className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md text-on-primary shadow-lg transition-all hover:bg-pine-hover hover:shadow-xl active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep focus-visible:ring-offset-2 sm:w-auto"
           href="/pendaftaran"
         >
           <span>Mulai Uji Coba Gratis 30 Hari</span>
           <MaterialIcon name="arrow_forward" className="text-[18px]" />
         </Link>
         <a
-          className="inline-flex h-12 w-full items-center justify-center gap-space-xs rounded-xl bg-surface-card px-space-lg font-label-md text-label-md text-text-primary shadow-sm transition-all hover:bg-surface-container sm:w-auto"
+          className="inline-flex h-12 w-full items-center justify-center gap-space-xs rounded-xl bg-surface-card px-space-lg font-label-md text-label-md text-text-primary shadow-sm transition-all hover:bg-surface-container active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep focus-visible:ring-offset-2 sm:w-auto"
           href="#demo"
         >
           <MaterialIcon name="play_circle" className="text-[18px] text-primary" />
@@ -185,7 +185,7 @@ export const HeroSection = () => (
             ))}
           </div>
           <button
-            className="mt-space-md flex w-full items-center justify-center gap-space-xs rounded-xl bg-primary py-2 font-label-md text-label-md text-on-primary transition-colors hover:bg-pine-hover"
+            className="mt-space-md flex w-full cursor-pointer items-center justify-center gap-space-xs rounded-xl bg-primary py-2 font-label-md text-label-md text-on-primary transition-all hover:bg-pine-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep focus-visible:ring-offset-2"
             type="button"
           >
             <MaterialIcon name="done_all" className="text-[16px]" />

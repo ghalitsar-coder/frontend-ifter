@@ -462,14 +462,14 @@ export function PendaftaranIdentityStep(props: {
                 >
                   {t.rich('id_terms', {
                     layanan: (chunk) => (
-                      <a className={LINK} href="#">
+                      <Link className={LINK} href="/#faq">
                         {chunk}
-                      </a>
+                      </Link>
                     ),
                     privasi: (chunk) => (
-                      <a className={LINK} href="#">
+                      <Link className={LINK} href="/#faq">
                         {chunk}
-                      </a>
+                      </Link>
                     ),
                   })}
                 </label>
@@ -503,7 +503,7 @@ export function PendaftaranIdentityStep(props: {
 
             <div className="flex flex-col items-center justify-between gap-space-md pt-space-md sm:flex-row">
               <button
-                className="flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md font-semibold text-on-primary shadow-md transition-all outline-none hover:-translate-y-0.5 hover:bg-pine-hover focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 sm:w-auto"
+                className="flex h-12 w-full cursor-pointer items-center justify-center gap-space-sm rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md font-semibold text-on-primary shadow-md transition-all outline-none hover:-translate-y-0.5 hover:bg-pine-hover focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 active:translate-y-0 active:scale-[0.99] sm:w-auto"
                 type="submit"
               >
                 <span>{t('id_submit')}</span>

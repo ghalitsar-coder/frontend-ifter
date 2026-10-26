@@ -1,19 +1,19 @@
 'use client';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { LOGIN_ROLE_FIELDS } from '@/components/presensi/presensiLoginRoles';
-import type { PresensiLoginRole } from '@/components/presensi/presensiLoginRoles';
+import { useState } from 'react';
 import { presensiErrorKey } from '@/components/presensi/presensiErrors';
 import type { PresensiErrorKey } from '@/components/presensi/presensiErrors';
-import { AUTH_QUERY_KEY, signIn } from '@/services/presensiApi';
+import { LOGIN_ROLE_FIELDS } from '@/components/presensi/presensiLoginRoles';
+import type { PresensiLoginRole } from '@/components/presensi/presensiLoginRoles';
 import { Link, useRouter } from '@/libs/I18nNavigation';
+import { AUTH_QUERY_KEY, signIn } from '@/services/presensiApi';
 
 const TAB_CLASSES = {
   active:
-    'flex flex-1 items-center justify-center gap-space-xs rounded-lg bg-surface-card px-space-md py-2.5 font-label-md text-label-md font-semibold text-pine-deep shadow-sm transition-all duration-200',
-  idle: 'flex flex-1 items-center justify-center gap-space-xs rounded-lg px-space-md py-2.5 font-label-md text-label-md font-medium text-text-muted transition-all duration-200 hover:text-text-primary',
+    'flex flex-1 cursor-pointer items-center justify-center gap-space-xs rounded-lg bg-surface-card px-space-md py-2.5 font-label-md text-label-md font-semibold text-pine-deep shadow-sm transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/40',
+  idle: 'flex flex-1 cursor-pointer items-center justify-center gap-space-xs rounded-lg px-space-md py-2.5 font-label-md text-label-md font-medium text-text-muted transition-all duration-200 hover:text-text-primary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/40',
 } as const;
 
 /**
@@ -111,7 +111,7 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
               <input
                 aria-label={t(field.labelKey)}
                 autoComplete="username"
-                className="h-11 w-full rounded-xl bg-canvas-base pr-space-md pl-11 font-body-md text-body-md text-text-primary placeholder:text-text-muted transition-all duration-150 focus:bg-white focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+                className="h-11 w-full rounded-xl bg-canvas-base pr-space-md pl-11 font-body-md text-body-md text-text-primary transition-all duration-150 placeholder:text-text-muted focus:bg-white focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
                 id="username"
                 name="username"
                 onChange={(event) => {
@@ -134,13 +134,14 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
               >
                 {t('login_password_label')}
               </label>
-              {/* shortcut: reset-password has no route yet, so the link only points at itself */}
-              <a
-                className="font-caption text-caption rounded font-medium text-pine-deep underline-offset-2 hover:text-pine-hover hover:underline focus-visible:ring-2 focus-visible:ring-pine-deep focus-visible:ring-offset-2 focus:outline-none"
-                href="#"
+              {/* shortcut: reset-password has no route yet, so the control is honestly disabled */}
+              <button
+                className="cursor-not-allowed rounded font-caption text-caption font-medium text-text-muted"
+                disabled
+                type="button"
               >
                 {t('login_forgot_password')}
-              </a>
+              </button>
             </div>
             <div className="relative flex items-center">
               <span className="material-symbols-outlined pointer-events-none absolute left-space-md text-[20px] text-text-muted">
@@ -149,7 +150,7 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
               <input
                 aria-label={t('login_password_label')}
                 autoComplete="current-password"
-                className="h-11 w-full rounded-xl bg-canvas-base pr-11 pl-11 font-body-md text-body-md text-text-primary placeholder:text-text-muted transition-all duration-150 focus:bg-white focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+                className="h-11 w-full rounded-xl bg-canvas-base pr-11 pl-11 font-body-md text-body-md text-text-primary transition-all duration-150 placeholder:text-text-muted focus:bg-white focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
                 id="password"
                 name="password"
                 onChange={(event) => {
@@ -163,7 +164,7 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
               <button
                 aria-label={t(visible ? 'login_password_hide' : 'login_password_show')}
                 aria-pressed={visible}
-                className="absolute right-space-sm rounded-lg p-1.5 text-text-muted transition-colors hover:text-text-primary"
+                className="absolute right-space-sm cursor-pointer rounded-lg p-1.5 text-text-muted transition-colors hover:text-text-primary focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none active:scale-[0.96]"
                 onClick={() => {
                   setVisible(!visible);
                 }}
@@ -195,14 +196,17 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
           </div>
 
           {errorKey !== null && (
-            <p className="flex items-center gap-2 font-caption text-caption font-semibold text-error" role="alert">
+            <p
+              className="flex items-center gap-2 font-caption text-caption font-semibold text-error"
+              role="alert"
+            >
               <span className="material-symbols-outlined text-[18px]">warning</span>
               <span>{t(errorKey)}</span>
             </p>
           )}
 
           <button
-            className="group flex h-11 w-full items-center justify-center gap-space-xs rounded-xl bg-pine-deep font-label-md text-label-md font-semibold tracking-wide text-white shadow-sm transition-all duration-200 hover:bg-pine-hover hover:shadow-md focus-visible:ring-2 focus-visible:ring-pine-deep focus-visible:ring-offset-2 focus:outline-none disabled:pointer-events-none disabled:opacity-60"
+            className="group flex h-11 w-full cursor-pointer items-center justify-center gap-space-xs rounded-xl bg-pine-deep font-label-md text-label-md font-semibold tracking-wide text-white shadow-sm transition-all duration-200 hover:bg-pine-hover hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep focus-visible:ring-offset-2 active:scale-[0.99] active:shadow-inner disabled:pointer-events-none disabled:opacity-60"
             disabled={pending}
             type="submit"
           >
@@ -237,7 +241,8 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
 
         <div className="grid grid-cols-1 gap-space-sm sm:grid-cols-2">
           <button
-            className="group flex w-full items-center justify-center gap-space-xs rounded-xl bg-surface-container-low px-space-md py-2.5 text-left transition-colors hover:bg-surface-container disabled:pointer-events-none disabled:opacity-60"
+            aria-label={t('login_google_title')}
+            className="group flex w-full items-center justify-center gap-space-xs rounded-xl bg-surface-container-low px-space-md py-2.5 text-left transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-60"
             disabled
             type="button"
           >
@@ -270,7 +275,7 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
           </button>
 
           <button
-            className="flex w-full items-center justify-between rounded-xl bg-amber-surface px-space-md py-2.5 text-left transition-colors hover:bg-secondary-fixed/30"
+            className="flex w-full cursor-pointer items-center justify-between rounded-xl bg-amber-surface px-space-md py-2.5 text-left transition-colors hover:bg-secondary-fixed/30 focus-visible:ring-2 focus-visible:ring-amber-gold focus-visible:outline-none active:scale-[0.98]"
             onClick={props.onRfidTap}
             type="button"
           >
@@ -301,7 +306,10 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
         </span>
         <span className="font-label-md text-label-md">
           <span className="text-text-muted">{t('login_no_account')}</span>
-          <Link className="ml-1 font-semibold text-pine-deep hover:underline" href="/pendaftaran">
+          <Link
+            className="ml-1 rounded font-semibold text-pine-deep underline-offset-2 hover:underline focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none"
+            href="/pendaftaran"
+          >
             {t('login_register_cta')}
           </Link>
         </span>

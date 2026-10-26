@@ -29,7 +29,7 @@ function UploadedDocumentPill(props: { file: File; onReplace: () => void }) {
       </div>
       <div className="flex shrink-0 items-center gap-space-xs">
         <button
-          className="inline-flex items-center gap-1 rounded-lg bg-surface-card px-3 py-2 font-label-md text-caption font-semibold text-error shadow-sm transition-colors hover:bg-surface-container"
+          className="inline-flex cursor-pointer items-center gap-1 rounded-lg bg-surface-card px-3 py-2 font-label-md text-caption font-semibold text-error shadow-sm transition-colors hover:bg-surface-container focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98]"
           onClick={props.onReplace}
           type="button"
         >
@@ -217,13 +217,15 @@ export function PendaftaranDocumentsStep(props: {
                 {t('doc_power_of_attorney_subtitle')}
               </p>
             </div>
-            <a
-              className="inline-flex items-center gap-1.5 rounded-lg bg-amber-surface px-3 py-1.5 font-caption text-caption font-bold text-amber-dark shadow-sm transition-colors hover:bg-secondary-container"
-              href="#"
+            {/* shortcut: no template file is hosted yet, so the download control is honestly disabled */}
+            <button
+              className="inline-flex cursor-not-allowed items-center gap-1.5 rounded-lg bg-amber-surface px-3 py-1.5 font-caption text-caption font-bold text-amber-dark opacity-60 shadow-sm"
+              disabled
+              type="button"
             >
               <span className="material-symbols-outlined text-[16px]">download</span>
               {t('doc_download_template')}
-            </a>
+            </button>
           </div>
 
           {suratKuasaFile ? (
@@ -338,7 +340,7 @@ export function PendaftaranDocumentsStep(props: {
                 </div>
               </div>
               <button
-                className="w-full rounded-xl bg-surface-card px-space-md py-2 font-label-md text-caption font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container sm:w-auto"
+                className="w-full cursor-pointer rounded-xl bg-surface-card px-space-md py-2 font-label-md text-caption font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98] sm:w-auto"
                 onClick={() => piagamInputRef.current?.click()}
                 type="button"
               >
@@ -388,7 +390,7 @@ export function PendaftaranDocumentsStep(props: {
 
         <div className="flex flex-col items-center justify-between gap-space-md pt-space-xs pb-space-lg sm:flex-row">
           <button
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-surface-card px-space-xl py-3 font-label-md text-label-md font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container sm:w-auto"
+            className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-surface-card px-space-xl py-3 font-label-md text-label-md font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98] sm:w-auto"
             onClick={props.onBack}
             type="button"
           >
@@ -396,7 +398,7 @@ export function PendaftaranDocumentsStep(props: {
             {t('doc_back_button')}
           </button>
           <button
-            className="inline-flex w-full transform items-center justify-center gap-2 rounded-xl bg-pine-deep px-space-xl py-3 font-label-md text-label-md font-bold text-on-primary shadow-md transition-all hover:bg-pine-hover hover:shadow-lg active:scale-95 sm:w-auto"
+            className="inline-flex w-full transform cursor-pointer items-center justify-center gap-2 rounded-xl bg-pine-deep px-space-xl py-3 font-label-md text-label-md font-bold text-on-primary shadow-md transition-all hover:bg-pine-hover hover:shadow-lg focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
             disabled={!attested || suratKuasaFile === undefined}
             onClick={props.onContinue}
             type="button"
