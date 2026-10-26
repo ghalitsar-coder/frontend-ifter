@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
+import { Suspense } from 'react';
 import { ActivateForm } from '@/components/auth/ActivateForm';
 
 export type ActivatePageProps = {
@@ -34,5 +35,9 @@ export default async function ActivatePage(props: ActivatePageProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
 
-  return <ActivateForm />;
+  return (
+    <Suspense fallback={null}>
+      <ActivateForm />
+    </Suspense>
+  );
 }

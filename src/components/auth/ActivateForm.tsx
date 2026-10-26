@@ -2,6 +2,7 @@
 
 import { CheckCircle2 } from 'lucide-react';
 import { useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
@@ -26,11 +27,10 @@ import { getI18nPath } from '@/utils/Helpers';
 export function ActivateForm() {
   const router = useRouter();
   const locale = useLocale();
-  // A `?token=` deep link pre-fills the field (lazy init avoids an
-  // effect-triggered rerender; this component only ever runs in the browser).
-  const [token, setToken] = useState(
-    () => new URLSearchParams(window.location.search).get('token') ?? '',
-  );
+  // A `?token=` deep link pre-fills the field. useSearchParams defers this
+  // subtree to client rendering (Suspense), so window is available here.
+  const searchParams = useSearchParams();
+  const [token, setToken] = useState(() => searchParams.get('token') ?? '');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [activated, setActivated] = useState(false);
