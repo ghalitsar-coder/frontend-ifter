@@ -12,7 +12,7 @@ export function PresensiLoginAside() {
   const t = useTranslations('PresensiPage');
 
   return (
-    <div className="relative flex min-h-[580px] flex-col justify-between overflow-hidden rounded-xl bg-pine-deep p-space-xl shadow-xl sm:p-space-2xl lg:col-span-5">
+    <div className="relative flex flex-col justify-between overflow-hidden rounded-xl bg-pine-deep p-space-xl shadow-xl sm:p-space-2xl md:min-h-[580px] lg:col-span-5">
       <div className="pointer-events-none absolute -top-24 -left-24 h-80 w-80 rounded-full bg-pine-hover/40 blur-3xl" />
       <div className="pointer-events-none absolute right-0 bottom-10 h-72 w-72 rounded-full bg-amber-gold/15 blur-2xl" />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-primary/60" />
@@ -44,7 +44,7 @@ export function PresensiLoginAside() {
 
         <div className="mt-space-xl rounded-xl bg-surface-container-lowest/10 p-space-md shadow-sm backdrop-blur-md">
           <div className="mb-space-xs flex items-center justify-between">
-            <span className="font-label-md text-label-md flex items-center gap-space-xs font-medium text-white">
+            <span className="flex items-center gap-space-xs font-label-md text-label-md font-medium text-white">
               <span className="material-symbols-outlined text-[18px] text-amber-gold">
                 insights
               </span>
@@ -66,9 +66,7 @@ export function PresensiLoginAside() {
                 <span className="font-caption text-caption text-primary-fixed-dim">
                   {t(labelKey)}
                 </span>
-                <span
-                  className={`font-headline-sm text-headline-sm font-semibold ${valueClass}`}
-                >
+                <span className={`font-headline-sm text-headline-sm font-semibold ${valueClass}`}>
                   {t(valueKey)}
                 </span>
               </div>

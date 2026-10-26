@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { MaterialIcon } from '@/components/landing/MaterialIcon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Link, usePathname } from '@/libs/I18nNavigation';
 import { dashboardRoles, roleConfigs } from './navigation';
 import type { DashboardRole, NavBadgeTone, NavItem, RoleCallout } from './navigation';
@@ -30,6 +31,7 @@ const NavItemRow = (props: {
   collapsed: boolean;
   activeClassName: string;
   activeIconClassName: string;
+  onNavigate?: () => void;
 }) => {
   const rowClassName = `flex items-center rounded-xl py-2 font-label-md text-label-md transition-colors active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-amber-gold/60 focus-visible:outline-none ${
     props.collapsed ? 'justify-center px-0' : 'justify-between px-3'
@@ -78,7 +80,12 @@ const NavItemRow = (props: {
   );
 
   const link = (
-    <Link aria-label={props.item.label} className={rowClassName} href={props.href}>
+    <Link
+      aria-label={props.item.label}
+      className={rowClassName}
+      href={props.href}
+      onClick={props.onNavigate}
+    >
       {content}
     </Link>
   );
@@ -150,6 +157,10 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
   const role = resolveRole(searchParams.get('role'));
   const config = roleConfigs[role];
   const [collapsed, setCollapsed] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const isMobile = useIsMobile();
+  // The drawer always renders full-width labels on phones; collapse is desktop-only.
+  const effectiveCollapsed = !isMobile && collapsed;
   const pathname = usePathname();
 
   // The shell rebuilds its nav from ?role=, so every navigation has to carry it.
@@ -164,19 +175,34 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
       ? pathname === item.href.split('?')[0]
       : pathname === '/dashboard/segera' && searchParams.get('item') === item.label;
 
+  const asideWidth = effectiveCollapsed ? 'w-20' : 'w-72';
+  const asideSlide = isMobile && !drawerOpen ? '-translate-x-full' : 'translate-x-0';
+  const desktopPad = effectiveCollapsed ? 'pl-20' : 'pl-72';
+  const desktopInset = effectiveCollapsed ? 'left-20' : 'left-72';
+  const contentPad = isMobile ? 'pl-0' : desktopPad;
+  const headerInset = isMobile ? 'left-0' : desktopInset;
+
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
+      {isMobile && drawerOpen ? (
+        <button
+          aria-label="Tutup navigasi"
+          className="fixed inset-0 z-40 cursor-default bg-black/50"
+          onClick={() => {
+            setDrawerOpen(false);
+          }}
+          type="button"
+        />
+      ) : null}
       <aside
         aria-label="Navigasi utama"
-        className={`fixed top-0 left-0 z-50 flex h-full flex-col justify-between bg-pine-deep text-on-primary shadow-[0_8px_24px_rgba(23,63,54,0.12)] transition-all duration-300 ${
-          collapsed ? 'w-20' : 'w-72'
-        }`}
+        className={`fixed top-0 left-0 z-50 flex h-full flex-col justify-between bg-pine-deep text-on-primary shadow-[0_8px_24px_rgba(23,63,54,0.12)] transition-all duration-300 ${asideWidth} ${asideSlide}`}
         id="app-sidebar"
       >
         <div className="flex min-h-0 flex-1 flex-col">
           <div
             className={`flex h-20 items-center border-b border-pine-hover ${
-              collapsed ? 'justify-center px-0' : 'justify-between px-6'
+              effectiveCollapsed ? 'justify-center px-0' : 'justify-between px-6'
             }`}
           >
             <div className="flex items-center gap-3 overflow-hidden">
@@ -186,7 +212,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
               >
                 A
               </div>
-              {collapsed ? null : (
+              {effectiveCollapsed ? null : (
                 <div className="flex flex-col">
                   <span className="font-headline-sm text-lg leading-none font-bold tracking-tight text-on-primary">
                     Attendly
@@ -201,7 +227,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
               <button
                 aria-expanded={!collapsed}
                 aria-label="Perkecil atau perluas sidebar"
-                className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-pine-hover text-on-primary transition-colors hover:bg-pine-deep focus-visible:ring-2 focus-visible:ring-amber-gold/60 focus-visible:outline-none active:scale-[0.96]"
+                className="hidden size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-pine-hover text-on-primary transition-colors hover:bg-pine-deep focus-visible:ring-2 focus-visible:ring-amber-gold/60 focus-visible:outline-none active:scale-[0.96] md:flex"
                 onClick={() => {
                   setCollapsed(!collapsed);
                 }}
@@ -216,7 +242,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
             <TooltipProvider delay={150}>
               {config.sections.map((section) => (
                 <div key={section.title}>
-                  {collapsed ? null : (
+                  {effectiveCollapsed ? null : (
                     <span className="px-2.5 font-eyebrow text-[11px] tracking-wider text-primary-fixed-dim/70 uppercase">
                       {section.title}
                     </span>
@@ -227,17 +253,20 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
                         activeClassName={config.activeClassName}
                         activeIconClassName={config.activeIconClassName}
                         active={isActive(item)}
-                        collapsed={collapsed}
+                        collapsed={effectiveCollapsed}
                         href={navHref(item)}
                         item={item}
                         key={item.label}
+                        onNavigate={() => {
+                          setDrawerOpen(false);
+                        }}
                       />
                     ))}
                   </nav>
                 </div>
               ))}
             </TooltipProvider>
-            {config.callout && !collapsed ? <Callout callout={config.callout} /> : null}
+            {config.callout && !effectiveCollapsed ? <Callout callout={config.callout} /> : null}
           </div>
         </div>
 
@@ -247,7 +276,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
           role={role}
           side="top"
           triggerClassName={`flex w-full cursor-pointer items-center gap-2.5 bg-tertiary-container/40 p-3 transition-colors hover:bg-tertiary-container/70 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-gold/60 ${
-            collapsed ? 'justify-center px-0' : 'justify-start px-3'
+            effectiveCollapsed ? 'justify-center px-0' : 'justify-start px-3'
           }`}
         >
           <div
@@ -255,7 +284,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
           >
             {config.user.initials}
           </div>
-          {collapsed ? null : (
+          {effectiveCollapsed ? null : (
             <div className="flex flex-col overflow-hidden">
               <span className="truncate font-label-md text-xs font-semibold text-on-primary">
                 {config.user.name}
@@ -268,16 +297,22 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
         </ProfileMenu>
       </aside>
 
-      <div
-        className={`flex min-h-screen flex-col transition-all duration-300 ${
-          collapsed ? 'pl-20' : 'pl-72'
-        }`}
-      >
+      <div className={`flex min-h-screen flex-col transition-all duration-300 ${contentPad}`}>
         <header
-          className={`fixed top-0 right-0 z-40 flex h-20 items-center justify-between border-b border-border-subtle bg-surface-card/90 px-8 shadow-[0_1px_8px_rgba(23,63,54,0.03)] backdrop-blur-xl transition-all duration-300 ${
-            collapsed ? 'left-20' : 'left-72'
-          }`}
+          className={`fixed top-0 right-0 z-40 flex h-20 items-center justify-between gap-2 border-b border-border-subtle bg-surface-card/90 px-4 shadow-[0_1px_8px_rgba(23,63,54,0.03)] backdrop-blur-xl transition-all duration-300 ${headerInset} md:justify-between md:px-8`}
         >
+          {isMobile ? (
+            <button
+              aria-label="Buka navigasi"
+              className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light focus-visible:ring-2 focus-visible:ring-pine-deep/30 focus-visible:outline-none active:scale-[0.96]"
+              onClick={() => {
+                setDrawerOpen(true);
+              }}
+              type="button"
+            >
+              <MaterialIcon className="text-[20px]" name="menu" />
+            </button>
+          ) : null}
           <div className="hidden items-center gap-6 md:flex">
             <div className="flex flex-col">
               <div className="flex items-center gap-2">

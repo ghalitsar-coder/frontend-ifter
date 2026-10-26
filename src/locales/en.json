@@ -471,7 +471,9 @@
     "rfid_title": "Tempelkan Kartu RFID",
     "rfid_body": "Dekatan kartu identitas guru atau kartu NUPTK ke reader USB/NFC yang terpasang.",
     "rfid_waiting": "Menunggu sinyal sensor NFC...",
-    "rfid_cancel": "Batalkan"
+    "rfid_cancel": "Batalkan",
+    "nav_mobile_open": "Buka menu navigasi",
+    "nav_mobile_close": "Tutup menu navigasi"
   },
   "PendaftaranPage": {
     "aside_eyebrow": "Program Kemudahan Institusi",

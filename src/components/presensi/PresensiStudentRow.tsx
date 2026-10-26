@@ -139,7 +139,7 @@ export function PresensiStudentRow(props: {
 
       <div className="flex w-full items-center justify-end md:col-span-1">
         <button
-          className={`rounded-lg p-2 ${noteAction.buttonClass}`}
+          className={`rounded-lg p-2.5 md:p-2 ${noteAction.buttonClass}`}
           disabled={props.disabled}
           onClick={props.onOpenNote}
           title={t(noteAction.titleKey)}

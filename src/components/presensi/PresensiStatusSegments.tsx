@@ -17,7 +17,7 @@ const SEGMENT_LABEL_KEYS = {
 const SEGMENT_SHELL =
   'inline-flex w-full max-w-sm items-center justify-between gap-1 rounded-xl p-1';
 const SEGMENT_BASE =
-  'flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-center flex font-label-md text-label-md transition-all';
+  'flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-2 text-center flex font-label-md text-label-md transition-all md:py-1.5';
 const SEGMENT_PENDING_PRESENT = `${SEGMENT_BASE} rounded-lg border border-emerald-200 bg-emerald-50 font-semibold text-emerald-800 hover:bg-pine-deep hover:text-surface`;
 
 type MarkableStatus = (typeof PRESENSI_MARKABLE_STATUSES)[number];

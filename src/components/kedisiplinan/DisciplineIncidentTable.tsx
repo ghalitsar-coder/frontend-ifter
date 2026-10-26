@@ -95,7 +95,7 @@ function StatusBadge(props: { status: IncidentStatus }) {
   }
 
   return (
-    <span className="bg-surface-container inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+    <span className="inline-flex items-center gap-1 rounded-full bg-surface-container px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
       <CheckCircle className="size-3 text-pine-deep" />
       Selesai
     </span>
@@ -183,7 +183,9 @@ export function DisciplineIncidentTable(props: {
                         <div>
                           <button
                             type="button"
-                            onClick={() =>{  props.onViewDetail(incident); }}
+                            onClick={() => {
+                              props.onViewDetail(incident);
+                            }}
                             aria-label={`Lihat detail ${incident.studentName}`}
                             className="text-left text-xs font-bold text-foreground transition-colors hover:text-pine-deep"
                           >
@@ -220,7 +222,7 @@ export function DisciplineIncidentTable(props: {
                     {/* Pencatat */}
                     <td className="px-4 py-3.5 whitespace-nowrap">
                       <div className="font-medium">{incident.recorderName}</div>
-                      <span className="bg-surface-container rounded px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                      <span className="rounded bg-surface-container px-1.5 py-0.5 text-[10px] text-muted-foreground">
                         {incident.recorderRole}
                       </span>
                     </td>
@@ -239,7 +241,7 @@ export function DisciplineIncidentTable(props: {
                           <span>{incident.studentTotalPoints} / 100</span>
                           <span>{incident.studentPointStatus}</span>
                         </div>
-                        <div className="bg-surface-container h-1.5 w-full overflow-hidden rounded-full">
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container">
                           <div
                             className={`h-1.5 rounded-full ${barColor}`}
                             style={{
@@ -260,8 +262,10 @@ export function DisciplineIncidentTable(props: {
                       <div className="flex items-center justify-center gap-1">
                         <button
                           type="button"
-                          onClick={() =>{  props.onViewDetail(incident); }}
-                          className="rounded-lg p-1.5 text-pine-deep transition-colors hover:bg-pine-light"
+                          onClick={() => {
+                            props.onViewDetail(incident);
+                          }}
+                          className="rounded-lg p-2 text-pine-deep transition-colors hover:bg-pine-light md:p-1.5"
                           title="Lihat Detail & Tindak Lanjut"
                           aria-label="Lihat Detail & Tindak Lanjut"
                         >
@@ -270,8 +274,10 @@ export function DisciplineIncidentTable(props: {
 
                         <button
                           type="button"
-                          onClick={() =>{  props.onEditIncident(incident); }}
-                          className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                          onClick={() => {
+                            props.onEditIncident(incident);
+                          }}
+                          className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:p-1.5"
                           title="Edit Rekam Data"
                           aria-label="Edit Rekam Data"
                         >
@@ -280,8 +286,10 @@ export function DisciplineIncidentTable(props: {
 
                         <button
                           type="button"
-                          onClick={() =>{  props.onViewHistory(incident); }}
-                          className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-muted"
+                          onClick={() => {
+                            props.onViewHistory(incident);
+                          }}
+                          className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted md:p-1.5"
                           title="Histori Audit"
                           aria-label="Histori Audit"
                         >
