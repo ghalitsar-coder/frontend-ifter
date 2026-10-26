@@ -204,7 +204,8 @@ export const validateDateRange = (range: DateRangeParams): string | null => {
   if (end < start) {
     return 'Tanggal akhir tidak boleh sebelum tanggal mulai.';
   }
-  if ((end - start) / DAY_MS > MAX_RANGE_DAYS) {
+  // The backend counts both bounds, so a 366-day range spans 365 days of delta.
+  if ((end - start) / DAY_MS + 1 > MAX_RANGE_DAYS) {
     return 'Rentang tanggal maksimal 366 hari.';
   }
   return null;

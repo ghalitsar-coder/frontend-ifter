@@ -98,6 +98,13 @@ describe('date range validation', () => {
       'Rentang tanggal maksimal 366 hari.',
     );
   });
+
+  it('counts both bounds against the 366-day cap', () => {
+    expect(validateDateRange({ from: '2025-10-01', to: '2026-10-01' })).toBeNull();
+    expect(validateDateRange({ from: '2025-10-01', to: '2026-10-02' })).toBe(
+      'Rentang tanggal maksimal 366 hari.',
+    );
+  });
 });
 
 describe('range query builder', () => {
