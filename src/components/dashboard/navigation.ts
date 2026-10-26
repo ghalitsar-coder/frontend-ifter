@@ -83,8 +83,8 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
       {
         title: 'Presensi & Regulasi',
         items: [
-          { icon: 'fact_check', label: 'Presensi Harian & Rekap' },
-          { icon: 'gavel', label: 'Aturan & Sanksi (Poin)' },
+          { icon: 'fact_check', label: 'Presensi Harian & Rekap', href: '/dashboard/presensi' },
+          { icon: 'gavel', label: 'Aturan & Sanksi (Poin)', href: '/dashboard/kedisiplinan' },
           {
             icon: 'table_view',
             label: 'Import / Export Excel',
@@ -120,6 +120,7 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
           {
             icon: 'checklist_rtl',
             label: 'Presensi Kelas Binaan',
+            href: '/dashboard/presensi',
             active: true,
             badge: { label: '2 Belum', tone: 'pine' },
           },
@@ -134,7 +135,12 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
             label: 'Data Siswa Kelas Saya',
             badge: { label: '32', tone: 'muted' },
           },
-          { icon: 'warning', label: 'Catat Pelanggaran Siswa', dot: 'absent' },
+          {
+            icon: 'warning',
+            label: 'Catat Pelanggaran Siswa',
+            href: '/dashboard/kedisiplinan',
+            dot: 'absent',
+          },
           { icon: 'summarize', label: 'Laporan Rapor & Absen' },
         ],
       },
@@ -185,11 +191,13 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
           {
             icon: 'supervisor_account',
             label: 'Evaluasi Kehadiran & Guru',
+            href: '/dashboard/presensi',
             badge: { label: '98.2%', tone: 'muted', box: true },
           },
           {
             icon: 'emergency_home',
             label: 'Monitoring Kasus Kritis (SP)',
+            href: '/dashboard/kedisiplinan',
             badge: { label: '2 SP2', tone: 'error' },
           },
         ],
@@ -229,6 +237,7 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
           {
             icon: 'mark_email_read',
             label: 'Verifikasi Berkas Izin & SK',
+            href: '/dashboard/presensi',
             active: true,
             badge: { label: '5 Berkas', tone: 'permission' },
           },
