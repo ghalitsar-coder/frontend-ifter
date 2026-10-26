@@ -211,7 +211,7 @@ export function PresensiWorkspace() {
     // The class switcher stays mounted so a forbidden or missing session is not a dead end.
     return (
       <div className="flex w-full flex-col">
-        <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-space-lg px-margin py-space-xl">
+        <div className="flex w-full flex-col gap-space-lg">
           <PresensiSessionBar
             classes={classes.data}
             classId={selectedClassId}
@@ -323,7 +323,7 @@ export function PresensiWorkspace() {
 
   return (
     <div className="flex w-full flex-col">
-      <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-space-lg px-margin py-space-xl">
+      <div className="flex w-full flex-col gap-space-lg">
         <PresensiSessionBar
           classes={classes.data}
           classId={selectedClassId}
