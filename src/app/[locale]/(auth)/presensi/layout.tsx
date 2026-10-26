@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { AttendlyShell } from '@/components/presensi/AttendlyShell';
 import { readBackendToken } from '@/libs/BackendSession';
+import { redirect } from '@/libs/I18nNavigation';
 
 type PresensiLayoutProps = {
   children: React.ReactNode;
@@ -34,7 +35,9 @@ export default async function PresensiLayout(props: PresensiLayoutProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
 
-  return (
-    <AttendlyShell signedIn={Boolean(await readBackendToken())}>{props.children}</AttendlyShell>
-  );
+  if ((await readBackendToken()) === undefined) {
+    redirect({ href: '/sign-in', locale });
+  }
+
+  return <AttendlyShell signedIn>{props.children}</AttendlyShell>;
 }

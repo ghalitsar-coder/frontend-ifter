@@ -8,7 +8,7 @@ import type { PresensiLoginRole } from '@/components/presensi/presensiLoginRoles
 import { presensiErrorKey } from '@/components/presensi/presensiErrors';
 import type { PresensiErrorKey } from '@/components/presensi/presensiErrors';
 import { AUTH_QUERY_KEY, signIn } from '@/services/presensiApi';
-import { Link } from '@/libs/I18nNavigation';
+import { Link, useRouter } from '@/libs/I18nNavigation';
 
 const TAB_CLASSES = {
   active:
@@ -26,6 +26,7 @@ const TAB_CLASSES = {
 export function PresensiLoginForm(props: { onRfidTap: () => void }) {
   const t = useTranslations('PresensiPage');
   const queryClient = useQueryClient();
+  const router = useRouter();
   const [role, setRole] = useState<PresensiLoginRole>('teacher');
   const [credential, setCredential] = useState('');
   const [password, setPassword] = useState('');
@@ -43,7 +44,9 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
     try {
       await signIn({ password, username: credential });
       setAccepted(true);
-      await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
+      // Seed the gate cache so /presensi mounts the workspace without a refetch round trip.
+      queryClient.setQueryData(AUTH_QUERY_KEY, true);
+      router.replace('/presensi');
     } catch (error) {
       setErrorKey(presensiErrorKey(error));
       setPending(false);

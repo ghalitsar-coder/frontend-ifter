@@ -1,21 +1,11 @@
 import { detectBot } from '@arcjet/next';
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import createMiddleware from 'next-intl/middleware';
-import type { NextFetchEvent, NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import arcjet from '@/libs/Arcjet';
 import { routing } from './libs/I18nRouting';
 
 const handleI18nRouting = createMiddleware(routing);
-
-const isClerkRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/:locale/dashboard(.*)',
-  '/sign-in(.*)',
-  '/:locale/sign-in(.*)',
-  '/sign-up(.*)',
-  '/:locale/sign-up(.*)',
-]);
 
 // Improve security with Arcjet
 const aj = arcjet.withRule(
@@ -31,7 +21,7 @@ const aj = arcjet.withRule(
   }),
 );
 
-export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+export default async function proxy(request: NextRequest) {
   // Verify the request with Arcjet
   // Use `process.env` instead of Env to reduce bundle size in middleware
   if (process.env.ARCJET_KEY) {
@@ -40,13 +30,6 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
     if (decision.isDenied()) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-  }
-
-  // Clerk keyless mode doesn't work with i18n, this is why we need to run the middleware conditionally
-  if (isClerkRoute(request)) {
-    // Clerk middleware still runs so server components can read the session, but
-    // dashboard routes are no longer gated behind authentication.
-    return await clerkMiddleware((_auth, req) => handleI18nRouting(req))(request, event);
   }
 
   return handleI18nRouting(request);

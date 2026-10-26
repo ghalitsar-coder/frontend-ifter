@@ -8,14 +8,8 @@
     "meta_title": "Sign in",
     "meta_description": "Seamlessly sign in to your account with our user-friendly login process."
   },
-  "SignUp": {
-    "meta_title": "Sign up",
-    "meta_description": "Effortlessly create an account through our intuitive sign-up process."
-  },
   "Dashboard": {
-    "hello_message": "Hello {email}!",
-    "alternative_message": "Need advanced features? Multi-tenancy & Teams, Roles & Permissions, Shadcn UI, End-to-End Typesafety with oRPC, Stripe Payment, Light / Dark mode. Try <url></url>.",
-    "max_message": "Or, need a Self-hosted auth stack (Better Auth)? Try <url></url>."
+    "hello_message": "Hello! Welcome to the Attendly dashboard."
   },
   "DashboardLayout": {
     "meta_title": "Dashboard",
@@ -816,5 +810,13 @@
     "step_number": "Langkah {current}",
     "step_of_three": "Langkah {current} dari 3",
     "step_ribbon_label": "Langkah pendaftaran sekolah"
+  },
+  "ComingSoonPage": {
+    "meta_title": "Fitur segera hadir",
+    "meta_description": "Menu dashboard ini belum tersedia dan sedang dikembangkan.",
+    "title": "Menu “{item}” belum tersedia",
+    "description": "Fitur ini sedang dikembangkan. Gunakan navigasi lain atau kembali ke dashboard.",
+    "back": "Kembali ke Dashboard",
+    "fallback_item": "Ini"
   }
 }
