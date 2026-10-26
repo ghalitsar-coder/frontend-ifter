@@ -594,7 +594,6 @@
     "stream_subtitle": "Capteurs des portiques 1 à 4 lisant les badges des élèves sans interruption",
     "stream_autosync": "Synchronisation auto",
     "search_placeholder": "Rechercher NIS, élève ou scanner un code-barres...",
-    "filter_class_all": "Toutes les classes",
     "filter_status_all": "Tous les statuts",
     "filter_status_ontime": "À l'heure",
     "filter_status_late": "En retard",

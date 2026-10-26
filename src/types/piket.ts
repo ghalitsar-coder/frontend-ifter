@@ -2,7 +2,7 @@
  * Types and interfaces for Gate Duty & RFID Monitoring module.
  */
 
-export type TapStatus = 'on_time' | 'late' | 'uniform_hold';
+export type TapStatus = 'on_time' | 'late' | 'uniform_hold' | 'unknown_card';
 
 export type GateShiftInfo = {
   shiftName: string;
@@ -27,11 +27,15 @@ export type RfidTapLog = {
   nis: string;
   studentName: string;
   className: string;
-  photoUrl: string;
+  photoUrl?: string;
   tapTime: string;
   status: TapStatus;
   readerId: string;
   readerName: string;
+  /** Tap source; `manual` rows are simulated by the duty officer. */
+  origin: 'device' | 'manual';
+  /** Raw card uid as reported by the reader. */
+  cardUid?: string;
   delayMinutes: number;
   pointPenalty: number;
   compensationTask?: string;
@@ -58,6 +62,6 @@ export type ActiveCompensation = {
 
 export type GateFilterOptions = {
   searchKeyword: string;
-  classFilter: string;
+  readerFilter: string;
   statusFilter: 'all' | TapStatus;
 };

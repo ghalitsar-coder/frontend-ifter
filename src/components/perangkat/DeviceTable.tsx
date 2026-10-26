@@ -1,6 +1,6 @@
 'use client';
 
-import { Cpu, Loader2, Pencil, Power, PowerOff } from 'lucide-react';
+import { Cpu, KeyRound, Loader2, Pencil, Power, PowerOff } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { Device } from '@/lib/api/perangkat';
 import { deviceStatusLabel, deviceTypeLabel, lastSeenLabel } from '@/lib/api/perangkat';
@@ -28,6 +28,7 @@ const toggleButtonClass = (isActive: boolean): string =>
  * @param props.canManage - Whether write actions are rendered.
  * @param props.onEdit - Opens the edit modal.
  * @param props.onToggleStatus - Opens the activate/deactivate confirmation.
+ * @param props.onRotateToken - Opens the ingest-token rotation confirmation.
  * @returns Table element.
  */
 export function DeviceTable(props: {
@@ -37,6 +38,7 @@ export function DeviceTable(props: {
   canManage: boolean;
   onEdit: (device: Device) => void;
   onToggleStatus: (device: Device) => void;
+  onRotateToken: (device: Device) => void;
 }) {
   const renderBody = (): ReactNode => {
     if (props.isLoading) {
@@ -133,6 +135,17 @@ export function DeviceTable(props: {
                     className={`flex size-8 cursor-pointer items-center justify-center rounded-lg bg-surface-container-low transition-colors ${toggleButtonClass(isActive)}`}
                   >
                     {isActive ? <PowerOff className="size-4" /> : <Power className="size-4" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      props.onRotateToken(device);
+                    }}
+                    title="Rotasi token ingest"
+                    aria-label={`Rotasi token ingest perangkat ${device.name}`}
+                    className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-pine-deep"
+                  >
+                    <KeyRound className="size-4" />
                   </button>
                 </>
               )}

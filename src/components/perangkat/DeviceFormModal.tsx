@@ -44,14 +44,14 @@ const errorText = (error: unknown): string => {
  * @param props.mode - Whether the form creates or edits a device.
  * @param props.device - Source device record when editing.
  * @param props.onClose - Closes the modal.
- * @param props.onSaved - Receives the success toast message.
+ * @param props.onSaved - Receives the toast message, plus the one-time ingest token and device name on create.
  * @returns Modal overlay.
  */
 export function DeviceFormModal(props: {
   mode: 'create' | 'edit';
   device?: Device;
   onClose: () => void;
-  onSaved: (message: string) => void;
+  onSaved: (message: string, ingestToken?: string, deviceName?: string) => void;
 }) {
   const initial = initialValues(props.device);
   const [name, setName] = useState(initial.name);
@@ -86,8 +86,12 @@ export function DeviceFormModal(props: {
         return;
       }
       createMutation.mutate(payload, {
-        onSuccess: () => {
-          props.onSaved(`Perangkat ${payload.name} berhasil ditambahkan.`);
+        onSuccess: (result) => {
+          props.onSaved(
+            `Perangkat ${payload.name} berhasil ditambahkan.`,
+            result.ingest_token,
+            payload.name,
+          );
         },
         onError: (mutationError) => {
           setError(errorText(mutationError));

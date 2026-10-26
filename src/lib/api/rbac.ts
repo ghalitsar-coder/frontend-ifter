@@ -54,6 +54,8 @@ export type Capability =
   | 'imports'
   /** Dispensation list/detail read (all staff roles). */
   | 'dispensations_read'
+  /** Gate tap stream read: GET /device-taps (admin, duty_teacher, principal). */
+  | 'device_taps'
   /** Student self-service `/my/*` portal. */
   | 'my'
   /** Any signed-in role. */
@@ -73,6 +75,7 @@ const CAPABILITY_ROLES: Record<Capability, readonly RoleCode[]> = {
   reports_read: [ROLE_ADMIN, ROLE_STAFF_TU, ROLE_TEACHER, ROLE_DUTY_TEACHER, ROLE_PRINCIPAL],
   imports: [ROLE_ADMIN, ROLE_STAFF_TU],
   dispensations_read: [ROLE_ADMIN, ROLE_STAFF_TU, ROLE_TEACHER, ROLE_DUTY_TEACHER, ROLE_PRINCIPAL],
+  device_taps: [ROLE_ADMIN, ROLE_DUTY_TEACHER, ROLE_PRINCIPAL],
   my: [ROLE_STUDENT],
   authenticated: [
     ROLE_ADMIN,

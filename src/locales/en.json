@@ -594,7 +594,6 @@
     "stream_subtitle": "Gate sensors 1 - 4 reading student tap cards in real time",
     "stream_autosync": "Auto-sync",
     "search_placeholder": "Search NIS, student, or scan barcode...",
-    "filter_class_all": "All classes",
     "filter_status_all": "All statuses",
     "filter_status_ontime": "On time",
     "filter_status_late": "Late",

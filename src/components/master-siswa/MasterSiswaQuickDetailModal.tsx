@@ -20,6 +20,7 @@ import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
+import { StudentCardSection } from '@/components/master-siswa/StudentCardSection';
 import { ApiError } from '@/lib/api/client';
 import type { AttendanceSummaryItem, HistoryRecord } from '@/lib/api/dto';
 import {
@@ -222,12 +223,12 @@ function AdministrativeNotesSection(props: { studentId: string }) {
         <span className="text-[11px] font-bold tracking-wider text-pine-deep uppercase">
           Catatan Administratif
         </span>
-        <span className="text-text-muted text-[11px]">{notes.length} catatan</span>
+        <span className="text-[11px] text-text-muted">{notes.length} catatan</span>
       </div>
 
-      <div className="bg-surface-card divide-y divide-border-subtle overflow-hidden rounded-2xl border border-border-control">
+      <div className="divide-y divide-border-subtle overflow-hidden rounded-2xl border border-border-control bg-surface-card">
         {notesQuery.isLoading && (
-          <p className="text-text-muted flex items-center justify-center gap-2 p-4 text-center text-xs">
+          <p className="flex items-center justify-center gap-2 p-4 text-center text-xs text-text-muted">
             <Loader2 className="size-3.5 animate-spin" /> Memuat catatan...
           </p>
         )}
@@ -235,14 +236,14 @@ function AdministrativeNotesSection(props: { studentId: string }) {
           <p className="p-4 text-center text-xs text-rose-600">Gagal memuat catatan.</p>
         )}
         {!notesQuery.isLoading && !notesQuery.isError && notes.length === 0 && (
-          <p className="text-text-muted p-4 text-center text-xs">
+          <p className="p-4 text-center text-xs text-text-muted">
             Belum ada catatan administratif.
           </p>
         )}
         {notes.map((note) => (
           <div key={note.id} className="p-3">
             <div className="flex items-start justify-between gap-3">
-              <p className="text-text-primary text-xs leading-relaxed break-words whitespace-pre-wrap">
+              <p className="text-xs leading-relaxed break-words whitespace-pre-wrap text-text-primary">
                 {note.note}
               </p>
               {confirmDeleteNoteId !== note.id && (
@@ -258,7 +259,7 @@ function AdministrativeNotesSection(props: { studentId: string }) {
                 </button>
               )}
             </div>
-            <div className="text-text-muted mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px]">
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[10px] text-text-muted">
               <Clock className="size-3" />
               <span>{formatStudentNoteDate(note.created_at)}</span>
               {note.created_by_name !== undefined && (
@@ -286,7 +287,7 @@ function AdministrativeNotesSection(props: { studentId: string }) {
                   onClick={() => {
                     setConfirmDeleteNoteId(null);
                   }}
-                  className="text-text-muted cursor-pointer rounded-md px-2 py-0.5 text-[10px] font-semibold transition-colors hover:text-pine-deep"
+                  className="cursor-pointer rounded-md px-2 py-0.5 text-[10px] font-semibold text-text-muted transition-colors hover:text-pine-deep"
                 >
                   Batal
                 </button>
@@ -319,7 +320,7 @@ function AdministrativeNotesSection(props: { studentId: string }) {
           }}
           placeholder="Tulis catatan administratif untuk siswa ini..."
           aria-label="Catatan administratif baru"
-          className="text-text-primary placeholder:text-text-muted w-full resize-y rounded-xl border border-border-control bg-white p-2.5 text-xs leading-relaxed focus:border-pine-deep focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+          className="w-full resize-y rounded-xl border border-border-control bg-white p-2.5 text-xs leading-relaxed text-text-primary placeholder:text-text-muted focus:border-pine-deep focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
         />
         <div className="mt-1.5 flex items-center justify-between gap-3">
           <span
@@ -406,18 +407,18 @@ export function MasterSiswaQuickDetailModal(props: {
       aria-labelledby="modal-quick-detail-name"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-pine-deep/40 p-3 backdrop-blur-md sm:p-6"
     >
-      <div className="bg-surface-card relative my-auto flex max-h-[92vh] w-full max-w-[720px] animate-in flex-col overflow-hidden rounded-3xl border border-border-control shadow-2xl duration-200 zoom-in-95 fade-in">
+      <div className="relative my-auto flex max-h-[92vh] w-full max-w-[720px] animate-in flex-col overflow-hidden rounded-3xl border border-border-control bg-surface-card shadow-2xl duration-200 zoom-in-95 fade-in">
         {/* Top Warm Glow Accent */}
         <div className="h-1.5 w-full bg-gradient-to-r from-pine-deep via-amber-gold to-pine-deep" />
 
         {/* Modal Header */}
-        <div className="bg-surface-card relative border-b border-border-control px-6 pt-6 pb-4 sm:px-8">
+        <div className="relative border-b border-border-control bg-surface-card px-6 pt-6 pb-4 sm:px-8">
           {/* Close button */}
           <button
             type="button"
             onClick={props.onClose}
             aria-label={t('btn_close')}
-            className="text-text-muted hover:bg-surface-container absolute top-5 right-5 flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-container-low transition-colors hover:text-pine-deep"
+            className="absolute top-5 right-5 flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-pine-deep"
           >
             <X className="size-4" />
           </button>
@@ -449,17 +450,17 @@ export function MasterSiswaQuickDetailModal(props: {
                 <span className="rounded-full bg-pine-light px-2.5 py-0.5 text-[11px] font-bold tracking-wide text-pine-deep uppercase">
                   {statusBadgeLabels[student.status]}
                 </span>
-                <span className="text-text-muted text-xs">•</span>
+                <span className="text-xs text-text-muted">•</span>
                 <span className="rounded-full border border-border-control bg-surface-container-low px-2.5 py-0.5 text-[11px] font-bold text-pine-deep">
                   {student.className}
                 </span>
-                <span className="text-text-muted text-xs">•</span>
-                <span className="text-text-muted text-[11px] font-medium">
+                <span className="text-xs text-text-muted">•</span>
+                <span className="text-[11px] font-medium text-text-muted">
                   {t('label_absent_num', { num: student.absentNumber })}
                 </span>
                 {discipline !== undefined && (
                   <>
-                    <span className="text-text-muted text-xs">•</span>
+                    <span className="text-xs text-text-muted">•</span>
                     <span className="text-[11px] font-bold text-amber-dark">
                       Poin: {discipline.total_points} ({discipline.total_records} kasus)
                     </span>
@@ -474,7 +475,7 @@ export function MasterSiswaQuickDetailModal(props: {
                 {student.name}
               </h2>
 
-              <div className="text-text-muted mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 font-mono text-xs">
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 font-mono text-xs text-text-muted">
                 <span>
                   NISN: <span className="font-semibold text-pine-deep">{student.nisn}</span>
                 </span>
@@ -523,7 +524,7 @@ export function MasterSiswaQuickDetailModal(props: {
               <span className="text-[11px] font-bold tracking-wider text-pine-deep uppercase">
                 {t('quick_stats_title')}
               </span>
-              <span className="text-text-muted text-[11px] font-medium">
+              <span className="text-[11px] font-medium text-text-muted">
                 {t('quick_stats_semester')}
               </span>
             </div>
@@ -532,7 +533,7 @@ export function MasterSiswaQuickDetailModal(props: {
               {/* Bento 1: Attendance rate */}
               <div className="flex flex-col justify-between rounded-2xl border border-border-control bg-surface-container-low/70 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-text-muted text-xs font-medium">
+                  <span className="text-xs font-medium text-text-muted">
                     {t('quick_stat_rate_title')}
                   </span>
                   <span className="flex size-6 items-center justify-center rounded-full bg-pine-light text-pine-deep">
@@ -548,13 +549,13 @@ export function MasterSiswaQuickDetailModal(props: {
                       {student.attendanceCategory}
                     </span>
                   </div>
-                  <div className="bg-surface-container mt-2 h-1.5 w-full overflow-hidden rounded-full">
+                  <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface-container">
                     <div
                       className="h-full rounded-full bg-amber-gold transition-all duration-500"
                       style={{ width: `${student.semesterAttendanceRate}%` }}
                     />
                   </div>
-                  <p className="text-text-muted mt-1.5 text-[10px]">
+                  <p className="mt-1.5 text-[10px] text-text-muted">
                     {t('quick_stat_target_minimum')}
                   </p>
                 </div>
@@ -563,7 +564,7 @@ export function MasterSiswaQuickDetailModal(props: {
               {/* Bento 2: Days Breakdown */}
               <div className="flex flex-col justify-between rounded-2xl border border-border-control bg-surface-container-low/70 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-text-muted text-xs font-medium">
+                  <span className="text-xs font-medium text-text-muted">
                     {t('quick_stat_recap_title')}
                   </span>
                   <span className="flex size-6 items-center justify-center rounded-full bg-pine-light text-pine-deep">
@@ -579,13 +580,13 @@ export function MasterSiswaQuickDetailModal(props: {
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-text-muted">Sakit / Izin:</span>
-                    <span className="text-text-primary text-[11px] font-semibold">
+                    <span className="text-[11px] font-semibold text-text-primary">
                       {recap.sakitIzin}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-text-muted">Alpa:</span>
-                    <span className="text-text-primary text-[11px] font-semibold">
+                    <span className="text-[11px] font-semibold text-text-primary">
                       {recap.alpa}
                     </span>
                   </div>
@@ -595,7 +596,7 @@ export function MasterSiswaQuickDetailModal(props: {
               {/* Bento 3: Punctuality */}
               <div className="flex flex-col justify-between rounded-2xl border border-border-control bg-surface-container-low/70 p-4">
                 <div className="flex items-center justify-between">
-                  <span className="text-text-muted text-xs font-medium">
+                  <span className="text-xs font-medium text-text-muted">
                     {t('quick_stat_average_arrival')}
                   </span>
                   <span className="flex size-6 items-center justify-center rounded-full border border-amber-gold/40 bg-amber-surface text-amber-dark">
@@ -606,12 +607,12 @@ export function MasterSiswaQuickDetailModal(props: {
                   <div className="flex items-baseline gap-1">
                     {/* shortcut: no average-arrival aggregate endpoint, keep static display */}
                     <span className="text-xl font-bold text-pine-deep">06:58</span>
-                    <span className="text-text-muted text-xs font-medium">WIB</span>
+                    <span className="text-xs font-medium text-text-muted">WIB</span>
                   </div>
                   <div className="mt-1.5 inline-flex items-center gap-1 rounded-full border border-amber-gold/50 bg-amber-surface px-2 py-0.5 text-[10px] font-bold text-amber-dark">
                     <span>★ {t('quick_stat_ranking_badge')}</span>
                   </div>
-                  <p className="text-text-muted mt-1.5 text-[10px]">{t('quick_stat_bell_time')}</p>
+                  <p className="mt-1.5 text-[10px] text-text-muted">{t('quick_stat_bell_time')}</p>
                 </div>
               </div>
             </div>
@@ -623,12 +624,12 @@ export function MasterSiswaQuickDetailModal(props: {
               <span className="text-[11px] font-bold tracking-wider text-pine-deep uppercase">
                 {t('quick_recent_logs_title')}
               </span>
-              <span className="text-text-muted text-[11px]">{t('quick_recent_logs_subtitle')}</span>
+              <span className="text-[11px] text-text-muted">{t('quick_recent_logs_subtitle')}</span>
             </div>
 
-            <div className="bg-surface-card divide-y divide-border-subtle overflow-hidden rounded-2xl border border-border-control">
+            <div className="divide-y divide-border-subtle overflow-hidden rounded-2xl border border-border-control bg-surface-card">
               {timeline.length === 0 && (
-                <p className="text-text-muted p-4 text-center text-xs">
+                <p className="p-4 text-center text-xs text-text-muted">
                   Belum ada catatan presensi pada rentang ini.
                 </p>
               )}
@@ -645,13 +646,13 @@ export function MasterSiswaQuickDetailModal(props: {
                     </div>
                     <div>
                       <p className="text-xs font-bold text-pine-deep">{log.date}</p>
-                      <p className="text-text-muted text-[10px]">
+                      <p className="text-[10px] text-text-muted">
                         {log.method} {log.note ? `• ${log.note}` : ''}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-text-muted font-mono text-[11px]">{log.time}</span>
+                    <span className="font-mono text-[11px] text-text-muted">{log.time}</span>
                     <span
                       className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${logBadgeClass(log.status)}`}
                     >
@@ -669,10 +670,10 @@ export function MasterSiswaQuickDetailModal(props: {
               <span className="text-[11px] font-bold tracking-wider text-pine-deep uppercase">
                 Riwayat Rombel
               </span>
-              <span className="text-text-muted text-[11px]">{enrollments.length} enrollmen</span>
+              <span className="text-[11px] text-text-muted">{enrollments.length} enrollmen</span>
             </div>
 
-            <div className="bg-surface-card divide-y divide-border-subtle overflow-hidden rounded-2xl border border-border-control">
+            <div className="divide-y divide-border-subtle overflow-hidden rounded-2xl border border-border-control bg-surface-card">
               {enrollments.map((enrollment) => (
                 <div key={enrollment.id} className="flex items-center justify-between p-3 text-xs">
                   <div className="flex items-center gap-3">
@@ -680,8 +681,8 @@ export function MasterSiswaQuickDetailModal(props: {
                       <FolderOpen className="size-3.5" />
                     </span>
                     <div>
-                      <p className="text-text-primary font-bold">{enrollment.class_name}</p>
-                      <p className="text-text-muted text-[10px]">{enrollment.academic_year_name}</p>
+                      <p className="font-bold text-text-primary">{enrollment.class_name}</p>
+                      <p className="text-[10px] text-text-muted">{enrollment.academic_year_name}</p>
                     </div>
                   </div>
                   <span className="rounded-full border border-border-control bg-surface-container-low px-2 py-0.5 text-[10px] font-bold text-pine-deep">
@@ -690,13 +691,16 @@ export function MasterSiswaQuickDetailModal(props: {
                 </div>
               ))}
               {isLoadingEnrollments && (
-                <p className="text-text-muted p-4 text-center text-xs">Memuat riwayat kelas...</p>
+                <p className="p-4 text-center text-xs text-text-muted">Memuat riwayat kelas...</p>
               )}
             </div>
           </section>
 
           {/* Section 2c: Administrative notes (admin / staff_tu) */}
           <AdministrativeNotesSection key={studentId} studentId={studentId} />
+
+          {/* Section 2d: RFID card binding (admin / staff_tu) */}
+          <StudentCardSection key={studentId} studentId={studentId} studentName={student.name} />
 
           {/* Section 3: Guardian Details & Homeroom Notes */}
           <section className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
@@ -713,18 +717,18 @@ export function MasterSiswaQuickDetailModal(props: {
                 </div>
                 <div className="space-y-2 text-xs">
                   <div>
-                    <span className="text-text-muted block text-[11px]">
+                    <span className="block text-[11px] text-text-muted">
                       {t('quick_guardian_name_label')}:
                     </span>
                     <span className="font-bold text-pine-deep">{student.guardian.name}</span>
                     {student.guardian.relation !== '' && (
-                      <span className="text-text-muted ml-1 text-[10px]">
+                      <span className="ml-1 text-[10px] text-text-muted">
                         ({student.guardian.relation})
                       </span>
                     )}
                   </div>
                   <div>
-                    <span className="text-text-muted block text-[11px]">
+                    <span className="block text-[11px] text-text-muted">
                       {t('quick_guardian_phone_label')}:
                     </span>
                     <div className="mt-0.5 flex items-center gap-1.5">
@@ -737,10 +741,10 @@ export function MasterSiswaQuickDetailModal(props: {
                     </div>
                   </div>
                   <div>
-                    <span className="text-text-muted block text-[11px]">
+                    <span className="block text-[11px] text-text-muted">
                       {t('quick_guardian_address_label')}:
                     </span>
-                    <span className="text-text-primary line-clamp-2 text-[11px]">
+                    <span className="line-clamp-2 text-[11px] text-text-primary">
                       {student.guardian.address === '' ? '—' : student.guardian.address}
                     </span>
                   </div>
@@ -756,7 +760,7 @@ export function MasterSiswaQuickDetailModal(props: {
                 >
                   <MessageCircle className="size-3.5" />
                   <span>{t('btn_contact_guardian_wa')}</span>
-                  <ExternalLink className="text-text-muted size-3" />
+                  <ExternalLink className="size-3 text-text-muted" />
                 </a>
               )}
             </div>
@@ -777,12 +781,12 @@ export function MasterSiswaQuickDetailModal(props: {
                     Aktif
                   </span>
                 </div>
-                <blockquote className="text-text-primary rounded-xl border border-amber-gold/30 bg-white p-3 text-xs leading-relaxed italic shadow-2xs">
+                <blockquote className="rounded-xl border border-amber-gold/30 bg-white p-3 text-xs leading-relaxed text-text-primary italic shadow-2xs">
                   &ldquo;{student.homeroomNotes ?? t('quick_homeroom_default_note')}&rdquo;
                 </blockquote>
               </div>
 
-              <div className="text-text-muted mt-3 flex items-center justify-between border-t border-amber-gold/20 pt-2 text-[10px]">
+              <div className="mt-3 flex items-center justify-between border-t border-amber-gold/20 pt-2 text-[10px] text-text-muted">
                 <span>
                   Wali Kelas:{' '}
                   <span className="font-semibold text-pine-deep">{student.homeroomTeacher}</span>
@@ -802,7 +806,7 @@ export function MasterSiswaQuickDetailModal(props: {
                 props.onQuickStatusChange(student);
               }
             }}
-            className="hover:bg-surface-container w-full cursor-pointer rounded-xl border border-border-control bg-white px-4 py-2 text-xs font-semibold text-pine-deep shadow-2xs transition-colors sm:w-auto sm:text-sm"
+            className="w-full cursor-pointer rounded-xl border border-border-control bg-white px-4 py-2 text-xs font-semibold text-pine-deep shadow-2xs transition-colors hover:bg-surface-container sm:w-auto sm:text-sm"
           >
             {t('btn_change_today_status')}
           </button>
@@ -811,7 +815,7 @@ export function MasterSiswaQuickDetailModal(props: {
             <button
               type="button"
               onClick={props.onClose}
-              className="text-text-muted cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold transition-colors hover:text-pine-deep sm:text-sm"
+              className="cursor-pointer rounded-xl px-4 py-2 text-xs font-semibold text-text-muted transition-colors hover:text-pine-deep sm:text-sm"
             >
               {t('btn_close')}
             </button>

@@ -150,14 +150,30 @@ export const fetchDevices = async (filter?: DeviceFilter): Promise<Device[]> => 
   return result.data;
 };
 
+/** Result of POST /devices: the record plus the one-time plaintext ingest token. */
+export type CreateDeviceResult = {
+  device: Device;
+  ingest_token: string;
+};
+
 /**
  * POST /devices.
  * @param payload - Create payload.
- * @returns Created device.
+ * @returns Created device and its one-time ingest token.
  */
-export const createDevice = async (payload: DevicePayload): Promise<Device> => {
-  const result = await apiPost<{ device: Device }>('/devices', payload);
-  return result.device;
+export const createDevice = async (payload: DevicePayload): Promise<CreateDeviceResult> =>
+  await apiPost<CreateDeviceResult>('/devices', payload);
+
+/**
+ * POST /devices/:id/token. Rotates the ingest token; the old one stops working.
+ * @param deviceId - Device id.
+ * @returns New one-time plaintext ingest token.
+ */
+export const rotateDeviceToken = async (deviceId: string): Promise<string> => {
+  const result = await apiPost<{ ingest_token: string }>(
+    `/devices/${encodeURIComponent(deviceId)}/token`,
+  );
+  return result.ingest_token;
 };
 
 /**
@@ -233,6 +249,20 @@ export const useUpdateDevice = () => {
   return useMutation({
     mutationFn: async ({ deviceId, ...payload }: UpdateDeviceVariables) =>
       await updateDevice(deviceId, payload),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: deviceKeys.root });
+    },
+  });
+};
+
+/**
+ * POST /devices/:id/token.
+ * @returns Mutation over the device id; resolves to the new one-time token.
+ */
+export const useRotateDeviceToken = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (deviceId: string) => await rotateDeviceToken(deviceId),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: deviceKeys.root });
     },

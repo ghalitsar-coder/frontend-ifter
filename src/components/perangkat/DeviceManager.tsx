@@ -7,23 +7,35 @@ import { AttendanceConfirmDialog } from '@/components/presensi/AttendanceConfirm
 import type { ConfirmRequest } from '@/components/presensi/AttendanceConfirmDialog';
 import { ApiError } from '@/lib/api/client';
 import type { Device, DeviceFilter, DeviceStatus, DeviceType } from '@/lib/api/perangkat';
-import { useDeviceList, useUpdateDeviceStatus } from '@/lib/api/perangkat';
+import { useDeviceList, useRotateDeviceToken, useUpdateDeviceStatus } from '@/lib/api/perangkat';
 import { can } from '@/lib/api/rbac';
 import { DeviceFormModal } from './DeviceFormModal';
 import { DeviceTable } from './DeviceTable';
+import { DeviceTokenModal } from './DeviceTokenModal';
 import { DeviceToolbar } from './DeviceToolbar';
 
 type PendingStatus = { device: Device; status: DeviceStatus };
 
 type FormState = { mode: 'create' } | { mode: 'edit'; device: Device };
 
+type TokenShown = { deviceName: string; token: string };
+
 const errorText = (error: unknown): string =>
   error instanceof ApiError ? error.message : 'Terjadi kesalahan tak terduga.';
 
 const buildConfirmRequest = (
   pending: PendingStatus | null,
+  pendingRotate: Device | null,
   onConfirm: () => void,
+  onConfirmRotate: () => void,
 ): ConfirmRequest | null => {
+  if (pendingRotate !== null) {
+    return {
+      message: `Rotasi token ingest ${pendingRotate.name}? Token lama langsung berhenti bekerja dan perangkat harus diisi ulang dengan token baru.`,
+      confirmLabel: 'Rotasi Token',
+      onConfirm: onConfirmRotate,
+    };
+  }
   if (pending === null) {
     return null;
   }
@@ -51,6 +63,8 @@ export function DeviceManager() {
   const [typeFilter, setTypeFilter] = useState<'all' | DeviceType>('all');
   const [formState, setFormState] = useState<FormState | null>(null);
   const [pendingStatus, setPendingStatus] = useState<PendingStatus | null>(null);
+  const [pendingRotate, setPendingRotate] = useState<Device | null>(null);
+  const [tokenShown, setTokenShown] = useState<TokenShown | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   const showToast = (message: string) => {
@@ -69,6 +83,7 @@ export function DeviceManager() {
   const devices = listQuery.data ?? [];
   const hasActiveFilters = statusFilter !== 'all' || typeFilter !== 'all';
   const statusMutation = useUpdateDeviceStatus();
+  const rotateMutation = useRotateDeviceToken();
 
   const confirmStatusChange = () => {
     if (pendingStatus === null || statusMutation.isPending) {
@@ -91,6 +106,23 @@ export function DeviceManager() {
         },
       },
     );
+  };
+
+  const confirmRotate = () => {
+    if (pendingRotate === null || rotateMutation.isPending) {
+      return;
+    }
+    const device = pendingRotate;
+    rotateMutation.mutate(device.id, {
+      onSuccess: (token) => {
+        setPendingRotate(null);
+        setTokenShown({ deviceName: device.name, token });
+      },
+      onError: (error) => {
+        setPendingRotate(null);
+        showToast(errorText(error));
+      },
+    });
   };
 
   const resetFilters = () => {
@@ -157,6 +189,9 @@ export function DeviceManager() {
             setFormState({ mode: 'edit', device });
           }}
           onToggleStatus={toggleStatus}
+          onRotateToken={(device) => {
+            setPendingRotate(device);
+          }}
         />
       </div>
 
@@ -168,17 +203,38 @@ export function DeviceManager() {
           onClose={() => {
             setFormState(null);
           }}
-          onSaved={(message) => {
+          onSaved={(message, ingestToken, deviceName) => {
             setFormState(null);
             showToast(message);
+            if (ingestToken !== undefined) {
+              setTokenShown({ deviceName: deviceName ?? 'Perangkat baru', token: ingestToken });
+            }
+          }}
+        />
+      )}
+
+      {tokenShown !== null && (
+        <DeviceTokenModal
+          deviceName={tokenShown.deviceName}
+          token={tokenShown.token}
+          onClose={() => {
+            setTokenShown(null);
+            // Drop the plaintext rotate token from the mutation cache too.
+            rotateMutation.reset();
           }}
         />
       )}
 
       <AttendanceConfirmDialog
-        request={buildConfirmRequest(pendingStatus, confirmStatusChange)}
+        request={buildConfirmRequest(
+          pendingStatus,
+          pendingRotate,
+          confirmStatusChange,
+          confirmRotate,
+        )}
         onCancel={() => {
           setPendingStatus(null);
+          setPendingRotate(null);
         }}
       />
 

@@ -8,6 +8,7 @@ import {
   deviceTypeLabel,
   fetchDevices,
   lastSeenLabel,
+  rotateDeviceToken,
   updateDevice,
   updateDeviceStatus,
 } from '@/lib/api/perangkat';
@@ -153,9 +154,11 @@ describe('device requests', () => {
     );
   });
 
-  it('POST /devices sends the create payload', async () => {
+  it('POST /devices sends the create payload and returns the one-time ingest token', async () => {
     installFetch();
-    fetchMock.mockResolvedValueOnce(jsonResponse(201, { device: baseDevice }));
+    fetchMock.mockResolvedValueOnce(
+      jsonResponse(201, { device: baseDevice, ingest_token: 'dt_2f8a9c' }),
+    );
 
     await expect(
       createDevice({
@@ -164,7 +167,7 @@ describe('device requests', () => {
         device_type: 'rfid_reader',
         location: 'Gerbang depan',
       }),
-    ).resolves.toStrictEqual(baseDevice);
+    ).resolves.toStrictEqual({ device: baseDevice, ingest_token: 'dt_2f8a9c' });
 
     const [url, init] = fetchMock.mock.calls[0] ?? [];
     expect(url).toStrictEqual(expect.stringContaining('/api/v1/devices'));
@@ -174,6 +177,28 @@ describe('device requests', () => {
       identifier: 'RFID-GATE-01',
       device_type: 'rfid_reader',
       location: 'Gerbang depan',
+    });
+  });
+
+  it('POST /devices/:id/token rotates the ingest token', async () => {
+    installFetch();
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, { ingest_token: 'dt_newtoken' }));
+
+    await expect(rotateDeviceToken('dev-1')).resolves.toBe('dt_newtoken');
+
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toStrictEqual(expect.stringContaining('/api/v1/devices/dev-1/token'));
+    expect(init?.method).toBe('POST');
+  });
+
+  it('surfaces a missing device on rotation as a not-found ApiError', async () => {
+    installFetch();
+    fetchMock.mockResolvedValueOnce(jsonResponse(404, { code: 'not_found', message: 'gone' }));
+
+    await expect(rotateDeviceToken('missing')).rejects.toMatchObject({
+      name: 'ApiError',
+      status: 404,
+      code: 'not_found',
     });
   });
 
