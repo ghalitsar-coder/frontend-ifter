@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   can,
+  isParentOnly,
   isStudentOnly,
+  landingPath,
   ROLE_ADMIN,
   ROLE_DUTY_TEACHER,
+  ROLE_PARENT,
   ROLE_PRINCIPAL,
   ROLE_STAFF_TU,
   ROLE_STUDENT,
@@ -128,5 +131,60 @@ describe(isStudentOnly, () => {
     expect(isStudentOnly([])).toBeFalsy();
     expect(isStudentOnly([ROLE_STUDENT, ROLE_TEACHER])).toBeFalsy();
     expect(isStudentOnly([ROLE_ADMIN])).toBeFalsy();
+  });
+});
+
+describe('can — parent role', () => {
+  it('reaches the parent portal and the profile page', () => {
+    expect(can([ROLE_PARENT], 'parent_portal')).toBeTruthy();
+    expect(can([ROLE_PARENT], 'profile')).toBeTruthy();
+  });
+
+  it('grants no staff surface', () => {
+    expect(can([ROLE_PARENT], 'dashboard')).toBeFalsy();
+    expect(can([ROLE_PARENT], 'master_data')).toBeFalsy();
+    expect(can([ROLE_PARENT], 'attendance_read')).toBeFalsy();
+    expect(can([ROLE_PARENT], 'device_taps')).toBeFalsy();
+    expect(can([ROLE_PARENT], 'my')).toBeFalsy();
+  });
+});
+
+describe('can — profile capability', () => {
+  it('grants the user profile page to every signed-in role', () => {
+    expect(can([ROLE_ADMIN], 'profile')).toBeTruthy();
+    expect(can([ROLE_STAFF_TU], 'profile')).toBeTruthy();
+    expect(can([ROLE_TEACHER], 'profile')).toBeTruthy();
+    expect(can([ROLE_PRINCIPAL], 'profile')).toBeTruthy();
+    expect(can([ROLE_STUDENT], 'profile')).toBeTruthy();
+  });
+
+  it('grants nothing for an empty or unknown role list', () => {
+    expect(can([], 'profile')).toBeFalsy();
+    expect(can(['auditor'], 'profile')).toBeFalsy();
+  });
+});
+
+describe(isParentOnly, () => {
+  it('is true exactly for non-empty parent-only role lists', () => {
+    expect(isParentOnly([ROLE_PARENT])).toBeTruthy();
+  });
+
+  it('is false for empty lists and accounts that also carry staff roles', () => {
+    expect(isParentOnly([])).toBeFalsy();
+    expect(isParentOnly([ROLE_PARENT, ROLE_TEACHER])).toBeFalsy();
+    expect(isParentOnly([ROLE_STUDENT])).toBeFalsy();
+  });
+});
+
+describe(landingPath, () => {
+  it('sends single-purpose roles to their own portal', () => {
+    expect(landingPath([ROLE_STUDENT])).toBe('/dashboard/murid');
+    expect(landingPath([ROLE_PARENT])).toBe('/dashboard/orang-tua');
+  });
+
+  it('sends staff and mixed roles to the staff dashboard', () => {
+    expect(landingPath([ROLE_ADMIN])).toBe('/dashboard');
+    expect(landingPath([ROLE_PARENT, ROLE_TEACHER])).toBe('/dashboard');
+    expect(landingPath([])).toBe('/dashboard');
   });
 });

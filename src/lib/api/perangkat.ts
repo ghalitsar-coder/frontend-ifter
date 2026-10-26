@@ -234,6 +234,9 @@ export const useCreateDevice = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (payload: DevicePayload) => await createDevice(payload),
+    // The ingest token is a one-time secret: drop it from the mutation cache on
+    // unmount instead of keeping it for the default 5-minute gcTime.
+    gcTime: 0,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: deviceKeys.root });
     },
@@ -263,6 +266,7 @@ export const useRotateDeviceToken = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (deviceId: string) => await rotateDeviceToken(deviceId),
+    gcTime: 0,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: deviceKeys.root });
     },

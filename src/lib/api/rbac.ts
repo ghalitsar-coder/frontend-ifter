@@ -1,17 +1,18 @@
 /**
  * RBAC capability gate for the Attendly UI.
  *
- * Mirrors docs/API_ADDENDUM.md §1–§2 (6 roles: admin, staff_tu, teacher,
- * duty_teacher, principal, student; capability groups per RouteGroups).
+ * Mirrors docs/API_ADDENDUM.md §1–§2 (admin, staff_tu, teacher, duty_teacher,
+ * principal, student, plus the `parent` portal role; capability groups per
+ * RouteGroups).
  * Menu items and write surfaces check `can(roles, capability)` client-side;
  * the server always enforces the same groups independently, so this file is
  * presentation-only and deliberately permissive-neutral (hide, never fake).
  *
  * NOTE on role typing: the `UserRole` union in `@/lib/api/dto` predates the
- * 6-role re-cut (it lacks `staff_tu` and `student`) and dto.ts is a shared
- * file, so every check here compares plain strings. The authoritative role
- * list is the `roles` table — admins can read it dynamically via GET /roles
- * (`useRolesCatalog` below).
+ * role re-cut (it lacks `staff_tu`, `student` and `parent`) and dto.ts is a
+ * shared file, so every check here compares plain strings. The authoritative
+ * role list is the `roles` table — admins can read it dynamically via GET
+ * /roles (`useRolesCatalog` below).
  */
 import { queryOptions, useQuery } from '@tanstack/react-query';
 import { apiGet } from '@/lib/api/client';
@@ -26,6 +27,7 @@ export const ROLE_TEACHER = 'teacher';
 export const ROLE_DUTY_TEACHER = 'duty_teacher';
 export const ROLE_PRINCIPAL = 'principal';
 export const ROLE_STUDENT = 'student';
+export const ROLE_PARENT = 'parent';
 
 /** Any role code the backend may return; kept as `string` on purpose (dto.ts is frozen). */
 export type RoleCode = string;
@@ -58,7 +60,11 @@ export type Capability =
   | 'device_taps'
   /** Student self-service `/my/*` portal. */
   | 'my'
-  /** Any signed-in role. */
+  /** Parent portal: `/dashboard/orang-tua` over the GET /parent/* reads. */
+  | 'parent_portal'
+  /** UI menu: the account's own profile page (every role, parents included). */
+  | 'profile'
+  /** Any signed-in staff or student role (a parent-only account is gated by `profile`). */
   | 'authenticated'
   /** UI menu: staff dashboard landing (admin + teacher + duty_teacher + principal). */
   | 'dashboard'
@@ -77,6 +83,16 @@ const CAPABILITY_ROLES: Record<Capability, readonly RoleCode[]> = {
   dispensations_read: [ROLE_ADMIN, ROLE_STAFF_TU, ROLE_TEACHER, ROLE_DUTY_TEACHER, ROLE_PRINCIPAL],
   device_taps: [ROLE_ADMIN, ROLE_DUTY_TEACHER, ROLE_PRINCIPAL],
   my: [ROLE_STUDENT],
+  parent_portal: [ROLE_PARENT],
+  profile: [
+    ROLE_ADMIN,
+    ROLE_STAFF_TU,
+    ROLE_TEACHER,
+    ROLE_DUTY_TEACHER,
+    ROLE_PRINCIPAL,
+    ROLE_STUDENT,
+    ROLE_PARENT,
+  ],
   authenticated: [
     ROLE_ADMIN,
     ROLE_STAFF_TU,
@@ -110,6 +126,31 @@ export const can = (roles: readonly RoleCode[], capability: Capability): boolean
  */
 export const isStudentOnly = (roles: readonly RoleCode[]): boolean =>
   roles.length > 0 && roles.every((role) => role === ROLE_STUDENT);
+
+/**
+ * True when the account only carries the `parent` role — such users are
+ * redirected to the `/dashboard/orang-tua` portal and get no staff navigation.
+ * @param roles - Role codes of the signed-in user.
+ * @returns Whether the roles are exactly parent-only (non-empty).
+ */
+export const isParentOnly = (roles: readonly RoleCode[]): boolean =>
+  roles.length > 0 && roles.every((role) => role === ROLE_PARENT);
+
+/**
+ * Landing route after sign-in: the two single-purpose portals come first, every
+ * other role lands on the staff dashboard.
+ * @param roles - Role codes of the signed-in user.
+ * @returns Dashboard-relative path.
+ */
+export const landingPath = (roles: readonly RoleCode[]): string => {
+  if (isStudentOnly(roles)) {
+    return '/dashboard/murid';
+  }
+  if (isParentOnly(roles)) {
+    return '/dashboard/orang-tua';
+  }
+  return '/dashboard';
+};
 
 // ---------------------------------------------------------------------------
 // Dynamic role catalog — GET /roles (Admin-only per router.go, so the query

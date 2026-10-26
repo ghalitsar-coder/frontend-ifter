@@ -10,14 +10,14 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/lib/api/auth';
 import { ApiError } from '@/lib/api/client';
-import { isStudentOnly } from '@/lib/api/rbac';
+import { landingPath } from '@/lib/api/rbac';
 import { Link, useRouter } from '@/libs/I18nNavigation';
 import { getI18nPath } from '@/utils/Helpers';
 
 /**
  * Credential sign-in form replacing the former Clerk <SignIn /> widget.
- * Calls POST /auth/login, then redirects to the dashboard — student-only
- * accounts go to their `/dashboard/murid` portal instead of the staff shell.
+ * Calls POST /auth/login, then redirects to the dashboard — student and parent
+ * accounts go to their own portal instead of the staff shell.
  * @returns The sign-in card element.
  */
 export function SignInForm() {
@@ -35,7 +35,7 @@ export function SignInForm() {
     setSubmitting(true);
     try {
       const user = await login(username, password);
-      const target = isStudentOnly(user.roles) ? '/dashboard/murid' : '/dashboard';
+      const target = landingPath(user.roles);
       router.replace(getI18nPath(target, locale));
     } catch (error) {
       setFormError(

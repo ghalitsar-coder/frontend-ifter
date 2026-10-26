@@ -8,6 +8,7 @@ import {
   FileHeart,
   FilePenLine,
   GraduationCap,
+  HeartHandshake,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -20,6 +21,7 @@ import {
   ShieldAlert,
   User,
   UserCheck,
+  UserCog,
   Users,
   X,
 } from 'lucide-react';
@@ -27,7 +29,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/components/auth/AuthProvider';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
-import { can, isStudentOnly, useRolesCatalog } from '@/lib/api/rbac';
+import { can, isParentOnly, isStudentOnly, useRolesCatalog } from '@/lib/api/rbac';
 import type { Capability } from '@/lib/api/rbac';
 import { Link, useRouter, usePathname } from '@/libs/I18nNavigation';
 import { getI18nPath } from '@/utils/Helpers';
@@ -171,6 +173,7 @@ export function AttendlyShell(props: {
   const roleNameByCode = new Map((roleCatalog.data ?? []).map((entry) => [entry.code, entry.name]));
 
   const studentOnly = isStudentOnly(auth.roles);
+  const parentOnly = isParentOnly(auth.roles);
 
   // Student portal gate: `student` reaches no staff route on the backend, so
   // any staff page opened by a student-only account bounces to /dashboard/murid.
@@ -179,6 +182,16 @@ export function AttendlyShell(props: {
       router.replace(getI18nPath('/dashboard/murid', locale));
     }
   }, [studentOnly, pathname, locale, router]);
+
+  // Parent portal gate: the same rule for `parent`, except the shared account
+  // profile page, which every role may open.
+  useEffect(() => {
+    const inPortal = pathname.startsWith('/dashboard/orang-tua');
+    const isProfile = pathname === '/dashboard/user-profile';
+    if (parentOnly && !inPortal && !isProfile) {
+      router.replace(getI18nPath('/dashboard/orang-tua', locale));
+    }
+  }, [parentOnly, pathname, locale, router]);
 
   // Navigation menu groupings — each item declares its capability and the
   // lists below are filtered against the signed-in roles before rendering.
@@ -242,6 +255,14 @@ export function AttendlyShell(props: {
           badge: null,
           capability: 'reports_read',
         },
+        {
+          // Hard-coded domain label: no new locale keys allowed for the portal.
+          label: 'Portal Orang Tua',
+          href: '/dashboard/orang-tua',
+          icon: HeartHandshake,
+          badge: null,
+          capability: 'parent_portal',
+        },
       ],
     },
     {
@@ -297,6 +318,14 @@ export function AttendlyShell(props: {
           capability: 'admin',
         },
         {
+          // Hard-coded domain label: no new locale keys allowed for the portal admin page.
+          label: 'Akun Orang Tua',
+          href: '/dashboard/akun-orang-tua',
+          icon: UserCog,
+          badge: 'Admin',
+          capability: 'admin',
+        },
+        {
           label: t('pengaturan_link'),
           href: '/dashboard/pengaturan',
           icon: Settings2,
@@ -310,14 +339,25 @@ export function AttendlyShell(props: {
           href: '/dashboard/user-profile',
           icon: User,
           badge: null,
-          capability: 'authenticated',
+          capability: 'profile',
         },
       ],
     },
   ];
 
-  const visibleSections: NavSection[] = studentOnly
-    ? []
+  const portalOnly = studentOnly || parentOnly;
+  const visibleSections: NavSection[] = portalOnly
+    ? navSections
+        .map((section) => ({
+          ...section,
+          items: section.items.filter(
+            (item) =>
+              (studentOnly && item.capability === 'my') ||
+              (parentOnly && item.capability === 'parent_portal') ||
+              item.capability === 'profile',
+          ),
+        }))
+        .filter((section) => section.items.length > 0)
     : navSections
         .map((section) => ({
           ...section,

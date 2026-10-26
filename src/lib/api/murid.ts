@@ -173,10 +173,12 @@ export const dispensationStatusLabel = (status: string): string =>
 
 /**
  * Display text for a dispensation date span (`end_date` is optional).
- * @param item - Dispensation row.
+ * @param item - Any row carrying the two date fields (student and parent portal).
  * @returns `'YYYY-MM-DD'` or `'YYYY-MM-DD s/d YYYY-MM-DD'`.
  */
-export const dispensationDateLabel = (item: DispensationItem): string =>
+export const dispensationDateLabel = (
+  item: Pick<DispensationItem, 'start_date' | 'end_date'>,
+): string =>
   item.end_date === null || item.end_date === '' || item.end_date === item.start_date
     ? item.start_date
     : `${item.start_date} s/d ${item.end_date}`;
