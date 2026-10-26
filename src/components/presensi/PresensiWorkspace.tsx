@@ -147,6 +147,12 @@ export function PresensiWorkspace() {
     }
   };
 
+  const handleClassChange = (nextClassId: number) => {
+    setClassId(nextClassId);
+    setOverrides({});
+    setPage(1);
+  };
+
   const classes = useQuery({
     queryFn: async () => await guard(getClasses()),
     queryKey: CLASSES_QUERY_KEY,
@@ -202,11 +208,22 @@ export function PresensiWorkspace() {
   }
 
   if (session.error !== null) {
+    // The class switcher stays mounted so a forbidden or missing session is not a dead end.
     return (
-      <PresensiNotice
-        state="error"
-        text={t('load_failed', { reason: t(presensiErrorKey(session.error)) })}
-      />
+      <div className="flex w-full flex-col">
+        <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-space-lg px-margin py-space-xl">
+          <PresensiSessionBar
+            classes={classes.data}
+            classId={selectedClassId}
+            onClassChange={handleClassChange}
+            progressPercent={0}
+          />
+          <PresensiNotice
+            state="error"
+            text={t('load_failed', { reason: t(presensiErrorKey(session.error)) })}
+          />
+        </div>
+      </div>
     );
   }
 
@@ -242,12 +259,6 @@ export function PresensiWorkspace() {
     (currentPage - 1) * ROSTER_PAGE_SIZE,
     currentPage * ROSTER_PAGE_SIZE,
   );
-
-  const handleClassChange = (nextClassId: number) => {
-    setClassId(nextClassId);
-    setOverrides({});
-    setPage(1);
-  };
 
   const handleTanggalChange = (nextTanggal: string) => {
     // Clearing the native date field would send an empty tanggal the backend rejects outright.
