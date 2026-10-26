@@ -2,23 +2,26 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { useRouter } from '@/libs/I18nNavigation';
 import { AUTH_QUERY_KEY, signOut } from '@/services/presensiApi';
 
 /**
- * Header sign-out button. It only drops the server-side session cookie and re-checks the gate, so the
- * workspace unmounts back into the sign-in form.
+ * Header sign-out button: drops the server-side session cookie, re-checks the gate and returns the
+ * browser to the sign-in route, same flow as the dashboard profile menu's Keluar.
  *
  * @returns Icon button matching the header chip row.
  */
 export function PresensiSignOut() {
   const t = useTranslations('PresensiPage');
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   const handleSignOut = async () => {
     await signOut();
     // Only the gate is re-read: invalidating every query would refetch the still-mounted workspace
     // without a cookie and bounce through two pointless 401s.
     await queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
+    router.replace('/sign-in');
   };
 
   return (

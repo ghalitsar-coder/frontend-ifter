@@ -3,12 +3,11 @@
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { MaterialIcon } from '@/components/landing/MaterialIcon';
-import { LocaleSwitcher } from '@/components/LocaleSwitcher';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Link, usePathname } from '@/libs/I18nNavigation';
-import { ProfileMenu } from './ProfileMenu';
 import { dashboardRoles, roleConfigs } from './navigation';
 import type { DashboardRole, NavBadgeTone, NavItem, RoleCallout } from './navigation';
+import { ProfileMenu } from './ProfileMenu';
 
 const badgeToneClassName: Record<NavBadgeTone, string> = {
   amber: 'bg-amber-gold text-pine-deep',
@@ -202,7 +201,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
               <button
                 aria-expanded={!collapsed}
                 aria-label="Perkecil atau perluas sidebar"
-                className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-pine-hover text-on-primary transition-colors hover:bg-pine-deep active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-gold/60"
+                className="flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-pine-hover text-on-primary transition-colors hover:bg-pine-deep focus-visible:ring-2 focus-visible:ring-amber-gold/60 focus-visible:outline-none active:scale-[0.96]"
                 onClick={() => {
                   setCollapsed(!collapsed);
                 }}
@@ -318,13 +317,12 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
             </div>
             <button
               aria-label="Notifikasi terkini"
-              className="relative flex size-10 items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light active:scale-[0.96] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/30"
+              className="relative flex size-10 items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light focus-visible:ring-2 focus-visible:ring-pine-deep/30 focus-visible:outline-none active:scale-[0.96]"
               type="button"
             >
               <MaterialIcon className="text-[20px]" name="notifications" />
               <span className="absolute top-2 right-2 size-2 rounded-full bg-amber-gold ring-2 ring-surface-card" />
             </button>
-            <LocaleSwitcher />
             <div className="hidden h-8 w-px bg-border-subtle sm:block" />
             <ProfileMenu
               align="end"

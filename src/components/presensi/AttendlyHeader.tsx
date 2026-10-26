@@ -20,7 +20,13 @@ export async function AttendlyHeader(props: { signedIn?: boolean }) {
     <header className="fixed inset-x-0 top-0 z-50 border-b border-border-subtle bg-surface/90 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1200px] items-center justify-between px-margin">
         <div className="flex items-center gap-8">
-          <AttendlyBrand />
+          <Link
+            aria-label={t('brand_home_aria')}
+            className="rounded-lg transition-transform focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none active:scale-[0.98]"
+            href="/"
+          >
+            <AttendlyBrand />
+          </Link>
           <nav className="hidden items-center gap-6 md:flex">
             <Link className={navLinkClassName} href="/dashboard">
               {t('nav_dashboard')}
@@ -43,9 +49,7 @@ export async function AttendlyHeader(props: { signedIn?: boolean }) {
               <span className="font-label-md text-label-md font-semibold text-on-surface">
                 {t('teacher_name')}
               </span>
-              <span className="font-caption text-caption text-text-muted">
-                {t('teacher_role')}
-              </span>
+              <span className="font-caption text-caption text-text-muted">{t('teacher_role')}</span>
             </div>
             <div className="relative flex size-10 items-center justify-center rounded-full border border-border-subtle bg-surface-container font-label-md text-label-md font-semibold text-on-surface">
               <span className="text-[14px]">SW</span>
@@ -55,7 +59,7 @@ export async function AttendlyHeader(props: { signedIn?: boolean }) {
           </div>
         ) : (
           <Link
-            className="inline-flex h-10 items-center justify-center rounded-xl bg-secondary-container px-space-md font-label-md text-label-md font-semibold text-primary shadow-[0_4px_16px_rgba(242,201,108,0.25)] transition-all hover:bg-amber-hover active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none"
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-secondary-container px-space-md font-label-md text-label-md font-semibold text-primary shadow-[0_4px_16px_rgba(242,201,108,0.25)] transition-all hover:bg-amber-hover focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none active:scale-[0.98]"
             href="/sign-in"
           >
             {t('nav_login')}

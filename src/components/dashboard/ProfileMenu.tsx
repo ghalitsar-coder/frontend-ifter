@@ -46,14 +46,18 @@ export const ProfileMenu = (props: ProfileMenuProps) => {
       <DropdownMenuContent align={props.align} className="w-64" side={props.side}>
         <DropdownMenuGroup>
           <DropdownMenuLabel className="flex flex-col gap-0.5 py-2">
-            <span className="text-sm font-semibold text-text-primary">{props.config.user.name}</span>
+            <span className="text-sm font-semibold text-text-primary">
+              {props.config.user.name}
+            </span>
             <span className="text-xs font-normal text-text-muted">{props.config.headerRole}</span>
           </DropdownMenuLabel>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
           render={
-            <Link href={`/dashboard/segera?item=${encodeURIComponent('Profil Saya')}${roleQuery}`} />
+            <Link
+              href={`/dashboard/segera?item=${encodeURIComponent('Profil Saya')}${roleQuery}`}
+            />
           }
         >
           {t('menu_profile')}

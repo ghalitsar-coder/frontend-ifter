@@ -417,6 +417,7 @@
     "error_unreachable": "Layanan presensi tidak dapat dihubungi. Coba lagi sebentar.",
     "error_generic": "Terjadi kesalahan pada layanan presensi. Coba lagi.",
     "nav_register": "Daftarkan Sekolah",
+    "brand_home_aria": "Beranda Attendly",
     "nav_login": "Masuk Portal",
     "login_eyebrow": "Sistem Presensi Presisi",
     "login_date_stamp": "Hari ini, Semester Genap",
