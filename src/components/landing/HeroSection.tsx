@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import { Link } from '@/libs/I18nNavigation';
 import { MaterialIcon } from './MaterialIcon';
 
 const attendanceDays = [
@@ -72,13 +73,13 @@ export const HeroSection = () => (
       </p>
 
       <div className="mt-space-xl flex w-full flex-col items-center gap-space-md sm:w-auto sm:flex-row">
-        <a
+        <Link
           className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md text-on-primary shadow-lg transition-all hover:bg-pine-hover hover:shadow-xl sm:w-auto"
-          href="#daftar"
+          href="/pendaftaran"
         >
           <span>Mulai Uji Coba Gratis 30 Hari</span>
           <MaterialIcon name="arrow_forward" className="text-[18px]" />
-        </a>
+        </Link>
         <a
           className="inline-flex h-12 w-full items-center justify-center gap-space-xs rounded-xl bg-surface-card px-space-lg font-label-md text-label-md text-text-primary shadow-sm transition-all hover:bg-surface-container sm:w-auto"
           href="#demo"

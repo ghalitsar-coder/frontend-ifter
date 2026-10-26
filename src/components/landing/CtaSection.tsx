@@ -1,3 +1,4 @@
+import { Link } from '@/libs/I18nNavigation';
 import { MaterialIcon } from './MaterialIcon';
 
 export const CtaSection = () => (
@@ -19,13 +20,13 @@ export const CtaSection = () => (
           langsung dan panduan integrasi resmi Dapodik bersama tim konsultan pendidikan kami.
         </p>
         <div className="mt-space-xl flex flex-col items-center gap-space-md sm:flex-row">
-          <a
-            className="hover:bg-amber-hover inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-secondary-container px-space-xl font-label-md text-label-md font-bold text-primary shadow-lg transition-all sm:w-auto"
-            href="#daftar"
+          <Link
+            className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-secondary-container px-space-xl font-label-md text-label-md font-bold text-primary shadow-lg transition-all hover:bg-amber-hover sm:w-auto"
+            href="/pendaftaran"
           >
             <span>Daftar Sekolah Sekarang</span>
             <MaterialIcon name="arrow_forward" className="text-[18px]" />
-          </a>
+          </Link>
           <a
             className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-tertiary-container px-space-lg font-label-md text-label-md text-on-primary transition-all hover:bg-primary sm:w-auto"
             href="#demo"

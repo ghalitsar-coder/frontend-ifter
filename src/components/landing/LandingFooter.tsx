@@ -30,8 +30,8 @@ const footerColumns = [
   {
     title: 'Kelembagaan',
     links: [
-      { label: 'Pendaftaran Uji Coba Gratis', href: '#daftar' },
-      { label: 'Portal Presensi Guru', href: '#beranda' },
+      { label: 'Pendaftaran Uji Coba Gratis', href: '/pendaftaran' },
+      { label: 'Portal Presensi Guru', href: '/presensi' },
       { label: 'Suasana di Sekolah', href: '#galeri-penerapan' },
       { label: 'Tanya Jawab Seputar Layanan', href: '#faq' },
     ],

@@ -1,3 +1,4 @@
+import { Link } from '@/libs/I18nNavigation';
 import { MaterialIcon } from './MaterialIcon';
 
 const navItems = [
@@ -46,18 +47,18 @@ export const LandingHeader = () => (
       </nav>
 
       <div className="flex items-center gap-space-sm">
-        <a
+        <Link
           className="hidden h-11 items-center justify-center rounded-xl bg-surface px-space-md font-label-md text-label-md text-primary transition-all hover:bg-pine-light hover:text-primary md:inline-flex"
-          href="#beranda"
+          href="/presensi"
         >
           Masuk Portal Presensi
-        </a>
-        <a
-          className="hover:bg-amber-hover inline-flex h-11 items-center justify-center rounded-xl bg-secondary-container px-space-lg font-label-md text-label-md font-semibold text-primary shadow-[0_4px_16px_rgba(242,201,108,0.25)] transition-all hover:text-primary"
-          href="#daftar"
+        </Link>
+        <Link
+          className="inline-flex h-11 items-center justify-center rounded-xl bg-secondary-container px-space-lg font-label-md text-label-md font-semibold text-primary shadow-[0_4px_16px_rgba(242,201,108,0.25)] transition-all hover:bg-amber-hover hover:text-primary"
+          href="/pendaftaran"
         >
           Daftar Sekolah
-        </a>
+        </Link>
         <div className="ml-space-xs flex size-8 items-center justify-center rounded-full bg-primary">
           <MaterialIcon name="person" className="text-[18px] text-on-primary" />
         </div>
