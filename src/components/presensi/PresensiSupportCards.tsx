@@ -114,7 +114,7 @@ export function PresensiSupportCards(props: { unrecorded: number }) {
         <div className="relative z-10 mt-4 pt-2">
           <Link
             className="inline-flex items-center gap-2 rounded-lg bg-pine-deep px-3 py-1.5 font-label-md text-label-md font-bold text-surface transition-colors duration-200 group-hover:translate-x-1"
-            href="/presensi"
+            href="/dashboard/presensi"
           >
             <span>{t('guide_action')}</span>
             <span className="material-symbols-outlined text-[16px] text-amber-gold">

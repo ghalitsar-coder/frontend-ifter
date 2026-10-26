@@ -1,39 +1,30 @@
-import type { Metadata } from 'next';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { AttendanceManager } from '@/components/presensi/AttendanceManager';
+import { setRequestLocale } from 'next-intl/server';
+import { PresensiAuthGate } from '@/components/presensi/PresensiAuthGate';
+import { readBackendToken } from '@/libs/BackendSession';
+import { redirect } from '@/libs/I18nNavigation';
 
-export type AttendancePageProps = {
+type DashboardPresensiPageProps = {
   params: Promise<{ locale: string }>;
 };
 
 /**
- * Generate metadata for attendance page.
- *
- * @param props - Page route params.
- * @returns Metadata object.
- */
-export async function generateMetadata(props: AttendancePageProps): Promise<Metadata> {
-  const { locale } = await props.params;
-  const t = await getTranslations({
-    locale,
-    namespace: 'AttendancePage',
-  });
-
-  return {
-    title: t('meta_title'),
-    description: t('meta_description'),
-  };
-}
-
-/**
- * Class attendance management dashboard page.
+ * Daily attendance workspace inside the dashboard shell; unauthenticated visits are sent to the
+ * sign-in route before any backend query runs.
  *
  * @param props - Route params including locale.
- * @returns Rendered attendance page.
+ * @returns The attendance workspace behind the session gate.
  */
-export default async function AttendancePage(props: AttendancePageProps) {
+export default async function DashboardPresensiPage(props: DashboardPresensiPageProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
 
-  return <AttendanceManager />;
+  if ((await readBackendToken()) === undefined) {
+    redirect({ href: '/sign-in', locale });
+  }
+
+  return (
+    <div className="attendly text-body-md text-on-surface">
+      <PresensiAuthGate />
+    </div>
+  );
 }

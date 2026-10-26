@@ -49,7 +49,7 @@ export const LandingHeader = () => (
       <div className="flex items-center gap-space-sm">
         <Link
           className="hidden h-11 items-center justify-center rounded-xl bg-surface px-space-md font-label-md text-label-md text-primary transition-all hover:bg-pine-light hover:text-primary md:inline-flex"
-          href="/presensi"
+          href="/dashboard/presensi"
         >
           Masuk Portal Presensi
         </Link>

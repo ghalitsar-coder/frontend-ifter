@@ -44,9 +44,9 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
     try {
       await signIn({ password, username: credential });
       setAccepted(true);
-      // Seed the gate cache so /presensi mounts the workspace without a refetch round trip.
+      // Seed the gate cache so /dashboard/presensi mounts the workspace without a refetch round trip.
       queryClient.setQueryData(AUTH_QUERY_KEY, true);
-      router.replace('/presensi');
+      router.replace('/dashboard/presensi');
     } catch (error) {
       setErrorKey(presensiErrorKey(error));
       setPending(false);

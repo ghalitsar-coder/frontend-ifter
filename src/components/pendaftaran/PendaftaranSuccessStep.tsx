@@ -364,7 +364,7 @@ function PendaftaranSetupBento() {
             {/* shortcut: the data-import wizard has no route yet, so the internal link targets the app root; point it at the wizard once it ships. */}
             <Link
               className="flex w-full items-center justify-center gap-space-xs rounded-xl bg-amber-gold px-space-md py-space-sm font-label-md text-label-md font-semibold text-pine-deep shadow transition-colors hover:bg-amber-hover"
-              href="/presensi"
+              href="/dashboard/presensi"
             >
               <span>{t('done_task1_action')}</span>
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>

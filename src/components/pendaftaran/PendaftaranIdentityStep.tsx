@@ -515,7 +515,7 @@ export function PendaftaranIdentityStep(props: {
                 {t('id_already')}{' '}
                 <Link
                   className="ml-1 font-semibold text-primary underline-offset-4 hover:underline"
-                  href="/presensi"
+                  href="/dashboard/presensi"
                 >
                   {t('id_sign_in')}
                 </Link>

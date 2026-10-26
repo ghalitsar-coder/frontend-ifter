@@ -37,7 +37,7 @@ export default async function SignInPage(props: SignInPageProps) {
   setRequestLocale(locale);
 
   if (await readBackendToken()) {
-    redirect({ href: '/presensi', locale });
+    redirect({ href: '/dashboard/presensi', locale });
   }
 
   return (
