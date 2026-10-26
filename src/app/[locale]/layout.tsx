@@ -1,11 +1,18 @@
 import type { Metadata, Viewport } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
+import { Inter } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { DemoBadge } from '@/components/DemoBadge';
 import { QueryProvider } from '@/components/QueryProvider';
 import { routing } from '@/libs/I18nRouting';
 import '@/styles/global.css';
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   icons: [
@@ -54,7 +61,7 @@ export default async function RootLayout(props: {
   setRequestLocale(locale);
 
   return (
-    <html lang={locale}>
+    <html className={inter.variable} lang={locale}>
       <body>
         <NextIntlClientProvider>
           <QueryProvider>{props.children}</QueryProvider>

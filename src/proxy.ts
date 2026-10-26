@@ -8,9 +8,9 @@ import { routing } from './libs/I18nRouting';
 
 const handleI18nRouting = createMiddleware(routing);
 
-const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/:locale/dashboard(.*)']);
-
-const isAuthPage = createRouteMatcher([
+const isClerkRoute = createRouteMatcher([
+  '/dashboard(.*)',
+  '/:locale/dashboard(.*)',
   '/sign-in(.*)',
   '/:locale/sign-in(.*)',
   '/sign-up(.*)',
@@ -43,22 +43,10 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
   }
 
   // Clerk keyless mode doesn't work with i18n, this is why we need to run the middleware conditionally
-  if (isAuthPage(request) || isProtectedRoute(request)) {
-    // Match Clerk's documented middleware composition pattern, `return await` is not necessary.
-    // oxlint-disable-next-line typescript/return-await
-    return clerkMiddleware(async (auth, req) => {
-      if (isProtectedRoute(req)) {
-        const locale = req.nextUrl.pathname.match(/(\/.*)\/dashboard/u)?.at(1) ?? '';
-
-        const signInUrl = new URL(`${locale}/sign-in`, req.url);
-
-        await auth.protect({
-          unauthenticatedUrl: signInUrl.toString(),
-        });
-      }
-
-      return handleI18nRouting(req);
-    })(request, event);
+  if (isClerkRoute(request)) {
+    // Clerk middleware still runs so server components can read the session, but
+    // dashboard routes are no longer gated behind authentication.
+    return await clerkMiddleware((_auth, req) => handleI18nRouting(req))(request, event);
   }
 
   return handleI18nRouting(request);
