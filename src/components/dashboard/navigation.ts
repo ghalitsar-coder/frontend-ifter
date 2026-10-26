@@ -16,7 +16,7 @@ export type NavItem = {
   icon: string;
   label: string;
   href?: string;
-  active?: boolean;
+
   badge?: { label: string; tone: NavBadgeTone; box?: boolean };
   dot?: 'amber' | 'absent';
   arrow?: boolean;
@@ -62,7 +62,6 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
             icon: 'dashboard',
             label: 'Dashboard Utama',
             href: '/dashboard',
-            active: true,
             dot: 'amber',
           },
           {
@@ -121,7 +120,6 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
             icon: 'checklist_rtl',
             label: 'Presensi Kelas Binaan',
             href: '/dashboard/presensi',
-            active: true,
             badge: { label: '2 Belum', tone: 'pine' },
           },
           { icon: 'history', label: 'Riwayat & Rekap Kelas' },
@@ -180,7 +178,6 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
           {
             icon: 'draw',
             label: 'Pengesahan & TTD Resmi',
-            active: true,
             badge: { label: '3 Perlu TTD', tone: 'amber' },
           },
         ],
@@ -238,7 +235,6 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
             icon: 'mark_email_read',
             label: 'Verifikasi Berkas Izin & SK',
             href: '/dashboard/presensi',
-            active: true,
             badge: { label: '5 Berkas', tone: 'permission' },
           },
         ],

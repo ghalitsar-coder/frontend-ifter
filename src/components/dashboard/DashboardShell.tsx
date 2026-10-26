@@ -1,11 +1,12 @@
 'use client';
 
-import { Show, SignOutButton } from '@clerk/nextjs';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { MaterialIcon } from '@/components/landing/MaterialIcon';
 import { LocaleSwitcher } from '@/components/LocaleSwitcher';
-import { Link } from '@/libs/I18nNavigation';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Link, usePathname, useRouter } from '@/libs/I18nNavigation';
+import { signOut } from '@/services/presensiApi';
 import { dashboardRoles, roleConfigs } from './navigation';
 import type { DashboardRole, NavBadgeTone, NavItem, RoleCallout } from './navigation';
 
@@ -25,6 +26,8 @@ const resolveRole = (value: string | null): DashboardRole =>
 
 const NavItemRow = (props: {
   item: NavItem;
+  href: string;
+  active: boolean;
   collapsed: boolean;
   activeClassName: string;
   activeIconClassName: string;
@@ -32,7 +35,7 @@ const NavItemRow = (props: {
   const rowClassName = `flex items-center rounded-xl py-2 font-label-md text-label-md transition-colors ${
     props.collapsed ? 'justify-center px-0' : 'justify-between px-3'
   } ${
-    props.item.active
+    props.active
       ? props.activeClassName
       : 'text-primary-fixed-dim hover:bg-pine-hover hover:text-on-primary'
   }`;
@@ -41,7 +44,7 @@ const NavItemRow = (props: {
     <>
       <div className="flex items-center gap-2.5 truncate">
         <MaterialIcon
-          className={`shrink-0 text-[18px] ${props.item.active ? props.activeIconClassName : ''}`}
+          className={`shrink-0 text-[18px] ${props.active ? props.activeIconClassName : ''}`}
           name={props.item.icon}
         />
         {props.collapsed ? null : <span className="truncate">{props.item.label}</span>}
@@ -75,12 +78,21 @@ const NavItemRow = (props: {
     </>
   );
 
-  return props.item.href ? (
-    <Link className={rowClassName} href={props.item.href}>
+  const link = (
+    <Link aria-label={props.item.label} className={rowClassName} href={props.href}>
       {content}
     </Link>
-  ) : (
-    <div className={rowClassName}>{content}</div>
+  );
+
+  if (!props.collapsed) {
+    return link;
+  }
+
+  return (
+    <Tooltip>
+      <TooltipTrigger render={link} />
+      <TooltipContent side="right">{props.item.label}</TooltipContent>
+    </Tooltip>
   );
 };
 
@@ -139,6 +151,25 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
   const role = resolveRole(searchParams.get('role'));
   const config = roleConfigs[role];
   const [collapsed, setCollapsed] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+
+  // The shell rebuilds its nav from ?role=, so every navigation has to carry it.
+  const withRole = (href: string) =>
+    role === 'admin' || href.includes('role=')
+      ? href
+      : `${href}${href.includes('?') ? '&' : '?'}role=${role}`;
+  const navHref = (item: NavItem) =>
+    withRole(item.href ?? `/dashboard/segera?item=${encodeURIComponent(item.label)}`);
+  const isActive = (item: NavItem) =>
+    item.href
+      ? pathname === item.href.split('?')[0]
+      : pathname === '/dashboard/segera' && searchParams.get('item') === item.label;
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.replace('/sign-in');
+  };
 
   return (
     <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
@@ -189,26 +220,30 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
           </div>
 
           <div className="flex-1 space-y-4 overflow-y-auto p-3">
-            {config.sections.map((section) => (
-              <div key={section.title}>
-                {collapsed ? null : (
-                  <span className="px-2.5 font-eyebrow text-[11px] tracking-wider text-primary-fixed-dim/70 uppercase">
-                    {section.title}
-                  </span>
-                )}
-                <nav className="mt-1 space-y-0.5">
-                  {section.items.map((item) => (
-                    <NavItemRow
-                      activeClassName={config.activeClassName}
-                      activeIconClassName={config.activeIconClassName}
-                      collapsed={collapsed}
-                      item={item}
-                      key={item.label}
-                    />
-                  ))}
-                </nav>
-              </div>
-            ))}
+            <TooltipProvider delay={150}>
+              {config.sections.map((section) => (
+                <div key={section.title}>
+                  {collapsed ? null : (
+                    <span className="px-2.5 font-eyebrow text-[11px] tracking-wider text-primary-fixed-dim/70 uppercase">
+                      {section.title}
+                    </span>
+                  )}
+                  <nav className="mt-1 space-y-0.5">
+                    {section.items.map((item) => (
+                      <NavItemRow
+                        activeClassName={config.activeClassName}
+                        activeIconClassName={config.activeIconClassName}
+                        active={isActive(item)}
+                        collapsed={collapsed}
+                        href={navHref(item)}
+                        item={item}
+                        key={item.label}
+                      />
+                    ))}
+                  </nav>
+                </div>
+              ))}
+            </TooltipProvider>
             {config.callout && !collapsed ? <Callout callout={config.callout} /> : null}
           </div>
         </div>
@@ -279,6 +314,8 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
                 className="h-10 w-full rounded-xl border border-border-control bg-canvas-base pr-4 pl-9 text-sm text-text-primary transition-all placeholder:text-text-muted focus:border-pine-deep focus:ring-2 focus:ring-pine-deep/10 focus:outline-none"
                 placeholder="Cari NIS, Siswa, Guru..."
                 type="search"
+                name="q"
+                id="global-search"
               />
             </div>
             <button
@@ -290,19 +327,18 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
               <span className="absolute top-2 right-2 size-2 rounded-full bg-amber-gold ring-2 ring-surface-card" />
             </button>
             <LocaleSwitcher />
-            <Show when="signed-in">
-              <SignOutButton>
-                <button
-                  aria-label="Keluar"
-                  className="flex size-10 items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light"
-                  type="button"
-                >
-                  <MaterialIcon className="text-[20px]" name="logout" />
-                </button>
-              </SignOutButton>
-            </Show>
+            <button
+              aria-label="Keluar"
+              className="flex size-10 items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light"
+              onClick={() => {
+                void handleSignOut();
+              }}
+              type="button"
+            >
+              <MaterialIcon className="text-[20px]" name="logout" />
+            </button>
             <div className="hidden h-8 w-px bg-border-subtle sm:block" />
-            <Link className="flex items-center gap-3 pl-1" href="/dashboard/user-profile">
+            <div className="flex items-center gap-3 pl-1">
               <div className="hidden flex-col text-right sm:flex">
                 <span className="text-sm leading-snug font-semibold text-text-primary">
                   {config.user.name}
@@ -312,12 +348,12 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
               <div className="flex size-8 items-center justify-center rounded-full bg-pine-deep shadow-sm">
                 <MaterialIcon className="text-[18px] text-on-primary" name="person" />
               </div>
-            </Link>
+            </div>
           </div>
         </header>
 
         <main className="relative flex-1 bg-surface pt-20">
-          <div className="flex w-full flex-col">{props.children}</div>
+          <div className="flex w-full flex-col px-6 py-6 sm:px-8">{props.children}</div>
         </main>
       </div>
     </div>
