@@ -48,4 +48,4 @@ export type SystemSettings = {
 /**
  * Settings tab identifiers.
  */
-export type SettingsTab = 'presence' | 'sanctions' | 'notifications';
+export type SettingsTab = 'presence' | 'sanctions' | 'notifications' | 'subjects' | 'assignments';

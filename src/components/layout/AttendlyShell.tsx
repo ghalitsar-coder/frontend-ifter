@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  BookOpenCheck,
   Calendar,
   ChartColumn,
   CheckCircle2,
@@ -219,6 +220,15 @@ export function AttendlyShell(props: {
           icon: ScanFace,
           badge: null,
           capability: 'attendance_ops',
+        },
+        {
+          // Hard-coded domain label: no new locale keys allowed for this feature.
+          label: 'Presensi Mapel',
+          href: '/dashboard/presensi-mapel',
+          icon: BookOpenCheck,
+          badge: null,
+          // Recap read is the lowest common denominator; the Sesi tab gates on attendance_ops.
+          capability: 'reports_read',
         },
         {
           label: t('koreksi_link'),

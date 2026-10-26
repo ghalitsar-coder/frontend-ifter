@@ -1,6 +1,15 @@
 'use client';
 
-import { CheckCircle2, Clock, MessageCircle, Scale, ShieldAlert, X } from 'lucide-react';
+import {
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  MessageCircle,
+  Scale,
+  ShieldAlert,
+  UserRoundCheck,
+  X,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { defaultSystemSettings } from '@/data/mockSettings';
@@ -20,12 +29,23 @@ import { SettingsNotificationPanel } from './SettingsNotificationPanel';
 import { SettingsPresencePanel } from './SettingsPresencePanel';
 import { SettingsPushPanel } from './SettingsPushPanel';
 import { SettingsSanctionsPanel } from './SettingsSanctionsPanel';
+import { SettingsSubjectPanel } from './SettingsSubjectPanel';
+import { SettingsTeachingAssignmentPanel } from './SettingsTeachingAssignmentPanel';
 
+// Tabs carry either a locale key or a hard-coded label: the subject-attendance
+// master data ships without new locale keys.
 const TABS = [
   { id: 'presence', labelKey: 'tab_presence', icon: Clock },
   { id: 'sanctions', labelKey: 'tab_sanctions', icon: Scale },
   { id: 'notifications', labelKey: 'tab_notifications', icon: MessageCircle },
-] as const satisfies { id: SettingsTab; labelKey: string; icon: typeof Clock }[];
+  { id: 'subjects', label: 'Mapel', icon: BookOpen },
+  { id: 'assignments', label: 'Penugasan', icon: UserRoundCheck },
+] as const satisfies readonly {
+  id: SettingsTab;
+  icon: typeof Clock;
+  labelKey?: string;
+  label?: string;
+}[];
 
 // No 'toast_save_error' key exists in SettingsPage locales; backend messages
 // are Indonesian domain content, the fallback matches that style.
@@ -130,7 +150,7 @@ export function SettingsManager() {
               }`}
             >
               <Icon className="size-3.5" />
-              <span>{t(tab.labelKey)}</span>
+              <span>{'label' in tab ? tab.label : t(tab.labelKey)}</span>
             </button>
           );
         })}
@@ -193,6 +213,11 @@ export function SettingsManager() {
           />
         </div>
       )}
+
+      {/* Both master-data tabs save per row, so the header save button stays out of them. */}
+      {activeTab === 'subjects' && <SettingsSubjectPanel />}
+
+      {activeTab === 'assignments' && <SettingsTeachingAssignmentPanel />}
     </div>
   );
 }
