@@ -202,7 +202,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
         <div className="flex min-h-0 flex-1 flex-col">
           <div
             className={`flex h-20 items-center border-b border-pine-hover ${
-              effectiveCollapsed ? 'justify-center px-0' : 'justify-between px-6'
+              effectiveCollapsed ? 'justify-center px-0' : 'px-6'
             }`}
           >
             <div className="flex items-center gap-3 overflow-hidden">
@@ -222,19 +222,6 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
                   </span>
                 </div>
               )}
-            </div>
-            <div className="flex shrink-0 items-center">
-              <button
-                aria-expanded={!collapsed}
-                aria-label="Perkecil atau perluas sidebar"
-                className="hidden size-8 shrink-0 cursor-pointer items-center justify-center rounded-lg bg-pine-hover text-on-primary transition-colors hover:bg-pine-deep focus-visible:ring-2 focus-visible:ring-amber-gold/60 focus-visible:outline-none active:scale-[0.96] md:flex"
-                onClick={() => {
-                  setCollapsed(!collapsed);
-                }}
-                type="button"
-              >
-                <MaterialIcon className="text-[20px]" name={collapsed ? 'menu' : 'menu_open'} />
-              </button>
             </div>
           </div>
 
@@ -301,36 +288,50 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
         <header
           className={`fixed top-0 right-0 z-40 flex h-20 items-center justify-between gap-2 border-b border-border-subtle bg-surface-card/90 px-4 shadow-[0_1px_8px_rgba(23,63,54,0.03)] backdrop-blur-xl transition-all duration-300 ${headerInset} md:justify-between md:px-8`}
         >
-          {isMobile ? (
-            <button
-              aria-label="Buka navigasi"
-              className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light focus-visible:ring-2 focus-visible:ring-pine-deep/30 focus-visible:outline-none active:scale-[0.96]"
-              onClick={() => {
-                setDrawerOpen(true);
-              }}
-              type="button"
-            >
-              <MaterialIcon className="text-[20px]" name="menu" />
-            </button>
-          ) : null}
-          <div className="hidden items-center gap-6 md:flex">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="font-headline-sm text-base font-bold text-text-primary">
-                  SMP Negeri 1 Harapan Bangsa
-                </span>
-                <span className="inline-flex items-center rounded-full bg-status-present px-2 py-0.5 text-[11px] font-semibold tracking-wide text-pine-deep">
-                  TA 2026/2027 Ganjil
-                </span>
-              </div>
-              <div className="mt-0.5 flex items-center gap-2 text-xs text-text-muted">
-                <MaterialIcon className="text-[14px] text-amber-dark" name="calendar_today" />
-                <span>Kamis, 24 Okt 2026</span>
-                <span className="text-border-control">•</span>
-                <span className="flex items-center gap-1 font-medium text-pine-deep">
-                  <span className="size-1.5 animate-pulse rounded-full bg-pine-deep" />
-                  Sesi Pagi Berjalan
-                </span>
+          <div className="flex items-center gap-4">
+            {isMobile ? (
+              <button
+                aria-label="Buka navigasi"
+                className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light focus-visible:ring-2 focus-visible:ring-pine-deep/30 focus-visible:outline-none active:scale-[0.96]"
+                onClick={() => {
+                  setDrawerOpen(true);
+                }}
+                type="button"
+              >
+                <MaterialIcon className="text-[20px]" name="menu" />
+              </button>
+            ) : (
+              <button
+                aria-expanded={!collapsed}
+                aria-label="Perkecil atau perluas sidebar"
+                className="flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-canvas-base text-text-primary transition-colors hover:bg-pine-light focus-visible:ring-2 focus-visible:ring-pine-deep/30 focus-visible:outline-none active:scale-[0.96]"
+                onClick={() => {
+                  setCollapsed(!collapsed);
+                }}
+                type="button"
+              >
+                <MaterialIcon className="text-[20px]" name={collapsed ? 'menu' : 'menu_open'} />
+              </button>
+            )}
+            <div className="hidden items-center gap-6 md:flex">
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <span className="font-headline-sm text-base font-bold text-text-primary">
+                    SMP Negeri 1 Harapan Bangsa
+                  </span>
+                  <span className="inline-flex items-center rounded-full bg-status-present px-2 py-0.5 text-[11px] font-semibold tracking-wide text-pine-deep">
+                    TA 2026/2027 Ganjil
+                  </span>
+                </div>
+                <div className="mt-0.5 flex items-center gap-2 text-xs text-text-muted">
+                  <MaterialIcon className="text-[14px] text-amber-dark" name="calendar_today" />
+                  <span>Kamis, 24 Okt 2026</span>
+                  <span className="text-border-control">•</span>
+                  <span className="flex items-center gap-1 font-medium text-pine-deep">
+                    <span className="size-1.5 animate-pulse rounded-full bg-pine-deep" />
+                    Sesi Pagi Berjalan
+                  </span>
+                </div>
               </div>
             </div>
           </div>
