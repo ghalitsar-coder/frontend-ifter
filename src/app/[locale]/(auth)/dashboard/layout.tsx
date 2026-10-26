@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 import { AttendlyShell } from '@/components/layout/AttendlyShell';
+import { academicPeriodLabel, SCHOOL_TIME_ZONE } from '@/utils/SchoolPeriod';
 
 type DashboardLayoutProps = {
   children: React.ReactNode;
@@ -41,9 +42,20 @@ export default async function DashboardLayout(props: DashboardLayoutProps) {
   const { locale } = await props.params;
   setRequestLocale(locale);
 
+  const now = new Date();
+  const todayLabel = new Intl.DateTimeFormat('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: SCHOOL_TIME_ZONE,
+  }).format(now);
+
   return (
     <AuthProvider>
-      <AttendlyShell>{props.children}</AttendlyShell>
+      <AttendlyShell periodLabel={academicPeriodLabel(now)} todayLabel={todayLabel}>
+        {props.children}
+      </AttendlyShell>
     </AuthProvider>
   );
 }
