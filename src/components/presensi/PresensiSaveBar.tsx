@@ -13,7 +13,8 @@ export function PresensiSaveBar(props: {
   total: number;
   unrecorded: number;
   disabled?: boolean;
-  onMarkRemainingPresent: () => void;
+  saving?: boolean;
+  onMarkRemainingAndSave: () => void;
   onSaveDraft: () => void;
 }) {
   const t = useTranslations('PresensiPage');
@@ -52,8 +53,9 @@ export function PresensiSaveBar(props: {
             <span>{t('save_draft')}</span>
           </button>
           <button
-            className="inline-flex items-center justify-center gap-2 rounded-xl border-[1.5px] border-amber-hover bg-amber-gold px-5 py-2.5 font-label-md text-label-md font-bold text-pine-deep shadow-md transition-all hover:brightness-105 active:scale-[0.98]"
-            onClick={props.onMarkRemainingPresent}
+            className="inline-flex items-center justify-center gap-2 rounded-xl border-[1.5px] border-amber-hover bg-amber-gold px-5 py-2.5 font-label-md text-label-md font-bold text-pine-deep shadow-md transition-all hover:brightness-105 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
+            disabled={props.saving}
+            onClick={props.onMarkRemainingAndSave}
             type="button"
           >
             <span className="material-symbols-outlined text-[20px] font-bold text-pine-deep">

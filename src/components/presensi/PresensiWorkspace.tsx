@@ -250,6 +250,11 @@ export function PresensiWorkspace() {
   };
 
   const handleTanggalChange = (nextTanggal: string) => {
+    // Clearing the native date field would send an empty tanggal the backend rejects outright.
+    if (nextTanggal === '') {
+      return;
+    }
+
     setTanggal(nextTanggal);
     setOverrides({});
     setPage(1);
@@ -279,6 +284,22 @@ export function PresensiWorkspace() {
     }
 
     save.mutate({ attendances, sessionId: session.data.session.id });
+  };
+
+  const handleMarkRemainingAndSave = () => {
+    const marked = students.map((student) =>
+      student.status === 'none' ? { ...student, status: 'hadir' as const } : student,
+    );
+
+    setOverrides((current) => ({
+      ...current,
+      ...Object.fromEntries(
+        students
+          .filter((student) => student.status === 'none')
+          .map((student) => [student.id, 'hadir' as const]),
+      ),
+    }));
+    save.mutate({ attendances: toAttendanceInputs(marked), sessionId: session.data.session.id });
   };
 
   const handleFocusUnrecorded = () => {
@@ -357,9 +378,10 @@ export function PresensiWorkspace() {
       {!locked && (
         <PresensiSaveBar
           disabled={counts.recorded === 0 || save.isPending}
-          onMarkRemainingPresent={handleMarkRemainingPresent}
+          onMarkRemainingAndSave={handleMarkRemainingAndSave}
           onSaveDraft={handleSaveDraft}
           recorded={counts.recorded}
+          saving={save.isPending}
           total={counts.total}
           unrecorded={counts.unrecorded}
         />
