@@ -3,7 +3,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { useTranslations } from 'next-intl';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
+import { MaterialIcon } from '@/components/landing/MaterialIcon';
 import { PresensiClassHero } from '@/components/presensi/PresensiClassHero';
 import { PresensiDispensationModal } from '@/components/presensi/PresensiDispensationModal';
 import { isUnauthorized, presensiErrorKey } from '@/components/presensi/presensiErrors';
@@ -20,6 +21,7 @@ import { PresensiSessionBar } from '@/components/presensi/PresensiSessionBar';
 import { countPresensiStatuses, presensiPercent } from '@/components/presensi/presensiStatusStyles';
 import { PresensiSupportCards } from '@/components/presensi/PresensiSupportCards';
 import { PresensiToast } from '@/components/presensi/PresensiToast';
+import { Env } from '@/libs/Env';
 import {
   AUTH_QUERY_KEY,
   createSession,
@@ -104,6 +106,25 @@ async function openSession(input: { classId: number; tanggal: string }): Promise
 }
 
 /**
+ * Collect the statuses the server already holds for a roster, keyed by student id. Used as the
+ * pre-test baseline the demo reset restores to.
+ *
+ * @param attendances - Roster rows of a session detail.
+ * @returns Map of student id to its saved status, skipping students not yet recorded.
+ */
+function collectSavedStatuses(attendances: SessionDetail['attendances']) {
+  const statuses: Record<string, Exclude<PresensiStatus, 'none'>> = {};
+
+  for (const attendance of attendances) {
+    if (attendance.status !== null) {
+      statuses[String(attendance.student_id)] = attendance.status;
+    }
+  }
+
+  return statuses;
+}
+
+/**
  * Interactive Attendly daily attendance workspace, read from and written to the Go backend. Status
  * edits stay local until the teacher saves, so one screen rebuilds the roster from the session
  * detail plus the pending edits.
@@ -113,6 +134,13 @@ async function openSession(input: { classId: number; tanggal: string }): Promise
 export function PresensiWorkspace() {
   const t = useTranslations('PresensiPage');
   const queryClient = useQueryClient();
+  const demoMode = Env.NEXT_PUBLIC_DEMO_MODE === 'true';
+  // shortcut: demo-only reset restores the statuses the server held when this session first loaded;
+  // PUT cannot unset a row, so students that were blank at load stay marked once saved.
+  const snapshotRef = useRef<{
+    key: string;
+    statuses: Record<string, Exclude<PresensiStatus, 'none'>>;
+  } | null>(null);
   // shortcut: id 0 never leaves the browser — every read stays disabled until a class is picked.
   const [classId, setClassId] = useState(0);
   const [tanggal, setTanggal] = useState(() => format(new Date(), 'yyyy-MM-dd'));
@@ -161,7 +189,19 @@ export function PresensiWorkspace() {
 
   const session = useQuery({
     enabled: selectedClassId > 0,
-    queryFn: async () => await guard(openSession({ classId: selectedClassId, tanggal })),
+    queryFn: async () => {
+      const detail = await guard(openSession({ classId: selectedClassId, tanggal }));
+      const snapshotKey = `${selectedClassId}:${tanggal}`;
+
+      if (demoMode && snapshotRef.current?.key !== snapshotKey) {
+        snapshotRef.current = {
+          key: snapshotKey,
+          statuses: collectSavedStatuses(detail.attendances),
+        };
+      }
+
+      return detail;
+    },
     queryKey: [...SESSION_QUERY_KEY, selectedClassId, tanggal],
   });
 
@@ -321,9 +361,47 @@ export function PresensiWorkspace() {
       ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
+  const handleDemoReset = () => {
+    const snapshot = snapshotRef.current;
+
+    setOverrides({});
+
+    if (snapshot === null) {
+      return;
+    }
+
+    const rows = Object.entries(snapshot.statuses).map(([id, status]) => ({
+      keterangan: null,
+      status,
+      student_id: Number(id),
+    }));
+
+    if (rows.length === 0) {
+      void queryClient.invalidateQueries({ queryKey: SESSION_QUERY_KEY });
+      presentToast(t('demo_reset_label'), t('demo_reset_empty_description'));
+      return;
+    }
+
+    save.mutate({ attendances: rows, sessionId: session.data.session.id });
+  };
+
   return (
     <div className="flex w-full flex-col">
       <div className="flex w-full flex-col gap-space-lg">
+        {demoMode ? (
+          <div className="flex items-center justify-between gap-4 rounded-xl border border-dashed border-amber-gold bg-amber-surface px-4 py-2.5">
+            <span className="font-caption text-caption text-amber-dark">{t('demo_mode_hint')}</span>
+            <button
+              className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-amber-gold bg-surface-card px-3 py-1.5 font-label-md text-label-md font-semibold text-amber-dark transition-all hover:bg-amber-gold/20 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
+              disabled={save.isPending}
+              onClick={handleDemoReset}
+              type="button"
+            >
+              <MaterialIcon className="text-[16px]" name="restart_alt" />
+              <span>{t('demo_reset_label')}</span>
+            </button>
+          </div>
+        ) : null}
         <PresensiSessionBar
           classes={classes.data}
           classId={selectedClassId}
