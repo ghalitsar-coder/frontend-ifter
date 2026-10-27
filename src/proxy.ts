@@ -1,21 +1,42 @@
 import { detectBot } from '@arcjet/next';
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import createMiddleware from 'next-intl/middleware';
-import type { NextFetchEvent, NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import arcjet from '@/libs/Arcjet';
+import { decodeBackendToken, isAllowedPage, SESSION_COOKIE_NAME } from '@/libs/DashboardAccess';
 import { routing } from './libs/I18nRouting';
 
 const handleI18nRouting = createMiddleware(routing);
 
-const isClerkRoute = createRouteMatcher([
-  '/dashboard(.*)',
-  '/:locale/dashboard(.*)',
-  '/sign-in(.*)',
-  '/:locale/sign-in(.*)',
-  '/sign-up(.*)',
-  '/:locale/sign-up(.*)',
-]);
+/**
+ * Dashboard page gate: only an unexpired backend session may open `/dashboard`, and only the pages
+ * its roles allow. The JWT signature itself is never trusted here — the Go backend re-verifies it
+ * on every API call; this redirect is the UX-level selection.
+ *
+ * @param request - Incoming navigation request.
+ * @returns A redirect, or null when the page may render.
+ */
+function gateDashboard(request: NextRequest): NextResponse | null {
+  const allSegments = request.nextUrl.pathname.split('/').filter(Boolean);
+  const locales = routing.locales as readonly string[];
+  const segments = locales.includes(allSegments[0] ?? '') ? allSegments.slice(1) : allSegments;
+
+  if (segments[0] !== 'dashboard') {
+    return null;
+  }
+
+  const session = decodeBackendToken(request.cookies.get(SESSION_COOKIE_NAME)?.value);
+
+  if (session === null || session.expired) {
+    return NextResponse.redirect(new URL('/sign-in', request.url));
+  }
+
+  if (!isAllowedPage(session.roles, segments[1] ?? '')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  return null;
+}
 
 // Improve security with Arcjet
 const aj = arcjet.withRule(
@@ -31,7 +52,7 @@ const aj = arcjet.withRule(
   }),
 );
 
-export default async function proxy(request: NextRequest, event: NextFetchEvent) {
+export default async function proxy(request: NextRequest) {
   // Verify the request with Arcjet
   // Use `process.env` instead of Env to reduce bundle size in middleware
   if (process.env.ARCJET_KEY) {
@@ -42,11 +63,10 @@ export default async function proxy(request: NextRequest, event: NextFetchEvent)
     }
   }
 
-  // Clerk keyless mode doesn't work with i18n, this is why we need to run the middleware conditionally
-  if (isClerkRoute(request)) {
-    // Clerk middleware still runs so server components can read the session, but
-    // dashboard routes are no longer gated behind authentication.
-    return await clerkMiddleware((_auth, req) => handleI18nRouting(req))(request, event);
+  const gate = gateDashboard(request);
+
+  if (gate !== null) {
+    return gate;
   }
 
   return handleI18nRouting(request);

@@ -1,4 +1,4 @@
-@layer theme, base, clerk, components, utilities; /* Ensure Clerk is compatible with Tailwind CSS v4 */
+@layer theme, base, components, utilities;
 
 @import 'tailwindcss';
 @import 'tw-animate-css';
@@ -63,12 +63,13 @@
   --color-pine-hover: #1f4f44;
   --color-pine-light: #e9f0ee;
   --color-amber-gold: #f2c96c;
+  --color-amber-hover: #e5bb5a;
   --color-amber-dark: #7a5e12;
   --color-amber-surface: #fdf8ed;
   --color-error-container: #ffdad6;
 
   /* Attendly landing palette */
-  --color-surface: #f9f9f8;
+  --color-surface: var(--surface);
   --color-surface-dim: #d9dad9;
   --color-surface-bright: #f9f9f8;
   --color-surface-container-lowest: #ffffff;
@@ -116,7 +117,8 @@
   --color-status-absent: #e7b9b9;
   --color-status-active: #d9a7e8;
   --color-text-primary: #111816;
-  --color-text-muted: #6e7a76;
+  --color-text-placeholder: #9a9a9a;
+  --color-text-muted: var(--text-muted);
 
   /* Attendly spacing */
   --spacing-gutter: 1.25rem;
@@ -180,7 +182,61 @@
   --text-eyebrow--font-weight: 600;
 }
 
+/*
+ * Self-declared instead of the Google Fonts stylesheet: their `.material-symbols-outlined`
+ * rule is unlayered, so it would beat every Tailwind utility that sizes or bolds a glyph.
+ */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/materialsymbolsoutlined/v380/kJEhBvYX7BgnkSrUwT8OhrdQw4oELdPIeeII9v6oFsI.woff2)
+    format('woff2');
+}
+
+@layer components {
+  .material-symbols-outlined {
+    display: inline-block;
+    font-family: 'Material Symbols Outlined', sans-serif;
+    font-size: 24px;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Stitch screens use a tighter radius scale than the shadcn defaults. */
+.attendly {
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  /* The attendance mocks paint cards pure white on top of the near-white canvas. */
+  --surface: #ffffff;
+  --text-muted: #999999;
+  /*
+   * The Stitch palette names its brand ink `primary`/`secondary`, which collide with the shadcn
+   * neutrals. `@theme inline` resolves those utilities to `var(--primary)`, so redefining them here
+   * restyles only this subtree and leaves /dashboard untouched.
+   */
+  --primary: #002921;
+  --primary-foreground: #ffffff;
+  --secondary: #785a00;
+  --secondary-foreground: #ffffff;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
 :root {
+  /* Attendly neutrals aliased by `@theme inline`; `.attendly` re-scopes them per screen. */
+  --surface: #f9f9f8;
+  --text-muted: #6e7a76;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);

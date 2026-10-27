@@ -30,8 +30,8 @@ const footerColumns = [
   {
     title: 'Kelembagaan',
     links: [
-      { label: 'Pendaftaran Uji Coba Gratis', href: '#daftar' },
-      { label: 'Portal Presensi Guru', href: '#beranda' },
+      { label: 'Pendaftaran Uji Coba Gratis', href: '/pendaftaran' },
+      { label: 'Portal Presensi Guru', href: '/dashboard/presensi' },
       { label: 'Suasana di Sekolah', href: '#galeri-penerapan' },
       { label: 'Tanya Jawab Seputar Layanan', href: '#faq' },
     ],
@@ -102,7 +102,7 @@ export const LandingFooter = () => (
             </h3>
             {column.links.map((link) => (
               <a
-                className="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
+                className="rounded font-label-md text-label-md text-on-surface-variant transition-colors hover:text-on-surface focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none"
                 href={link.href}
                 key={link.label}
               >
@@ -121,7 +121,7 @@ export const LandingFooter = () => (
         <div className="flex items-center gap-space-lg">
           {legalLinks.map((link) => (
             <a
-              className="transition-colors hover:text-on-surface"
+              className="rounded transition-colors hover:text-on-surface focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none"
               href={link.href}
               key={link.label}
             >
