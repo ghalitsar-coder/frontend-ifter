@@ -50,7 +50,7 @@ export const GallerySection = () => (
             KOLABORASI PENDIDIK &amp; KELUARGA
           </span>
         </div>
-        <h2 className="mt-1 font-headline-xl text-headline-xl tracking-tight text-text-primary">
+        <h2 className="mt-1 font-headline-xl text-headline-xl-mobile tracking-tight text-text-primary md:text-headline-xl">
           Keunggulan Implementasi Lapangan Nyata
         </h2>
         <p className="mt-2 font-body-md text-body-md text-text-muted">

@@ -32,7 +32,7 @@ export function PresensiRfidModal(props: { onClose: () => void }) {
       >
         <button
           aria-label={t('modal_close')}
-          className="absolute top-space-md right-space-md text-text-muted hover:text-text-primary"
+          className="absolute top-space-md right-space-md flex size-11 items-center justify-center rounded-lg text-text-muted hover:text-text-primary"
           onClick={props.onClose}
           type="button"
         >
@@ -55,7 +55,7 @@ export function PresensiRfidModal(props: { onClose: () => void }) {
         </div>
 
         <button
-          className="mt-space-md w-full py-2 font-label-md text-label-md text-text-muted hover:text-text-primary"
+          className="mt-space-md inline-flex min-h-11 w-full items-center justify-center py-2 font-label-md text-label-md text-text-muted hover:text-text-primary"
           onClick={props.onClose}
           type="button"
         >

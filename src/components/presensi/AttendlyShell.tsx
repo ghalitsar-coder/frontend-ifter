@@ -13,7 +13,7 @@ export async function AttendlyShell(props: { children: React.ReactNode }) {
   const t = await getTranslations('PresensiPage');
 
   return (
-    <div className="attendly flex min-h-screen flex-col bg-canvas-base text-body-md text-on-surface antialiased">
+    <div className="attendly flex min-h-dvh flex-col bg-canvas-base text-body-md text-on-surface antialiased">
       {/* oxlint-disable-next-line next/no-page-custom-font -- the Stitch screens own this font, the dashboard shell does not load it */}
       <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"

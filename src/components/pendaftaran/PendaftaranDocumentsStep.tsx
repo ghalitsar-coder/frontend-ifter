@@ -128,14 +128,14 @@ export function PendaftaranDocumentsStep(props: {
             </div>
             <div className="flex shrink-0 items-center gap-space-xs">
               <button
-                className="inline-flex items-center gap-1 rounded-lg bg-surface-card px-3 py-2 font-label-md text-caption font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container"
+                className="inline-flex min-h-11 items-center gap-1 rounded-lg bg-surface-card px-3 py-2 font-label-md text-caption font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container"
                 type="button"
               >
                 <span className="material-symbols-outlined text-[16px]">visibility</span>
                 {t('doc_preview_button')}
               </button>
               <button
-                className="inline-flex items-center gap-1 rounded-lg bg-surface-card px-3 py-2 font-label-md text-caption font-semibold text-error shadow-sm transition-colors hover:bg-surface-container"
+                className="inline-flex min-h-11 items-center gap-1 rounded-lg bg-surface-card px-3 py-2 font-label-md text-caption font-semibold text-error shadow-sm transition-colors hover:bg-surface-container"
                 type="button"
               >
                 <span className="material-symbols-outlined text-[16px]">swap_horiz</span>

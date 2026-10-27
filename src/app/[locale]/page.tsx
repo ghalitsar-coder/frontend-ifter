@@ -26,12 +26,12 @@ export default async function IndexPage(props: IndexPageProps) {
 
   return (
     <div
-      className="attendly-landing min-h-screen bg-surface font-body-md text-on-surface antialiased"
+      className="attendly-landing min-h-dvh bg-surface font-body-md text-on-surface antialiased"
       id="beranda"
       lang="id"
     >
       <LandingHeader />
-      <main className="min-h-[calc(100vh-20rem)] w-full bg-surface pt-20">
+      <main className="min-h-[calc(100dvh-20rem)] w-full bg-surface pt-20">
         <div className="flex w-full flex-col overflow-hidden">
           <HeroSection />
           <TrustSection />

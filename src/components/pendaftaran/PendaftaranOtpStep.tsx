@@ -218,7 +218,7 @@ export function PendaftaranOtpStep(props: {
                   <span />
                 )}
                 <button
-                  className="flex items-center gap-0.5 font-caption text-caption font-semibold text-pine-deep transition-colors hover:text-pine-hover disabled:cursor-not-allowed disabled:opacity-60"
+                  className="flex min-h-11 items-center gap-0.5 font-caption text-caption font-semibold text-pine-deep transition-colors hover:text-pine-hover disabled:cursor-not-allowed disabled:opacity-60"
                   disabled={props.isSubmitting}
                   onClick={props.onBack}
                   type="button"
@@ -314,7 +314,7 @@ export function PendaftaranOtpStep(props: {
             </div>
             {/* shortcut: the helpdesk button has no support channel route yet, so it stays inert; wire it to the help deep link once one exists */}
             <button
-              className="shrink-0 rounded-lg bg-surface-card px-space-md py-space-xs font-label-md text-label-md font-semibold text-pine-deep transition-colors hover:bg-surface-container-high"
+              className="inline-flex min-h-11 shrink-0 items-center rounded-lg bg-surface-card px-space-md py-space-xs font-label-md text-label-md font-semibold text-pine-deep transition-colors hover:bg-surface-container-high"
               type="button"
             >
               {t('otp_helpdesk_button')}

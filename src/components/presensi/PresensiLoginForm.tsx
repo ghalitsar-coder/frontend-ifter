@@ -157,7 +157,7 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
               <button
                 aria-label={t(visible ? 'login_password_hide' : 'login_password_show')}
                 aria-pressed={visible}
-                className="absolute right-space-sm rounded-lg p-1.5 text-text-muted transition-colors hover:text-text-primary"
+                className="absolute right-space-sm flex size-11 items-center justify-center rounded-lg text-text-muted transition-colors hover:text-text-primary"
                 onClick={() => {
                   setVisible(!visible);
                 }}

@@ -56,11 +56,12 @@ export const HeroSection = () => (
       <div className="mb-space-lg inline-flex items-center gap-space-xs rounded-full bg-pine-light px-space-md py-1.5 text-primary shadow-sm">
         <MaterialIcon name="bolt" className="fill-1 text-[16px] text-amber-gold" />
         <span className="font-eyebrow text-eyebrow tracking-widest text-primary uppercase">
-          ATTENDLY UNTUK SEKOLAH MODERN • EKOSISTEM PRESENSI TERINTEGRASI
+          ATTENDLY UNTUK SEKOLAH MODERN
+          <span className="max-sm:hidden"> • EKOSISTEM PRESENSI TERINTEGRASI</span>
         </span>
       </div>
 
-      <h1 className="max-w-4xl font-display-hero text-display-hero tracking-tight text-balance text-text-primary">
+      <h1 className="max-w-4xl font-display-hero text-display-hero-mobile tracking-tight text-balance text-text-primary md:text-display-hero">
         Presensi Siswa Jadi Lebih Mudah,
         <br />
         <span className="font-serif text-primary italic">Cepat, dan Tertib.</span>

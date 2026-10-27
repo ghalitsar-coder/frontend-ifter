@@ -72,7 +72,7 @@ export const FeaturesSection = () => (
           <span className="font-eyebrow text-eyebrow font-semibold tracking-widest text-primary uppercase">
             3 Pilar Solusi Utama
           </span>
-          <h2 className="mt-1 font-headline-xl text-headline-xl tracking-tight text-text-primary">
+          <h2 className="mt-1 font-headline-xl text-headline-xl-mobile tracking-tight text-text-primary md:text-headline-xl">
             Presensi &amp; Ketertiban Tanpa Beban Administrasi
           </h2>
         </div>

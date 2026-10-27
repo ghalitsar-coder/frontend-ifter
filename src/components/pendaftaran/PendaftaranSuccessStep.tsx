@@ -104,7 +104,7 @@ function PendaftaranSuccessHeader() {
           {t('done_badge')}
         </span>
       </div>
-      <h1 className="mb-space-sm font-headline-xl text-headline-xl tracking-tight text-pine-deep">
+      <h1 className="mb-space-sm font-headline-xl text-headline-xl-mobile tracking-tight text-pine-deep md:text-headline-xl">
         {t('done_title')}
       </h1>
       <p className="mx-auto max-w-2xl font-body-lg text-body-lg text-text-muted">
@@ -497,12 +497,12 @@ function PendaftaranActionDock(props: { onStart: () => void }) {
         </div>
         <div className="flex w-full items-center gap-space-sm sm:w-auto">
           <input
-            className="h-10 w-full rounded-xl bg-canvas-base px-space-md font-label-md text-label-md text-text-primary placeholder:text-text-muted focus:ring-2 focus:ring-pine-deep focus:outline-none sm:w-64"
+            className="h-11 w-full rounded-xl bg-canvas-base px-space-md font-label-md text-label-md text-text-primary placeholder:text-text-muted focus:ring-2 focus:ring-pine-deep focus:outline-none sm:w-64"
             placeholder={t('done_invite_placeholder')}
             type="email"
           />
           <button
-            className="h-10 shrink-0 rounded-xl bg-secondary-container px-space-md font-label-md text-label-md font-semibold text-on-secondary-container transition-colors hover:bg-amber-gold"
+            className="h-11 shrink-0 rounded-xl bg-secondary-container px-space-md font-label-md text-label-md font-semibold text-on-secondary-container transition-colors hover:bg-amber-gold"
             type="button"
           >
             {t('done_invite_cta')}
@@ -650,7 +650,7 @@ export function PendaftaranSuccessStep(props: {
       <PendaftaranSecurityBox />
       <PendaftaranSupportBanner />
       <div
-        className={`fixed right-6 bottom-6 z-50 flex transform items-center gap-space-sm rounded-xl bg-primary px-space-md py-space-sm text-on-primary shadow-xl transition-all duration-300 ${
+        className={`fixed right-6 bottom-[max(1.5rem,env(safe-area-inset-bottom))] z-50 flex max-w-[calc(100vw-2rem)] transform items-center gap-space-sm rounded-xl bg-primary px-space-md py-space-sm text-on-primary shadow-xl transition-all duration-300 ${
           isCopied ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-20 opacity-0'
         }`}
       >

@@ -49,7 +49,7 @@ export const TestimonialsSection = () => (
             className="flex flex-col items-center text-center md:items-start md:text-left"
             key={metric.title}
           >
-            <span className="font-display-hero text-display-hero font-extrabold tracking-tight text-amber-gold">
+            <span className="font-display-hero text-display-hero-mobile font-extrabold tracking-tight text-amber-gold md:text-display-hero">
               {metric.value}
             </span>
             <p className="mt-1 font-headline-sm text-headline-sm font-semibold text-on-primary">

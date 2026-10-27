@@ -10,9 +10,11 @@ export const CtaSection = () => (
       <div className="relative z-10 max-w-3xl">
         <div className="mb-space-md inline-flex items-center gap-1.5 rounded-full bg-tertiary-container px-space-sm py-1 font-eyebrow text-eyebrow tracking-widest text-amber-gold uppercase">
           <MaterialIcon name="hourglass_top" className="text-[16px]" />
-          <span>Penerapan Cepat Tanpa Mengganggu Jam Belajar Mengajar</span>
+          <span className="max-sm:text-[10px] max-sm:tracking-[0.08em]">
+            Penerapan Cepat Tanpa Mengganggu Jam Belajar Mengajar
+          </span>
         </div>
-        <h2 className="font-headline-xl text-headline-xl font-extrabold tracking-tight text-balance text-on-primary">
+        <h2 className="font-headline-xl text-headline-xl-mobile font-extrabold tracking-tight text-balance text-on-primary md:text-headline-xl">
           Siap memodernisasi presensi sekolah Anda mulai esok hari?
         </h2>
         <p className="mt-space-md max-w-xl font-body-lg text-body-lg text-balance text-primary-fixed-dim">

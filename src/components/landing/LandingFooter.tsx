@@ -102,7 +102,7 @@ export const LandingFooter = () => (
             </h3>
             {column.links.map((link) => (
               <a
-                className="font-label-md text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
+                className="flex min-h-11 items-center py-1.5 font-label-md text-label-md text-on-surface-variant transition-colors hover:text-on-surface"
                 href={link.href}
                 key={link.label}
               >
@@ -118,7 +118,7 @@ export const LandingFooter = () => (
           © 2025 PT Attendly Edukasi Digital. Hak Cipta Dilindungi Undang-Undang. Mendukung
           standardisasi data sekolah di seluruh Indonesia.
         </p>
-        <div className="flex items-center gap-space-lg">
+        <div className="flex flex-wrap items-center justify-center gap-space-md">
           {legalLinks.map((link) => (
             <a
               className="transition-colors hover:text-on-surface"

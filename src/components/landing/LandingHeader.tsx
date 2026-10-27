@@ -1,4 +1,5 @@
 import { Link } from '@/libs/I18nNavigation';
+import { LandingMobileMenu } from './LandingMobileMenu';
 import { MaterialIcon } from './MaterialIcon';
 
 const navItems = [
@@ -59,7 +60,8 @@ export const LandingHeader = () => (
         >
           Daftar Sekolah
         </Link>
-        <div className="ml-space-xs flex size-8 items-center justify-center rounded-full bg-primary">
+        <LandingMobileMenu items={navItems} />
+        <div className="ml-space-xs hidden size-8 items-center justify-center rounded-full bg-primary md:flex">
           <MaterialIcon name="person" className="text-[18px] text-on-primary" />
         </div>
       </div>

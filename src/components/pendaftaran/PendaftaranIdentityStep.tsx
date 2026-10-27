@@ -257,7 +257,7 @@ function PendaftaranFieldControl(props: {
               <button
                 aria-label={t('id_toggle_visibility')}
                 aria-pressed={props.revealed === entry.field}
-                className="absolute top-1/2 right-3 -translate-y-1/2 rounded p-1 text-text-muted outline-none hover:text-text-primary focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2"
+                className="absolute top-1/2 right-3 flex size-11 -translate-y-1/2 items-center justify-center rounded-lg text-text-muted outline-none hover:text-text-primary focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2"
                 onClick={() => {
                   props.onReveal(entry.field);
                 }}

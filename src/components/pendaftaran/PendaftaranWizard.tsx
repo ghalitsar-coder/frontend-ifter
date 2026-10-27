@@ -57,7 +57,7 @@ export function PendaftaranWizard() {
                   {t('hero_eyebrow')}
                 </span>
               </div>
-              <h1 className="mb-space-sm font-headline-xl text-headline-xl tracking-tight text-text-primary">
+              <h1 className="mb-space-sm font-headline-xl text-headline-xl-mobile tracking-tight text-text-primary md:text-headline-xl">
                 {t('hero_title')}
               </h1>
               <p className="font-body-lg text-body-lg text-text-muted">{t('hero_desc')}</p>

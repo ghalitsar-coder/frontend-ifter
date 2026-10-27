@@ -43,7 +43,7 @@ export const WorkflowSection = () => (
         <span className="font-eyebrow text-eyebrow font-semibold tracking-widest text-primary uppercase">
           Alur Penggunaan Mudah
         </span>
-        <h2 className="mt-1 font-headline-xl text-headline-xl tracking-tight text-text-primary">
+        <h2 className="mt-1 font-headline-xl text-headline-xl-mobile tracking-tight text-text-primary md:text-headline-xl">
           3 Langkah Menuju Sekolah Tertib &amp; Modern
         </h2>
         <p className="mt-2 font-body-md text-body-md text-text-muted">
@@ -60,7 +60,7 @@ export const WorkflowSection = () => (
           >
             <div>
               <span
-                className={`mb-space-sm block font-display-hero text-display-hero leading-none ${step.numberClassName}`}
+                className={`mb-space-sm block font-headline-xl text-headline-xl leading-none md:font-display-hero md:text-display-hero ${step.numberClassName}`}
               >
                 {step.number}
               </span>

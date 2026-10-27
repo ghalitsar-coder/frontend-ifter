@@ -219,6 +219,14 @@
   font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* The 2rem gutters would eat most of a phone viewport; scope the mobile tokens to the landing only. */
+@media (width < 40rem) {
+  .attendly-landing {
+    --spacing-margin: var(--spacing-margin-mobile);
+    --spacing-gutter: var(--spacing-gutter-mobile);
+  }
+}
+
 /*
  * Self-declared instead of the Google Fonts stylesheet: their `.material-symbols-outlined`
  * rule is unlayered, so it would beat every Tailwind utility that sizes or bolds a glyph.
