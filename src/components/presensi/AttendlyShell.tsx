@@ -67,24 +67,27 @@ export async function AttendlyShell(props: { children: React.ReactNode }) {
           </div>
           <div className="flex items-center gap-6">
             {/* shortcut: placeholder legal/help targets until dedicated pages exist, then point each to its own route */}
-            <Link
-              className="font-caption text-caption text-on-surface-variant transition-colors hover:text-on-surface"
-              href="/"
+            <span
+              aria-disabled="true"
+              className="cursor-not-allowed font-caption text-caption text-on-surface-variant"
+              title="Belum tersedia"
             >
               {t('footer_help')}
-            </Link>
-            <Link
-              className="font-caption text-caption text-on-surface-variant transition-colors hover:text-on-surface"
-              href="/"
+            </span>
+            <span
+              aria-disabled="true"
+              className="cursor-not-allowed font-caption text-caption text-on-surface-variant"
+              title="Belum tersedia"
             >
               {t('footer_privacy')}
-            </Link>
-            <Link
-              className="font-caption text-caption text-on-surface-variant transition-colors hover:text-on-surface"
-              href="/"
+            </span>
+            <span
+              aria-disabled="true"
+              className="cursor-not-allowed font-caption text-caption text-on-surface-variant"
+              title="Belum tersedia"
             >
               {t('footer_terms')}
-            </Link>
+            </span>
           </div>
         </div>
       </footer>

@@ -104,6 +104,9 @@ export function TeacherJournalPanel(props: {
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                // shortcut: journal attachments have no upload endpoint yet, wire multipart POST when it ships.
+                disabled
+                title="Belum tersedia"
                 className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border-control bg-card px-3 py-2 text-[11px] font-semibold text-muted-foreground transition-colors hover:text-pine-deep"
               >
                 <Paperclip className="size-3.5" />

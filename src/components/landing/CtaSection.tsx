@@ -29,13 +29,13 @@ export const CtaSection = () => (
             <span>Daftar Sekolah Sekarang</span>
             <MaterialIcon name="arrow_forward" className="text-[18px]" />
           </Link>
-          <a
+          <Link
             className="inline-flex h-12 w-full items-center justify-center gap-space-sm rounded-xl bg-tertiary-container px-space-lg font-label-md text-label-md text-on-primary transition-all hover:bg-primary sm:w-auto"
-            href="#demo"
+            href="#daftar"
           >
             <MaterialIcon name="headset_mic" className="text-[18px]" />
             <span>Hubungi Tim Konsultan Kami</span>
-          </a>
+          </Link>
         </div>
       </div>
     </div>

@@ -243,6 +243,9 @@ export function MedicalCertificateModal(props: {
                 <button
                   type="button"
                   aria-label={t('btn_view')}
+                  // shortcut: no file preview viewer yet, open the uploaded certificate in a modal once GET /files/:id ships.
+                  disabled
+                  title="Belum tersedia"
                   className="flex size-6 cursor-pointer items-center justify-center rounded-md text-emerald-100/60 hover:bg-white/10 hover:text-white max-sm:size-9"
                 >
                   <Eye className="size-3" />

@@ -315,6 +315,8 @@ export function PendaftaranOtpStep(props: {
             {/* shortcut: the helpdesk button has no support channel route yet, so it stays inert; wire it to the help deep link once one exists */}
             <button
               className="inline-flex min-h-11 shrink-0 items-center rounded-lg bg-surface-card px-space-md py-space-xs font-label-md text-label-md font-semibold text-pine-deep transition-colors hover:bg-surface-container-high"
+              disabled
+              title="Belum tersedia"
               type="button"
             >
               {t('otp_helpdesk_button')}

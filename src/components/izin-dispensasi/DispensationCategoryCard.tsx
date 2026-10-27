@@ -35,6 +35,9 @@ export function DispensationCategoryCard(props: {
         <button
           type="button"
           aria-pressed
+          // shortcut: this is the active category of the page, no alternate flow to switch to yet.
+          disabled
+          title="Belum tersedia"
           className="flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-pine-deep px-3 py-2.5 text-[11px] font-bold text-white shadow-sm"
         >
           <BadgeCheck className="size-3.5 text-amber-gold" />

@@ -198,12 +198,12 @@ export function MasterSiswaAddModal(props: {
       aria-labelledby="modal-add-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-pine-deep/50 p-3 backdrop-blur-sm sm:p-6"
     >
-      <div className="bg-surface-card relative flex max-h-[92vh] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl shadow-2xl duration-200 zoom-in-95 fade-in">
+      <div className="relative flex max-h-[92vh] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl bg-surface-card shadow-2xl duration-200 zoom-in-95 fade-in">
         {/* Top architectural gradient accent */}
         <div className="h-1.5 w-full bg-gradient-to-r from-pine-deep via-pine-hover to-amber-gold" />
 
         {/* Modal Header */}
-        <div className="bg-surface-card flex items-start justify-between border-b border-border-control px-6 py-5 sm:px-8">
+        <div className="flex items-start justify-between border-b border-border-control bg-surface-card px-6 py-5 sm:px-8">
           <div className="flex items-start gap-4">
             <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-pine-light text-pine-deep shadow-xs">
               <UserPlus className="size-6" />
@@ -222,7 +222,7 @@ export function MasterSiswaAddModal(props: {
                   {t('add_modal_badge_manual')}
                 </span>
               </div>
-              <p className="text-text-muted mt-0.5 flex flex-wrap items-center gap-1.5 text-xs sm:text-sm">
+              <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-text-muted sm:text-sm">
                 <span>{t('add_modal_academic_year')}</span>
                 <span>•</span>
                 <span className="inline-flex items-center gap-1 font-medium text-pine-deep">
@@ -236,7 +236,7 @@ export function MasterSiswaAddModal(props: {
             type="button"
             onClick={props.onClose}
             aria-label={t('btn_close')}
-            className="hover:bg-surface-container text-text-muted hover:text-text-primary flex size-9 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low transition-colors"
+            className="flex size-9 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary"
           >
             <X className="size-4" />
           </button>
@@ -248,10 +248,10 @@ export function MasterSiswaAddModal(props: {
             e.preventDefault();
             handleSubmitInternal(false);
           }}
-          className="bg-canvas-base flex-1 space-y-6 overflow-y-auto px-6 py-6 sm:px-8"
+          className="flex-1 space-y-6 overflow-y-auto bg-canvas-base px-6 py-6 sm:px-8"
         >
           {/* SECTION 1: Identitas Pokok & Dapodik */}
-          <div className="bg-surface-card space-y-4 rounded-2xl border border-border-control p-5 shadow-xs">
+          <div className="space-y-4 rounded-2xl border border-border-control bg-surface-card p-5 shadow-xs">
             <div className="flex items-center justify-between border-b border-border-subtle pb-1">
               <div className="flex items-center gap-2.5">
                 <span className="flex size-6 items-center justify-center rounded-lg bg-pine-deep text-xs font-bold text-white">
@@ -261,7 +261,7 @@ export function MasterSiswaAddModal(props: {
                   {t('add_section_1_title')}
                 </h3>
               </div>
-              <span className="text-text-muted text-[11px] font-semibold tracking-wider uppercase">
+              <span className="text-[11px] font-semibold tracking-wider text-text-muted uppercase">
                 {t('add_section_1_badge')}
               </span>
             </div>
@@ -269,9 +269,9 @@ export function MasterSiswaAddModal(props: {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* NISN */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-text-primary flex items-center justify-between text-xs font-semibold">
+                <label className="flex items-center justify-between text-xs font-semibold text-text-primary">
                   <span>{t('field_nisn_label')} *</span>
-                  <span className="text-text-muted text-[10px] font-normal">
+                  <span className="text-[10px] font-normal text-text-muted">
                     {t('field_nisn_digits')}
                   </span>
                 </label>
@@ -303,7 +303,7 @@ export function MasterSiswaAddModal(props: {
 
               {/* NIS Lokal */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-text-primary flex items-center justify-between text-xs font-semibold">
+                <label className="flex items-center justify-between text-xs font-semibold text-text-primary">
                   <span>{t('field_nis_label')} *</span>
                   <span className="rounded bg-pine-light px-1.5 py-0.5 text-[10px] font-semibold text-pine-deep">
                     {t('field_nis_auto')}
@@ -321,7 +321,7 @@ export function MasterSiswaAddModal(props: {
 
               {/* Nama Lengkap */}
               <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_full_name_label')} *
                 </label>
                 <input
@@ -338,7 +338,7 @@ export function MasterSiswaAddModal(props: {
 
               {/* Nama Panggilan */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_calling_name_label')}
                 </label>
                 <input
@@ -354,7 +354,7 @@ export function MasterSiswaAddModal(props: {
 
               {/* Jenis Kelamin */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_gender_label')} *
                 </label>
                 <div className="grid h-10 grid-cols-2 gap-2">
@@ -366,7 +366,7 @@ export function MasterSiswaAddModal(props: {
                     className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-semibold transition-colors ${
                       gender === 'L'
                         ? 'bg-pine-deep text-white shadow-xs'
-                        : 'text-text-muted hover:bg-surface-container bg-surface-container-low'
+                        : 'bg-surface-container-low text-text-muted hover:bg-surface-container'
                     }`}
                   >
                     <span>Laki-laki</span>
@@ -379,7 +379,7 @@ export function MasterSiswaAddModal(props: {
                     className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-xl text-xs font-semibold transition-colors ${
                       gender === 'P'
                         ? 'bg-pine-deep text-white shadow-xs'
-                        : 'text-text-muted hover:bg-surface-container bg-surface-container-low'
+                        : 'bg-surface-container-low text-text-muted hover:bg-surface-container'
                     }`}
                   >
                     <span>Perempuan</span>
@@ -389,7 +389,7 @@ export function MasterSiswaAddModal(props: {
 
               {/* Tempat & Tanggal Lahir */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_pob_label')} *
                 </label>
                 <input
@@ -404,7 +404,7 @@ export function MasterSiswaAddModal(props: {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_dob_label')} *
                 </label>
                 <input
@@ -419,7 +419,7 @@ export function MasterSiswaAddModal(props: {
 
               {/* Agama */}
               <div className="flex flex-col gap-1.5 sm:col-span-2">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_religion_label')} *
                 </label>
                 <select
@@ -441,7 +441,7 @@ export function MasterSiswaAddModal(props: {
           </div>
 
           {/* SECTION 2: Penempatan Rombongan Belajar (Rombel) */}
-          <div className="bg-surface-card space-y-4 rounded-2xl border border-border-control p-5 shadow-xs">
+          <div className="space-y-4 rounded-2xl border border-border-control bg-surface-card p-5 shadow-xs">
             <div className="flex items-center justify-between border-b border-border-subtle pb-1">
               <div className="flex items-center gap-2.5">
                 <span className="flex size-6 items-center justify-center rounded-lg bg-pine-deep text-xs font-bold text-white">
@@ -458,7 +458,7 @@ export function MasterSiswaAddModal(props: {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
               <div className="flex flex-col gap-1.5 sm:col-span-3">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_grade_label')} *
                 </label>
                 <select
@@ -476,7 +476,7 @@ export function MasterSiswaAddModal(props: {
               </div>
 
               <div className="flex flex-col gap-1.5 sm:col-span-6">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_target_class_label')} *
                 </label>
                 <select
@@ -498,9 +498,9 @@ export function MasterSiswaAddModal(props: {
               </div>
 
               <div className="flex flex-col gap-1.5 sm:col-span-3">
-                <label className="text-text-primary flex items-center justify-between text-xs font-semibold">
+                <label className="flex items-center justify-between text-xs font-semibold text-text-primary">
                   <span>{t('field_absent_num_label')}</span>
-                  <span className="text-text-muted text-[10px]">Auto</span>
+                  <span className="text-[10px] text-text-muted">Auto</span>
                 </label>
                 <input
                   type="number"
@@ -517,7 +517,7 @@ export function MasterSiswaAddModal(props: {
           </div>
 
           {/* SECTION 3: Data Kontak & Wali Murid */}
-          <div className="bg-surface-card space-y-4 rounded-2xl border border-border-control p-5 shadow-xs">
+          <div className="space-y-4 rounded-2xl border border-border-control bg-surface-card p-5 shadow-xs">
             <div className="flex items-center justify-between border-b border-border-subtle pb-1">
               <div className="flex items-center gap-2.5">
                 <span className="flex size-6 items-center justify-center rounded-lg bg-pine-deep text-xs font-bold text-white">
@@ -534,7 +534,7 @@ export function MasterSiswaAddModal(props: {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
               <div className="flex flex-col gap-1.5 sm:col-span-8">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_guardian_name_label')} *
                 </label>
                 <input
@@ -549,7 +549,7 @@ export function MasterSiswaAddModal(props: {
               </div>
 
               <div className="flex flex-col gap-1.5 sm:col-span-4">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_guardian_relation_label')} *
                 </label>
                 <select
@@ -566,14 +566,14 @@ export function MasterSiswaAddModal(props: {
               </div>
 
               <div className="flex flex-col gap-1.5 sm:col-span-12">
-                <label className="text-text-primary flex items-center justify-between text-xs font-semibold">
+                <label className="flex items-center justify-between text-xs font-semibold text-text-primary">
                   <span>{t('field_guardian_phone_label')} *</span>
-                  <span className="text-text-muted text-[10px]">
+                  <span className="text-[10px] text-text-muted">
                     {t('field_guardian_phone_hint')}
                   </span>
                 </label>
                 <div className="flex">
-                  <div className="text-text-muted flex h-10 items-center gap-1 rounded-l-xl border border-r-0 border-border-control bg-surface-container-high px-3.5 text-xs font-bold">
+                  <div className="flex h-10 items-center gap-1 rounded-l-xl border border-r-0 border-border-control bg-surface-container-high px-3.5 text-xs font-bold text-text-muted">
                     <span>🇮🇩</span>
                     <span>+62</span>
                   </div>
@@ -590,7 +590,7 @@ export function MasterSiswaAddModal(props: {
               </div>
 
               <div className="flex flex-col gap-1.5 sm:col-span-12">
-                <label className="text-text-primary text-xs font-semibold">
+                <label className="text-xs font-semibold text-text-primary">
                   {t('field_guardian_address_label')} *
                 </label>
                 <textarea
@@ -607,7 +607,7 @@ export function MasterSiswaAddModal(props: {
           </div>
 
           {/* SECTION 4: Identifikasi RFID & Pas Foto */}
-          <div className="bg-surface-card space-y-4 rounded-2xl border border-border-control p-5 shadow-xs">
+          <div className="space-y-4 rounded-2xl border border-border-control bg-surface-card p-5 shadow-xs">
             <div className="flex items-center justify-between border-b border-border-subtle pb-1">
               <div className="flex items-center gap-2.5">
                 <span className="flex size-6 items-center justify-center rounded-lg bg-pine-deep text-xs font-bold text-white">
@@ -628,11 +628,14 @@ export function MasterSiswaAddModal(props: {
                 <div className="mb-2 flex size-24 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-pine-deep/20 bg-pine-light text-pine-deep">
                   <Camera className="size-8 text-pine-deep/60" />
                 </div>
-                <span className="text-text-primary text-xs font-bold">{t('photo_spec_title')}</span>
-                <span className="text-text-muted mt-0.5 text-[10px]">{t('photo_spec_desc')}</span>
+                <span className="text-xs font-bold text-text-primary">{t('photo_spec_title')}</span>
+                <span className="mt-0.5 text-[10px] text-text-muted">{t('photo_spec_desc')}</span>
                 <button
                   type="button"
-                  className="bg-surface-card hover:bg-surface-container mt-3 flex cursor-pointer items-center gap-1.5 rounded-xl border border-border-control px-3 py-1.5 text-xs font-semibold text-pine-deep transition-colors"
+                  // shortcut: no photo upload endpoint yet, wire PUT /students/:id/photo via apiUpload when it ships.
+                  disabled
+                  title="Belum tersedia"
+                  className="mt-3 flex cursor-pointer items-center gap-1.5 rounded-xl border border-border-control bg-surface-card px-3 py-1.5 text-xs font-semibold text-pine-deep transition-colors hover:bg-surface-container"
                 >
                   <Upload className="size-3.5" />
                   <span>{t('btn_upload_photo')}</span>
@@ -642,7 +645,7 @@ export function MasterSiswaAddModal(props: {
               {/* RFID UID registration */}
               <div className="flex flex-col gap-3 sm:col-span-8">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-text-primary flex items-center justify-between text-xs font-semibold">
+                  <label className="flex items-center justify-between text-xs font-semibold text-text-primary">
                     <span>{t('field_rfid_label')}</span>
                     <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-700">
                       <span className="size-1.5 animate-pulse rounded-full bg-emerald-600" />
@@ -651,7 +654,7 @@ export function MasterSiswaAddModal(props: {
                   </label>
                   <div className="flex gap-2">
                     <div className="relative flex-1">
-                      <CreditCard className="text-text-muted absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                      <CreditCard className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-text-muted" />
                       <input
                         type="text"
                         value={rfidUid}
@@ -676,7 +679,7 @@ export function MasterSiswaAddModal(props: {
                   <Info className="mt-0.5 size-4 shrink-0" />
                   <div className="flex flex-col text-xs">
                     <span className="font-bold">{t('rfid_integration_info_title')}</span>
-                    <span className="text-text-muted text-[11px] leading-relaxed">
+                    <span className="text-[11px] leading-relaxed text-text-muted">
                       {t('rfid_integration_info_desc')}
                     </span>
                   </div>
@@ -687,11 +690,11 @@ export function MasterSiswaAddModal(props: {
         </form>
 
         {/* Modal Footer Actions */}
-        <div className="bg-surface-card flex shrink-0 flex-col items-center justify-between gap-3 border-t border-border-control px-6 py-4 sm:flex-row sm:px-8">
+        <div className="flex shrink-0 flex-col items-center justify-between gap-3 border-t border-border-control bg-surface-card px-6 py-4 sm:flex-row sm:px-8">
           <button
             type="button"
             onClick={props.onClose}
-            className="hover:bg-surface-container text-text-muted hover:text-text-primary h-10 w-full cursor-pointer rounded-xl bg-surface-container-low px-4 text-xs font-semibold transition-colors sm:w-auto sm:text-sm"
+            className="h-10 w-full cursor-pointer rounded-xl bg-surface-container-low px-4 text-xs font-semibold text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary sm:w-auto sm:text-sm"
           >
             {t('btn_cancel')}
           </button>
@@ -704,7 +707,7 @@ export function MasterSiswaAddModal(props: {
                 onClick={() => {
                   handleSubmitInternal(true);
                 }}
-                className="bg-surface-container flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl px-4 text-xs font-semibold text-pine-deep transition-colors hover:bg-surface-container-high disabled:opacity-50 sm:w-auto sm:text-sm"
+                className="flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-surface-container px-4 text-xs font-semibold text-pine-deep transition-colors hover:bg-surface-container-high disabled:opacity-50 sm:w-auto sm:text-sm"
               >
                 <PlusCircle className="size-4" />
                 <span>{t('btn_save_and_add_another')}</span>

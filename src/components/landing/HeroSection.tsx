@@ -81,13 +81,13 @@ export const HeroSection = () => (
           <span>Mulai Uji Coba Gratis 30 Hari</span>
           <MaterialIcon name="arrow_forward" className="text-[18px]" />
         </Link>
-        <a
+        <Link
           className="inline-flex h-12 w-full items-center justify-center gap-space-xs rounded-xl bg-surface-card px-space-lg font-label-md text-label-md text-text-primary shadow-sm transition-all hover:bg-surface-container sm:w-auto"
-          href="#demo"
+          href="#daftar"
         >
           <MaterialIcon name="play_circle" className="text-[18px] text-primary" />
           <span>Jadwalkan Demo Langsung</span>
-        </a>
+        </Link>
       </div>
 
       <div className="mt-space-sm flex items-center gap-space-sm text-text-muted">
@@ -185,8 +185,11 @@ export const HeroSection = () => (
               </div>
             ))}
           </div>
+          {/* shortcut: mockup only — decorative button, upgrade when the hero preview becomes interactive */}
           <button
+            aria-hidden="true"
             className="mt-space-md flex w-full items-center justify-center gap-space-xs rounded-xl bg-primary py-2 font-label-md text-label-md text-on-primary transition-colors hover:bg-pine-hover"
+            tabIndex={-1}
             type="button"
           >
             <MaterialIcon name="done_all" className="text-[16px]" />

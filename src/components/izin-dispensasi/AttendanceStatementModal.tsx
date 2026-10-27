@@ -316,6 +316,9 @@ export function AttendanceStatementModal(props: {
                 <button
                   type="button"
                   aria-label={t('btn_view')}
+                  // shortcut: no file preview viewer yet, open the uploaded statement in a modal once GET /files/:id ships.
+                  disabled
+                  title="Belum tersedia"
                   className="flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground hover:bg-card hover:text-pine-deep max-sm:size-9"
                 >
                   <Eye className="size-3" />

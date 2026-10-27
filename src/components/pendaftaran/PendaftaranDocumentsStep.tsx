@@ -127,8 +127,11 @@ export function PendaftaranDocumentsStep(props: {
               </div>
             </div>
             <div className="flex shrink-0 items-center gap-space-xs">
+              {/* shortcut: no document viewer yet, open the uploaded file in a preview modal when it ships. */}
               <button
                 className="inline-flex min-h-11 items-center gap-1 rounded-lg bg-surface-card px-3 py-2 font-label-md text-caption font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container"
+                disabled
+                title="Belum tersedia"
                 type="button"
               >
                 <span className="material-symbols-outlined text-[16px]">visibility</span>
@@ -136,6 +139,9 @@ export function PendaftaranDocumentsStep(props: {
               </button>
               <button
                 className="inline-flex min-h-11 items-center gap-1 rounded-lg bg-surface-card px-3 py-2 font-label-md text-caption font-semibold text-error shadow-sm transition-colors hover:bg-surface-container"
+                onClick={() => {
+                  suratKuasaInputRef.current?.click();
+                }}
                 type="button"
               >
                 <span className="material-symbols-outlined text-[16px]">swap_horiz</span>
@@ -576,8 +582,11 @@ export function PendaftaranDocumentsStep(props: {
               <p className="font-caption text-caption text-text-muted">{t('doc_support_body')}</p>
             </div>
           </div>
+          {/* shortcut: no support channel wired yet, open the helpdesk widget when it ships. */}
           <button
             className="shrink-0 rounded-xl bg-pine-deep px-3.5 py-2 font-label-md text-caption font-bold text-on-primary shadow-sm transition-colors hover:bg-pine-hover"
+            disabled
+            title="Belum tersedia"
             type="button"
           >
             {t('doc_support_button')}

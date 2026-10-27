@@ -363,10 +363,10 @@ function PendaftaranSetupBento() {
             </p>
           </div>
           <div className="relative z-10 pt-space-md">
-            {/* shortcut: the data-import wizard has no route yet, so the internal link targets the app root; point it at the wizard once it ships. */}
+            {/* The import wizard lives on the student master page (MasterSiswaImportModal). */}
             <Link
               className="flex w-full items-center justify-center gap-space-xs rounded-xl bg-amber-gold px-space-md py-space-sm font-label-md text-label-md font-semibold text-pine-deep shadow transition-colors hover:bg-amber-hover"
-              href="/presensi"
+              href="/dashboard/master-siswa"
             >
               <span>{t('done_task1_action')}</span>
               <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
@@ -403,10 +403,10 @@ function PendaftaranSetupBento() {
             </div>
           </div>
           <div className="pt-space-md">
-            <button className={CONFIG_BUTTON} type="button">
+            <Link className={CONFIG_BUTTON} href="/dashboard/pengaturan">
               <span className="material-symbols-outlined text-[18px]">tune</span>
               <span>{t('done_task2_action')}</span>
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -440,7 +440,8 @@ function PendaftaranSetupBento() {
             </div>
           </div>
           <div className="pt-space-md">
-            <button className={CONFIG_BUTTON} type="button">
+            {/* shortcut: no notification test-send endpoint yet, wire when WhatsApp/WA gateway config ships. */}
+            <button className={CONFIG_BUTTON} disabled title="Belum tersedia" type="button">
               <span className="material-symbols-outlined text-[18px]">chat</span>
               <span>{t('done_task3_action')}</span>
             </button>
@@ -479,8 +480,11 @@ function PendaftaranActionDock(props: { onStart: () => void }) {
             <span>{t('done_cta_dashboard')}</span>
             <span className="material-symbols-outlined text-[20px] text-amber-gold">east</span>
           </button>
+          {/* shortcut: the admin guide PDF is not hosted yet, link the download when the asset ships. */}
           <button
             className="flex h-12 w-full items-center justify-center gap-space-xs rounded-xl bg-surface-container-lowest px-space-lg font-label-md text-label-md font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container sm:w-auto"
+            disabled
+            title="Belum tersedia"
             type="button"
           >
             <span className="material-symbols-outlined text-[18px]">download</span>
@@ -501,8 +505,11 @@ function PendaftaranActionDock(props: { onStart: () => void }) {
             placeholder={t('done_invite_placeholder')}
             type="email"
           />
+          {/* shortcut: no staff-invite form/endpoint yet, see fitur-next-action-button.md. */}
           <button
             className="h-11 shrink-0 rounded-xl bg-secondary-container px-space-md font-label-md text-label-md font-semibold text-on-secondary-container transition-colors hover:bg-amber-gold"
+            disabled
+            title="Belum tersedia"
             type="button"
           >
             {t('done_invite_cta')}
@@ -602,15 +609,16 @@ function PendaftaranSupportBanner() {
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-space-sm">
-        <a
+        {/* shortcut: the consultant WhatsApp number is a placeholder, re-enable with the real channel. */}
+        <button
           className="inline-flex items-center gap-space-xs rounded-xl bg-pine-deep px-space-md py-space-xs font-label-md text-label-md font-medium text-on-primary shadow-sm transition-colors hover:bg-pine-hover"
-          href="https://wa.me/6281234567890"
-          rel="noopener noreferrer"
-          target="_blank"
+          disabled
+          title="Belum tersedia"
+          type="button"
         >
           <span className="material-symbols-outlined text-[18px]">call</span>
           <span>{t('done_support_cta')}</span>
-        </a>
+        </button>
       </div>
     </div>
   );
