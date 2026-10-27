@@ -40,7 +40,7 @@ function EvidenceRow(props: {
   return (
     <li className="rounded-xl border border-border-subtle bg-surface-container-low/60 p-2.5">
       <div className="flex items-start gap-2">
-        <span className="bg-surface-card mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg text-pine-deep">
+        <span className="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-surface-card text-pine-deep">
           <FileText className="size-3.5" />
         </span>
         <div className="min-w-0 flex-1">
@@ -55,7 +55,7 @@ function EvidenceRow(props: {
             <p className="mt-0.5 text-[10px] leading-relaxed text-foreground/80">{item.note}</p>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-1">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-1">
           <button
             type="button"
             onClick={() => {
@@ -64,7 +64,7 @@ function EvidenceRow(props: {
             disabled={props.downloading}
             aria-label={`Unduh ${item.file_name}`}
             title="Unduh bukti"
-            className="flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-pine-light hover:text-pine-deep disabled:opacity-50"
+            className="flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-pine-light hover:text-pine-deep disabled:opacity-50 max-sm:size-9"
           >
             <Download className="size-3.5" />
           </button>

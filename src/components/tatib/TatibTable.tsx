@@ -128,7 +128,7 @@ export function TatibTable(props: {
         </table>
       </div>
 
-      <div className="flex items-center justify-between border-t border-border-subtle px-4 py-3 text-[11px] text-muted-foreground sm:px-6">
+      <div className="flex flex-col items-stretch justify-between gap-3 border-t border-border-subtle px-4 py-3 text-[11px] text-muted-foreground sm:flex-row sm:items-center sm:px-6">
         <span>{t('showing_label', { count: props.rules.length })}</span>
         <span className="font-semibold text-pine-deep">{t('footer_note')}</span>
       </div>

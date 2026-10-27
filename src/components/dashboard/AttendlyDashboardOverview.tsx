@@ -332,13 +332,14 @@ function DashboardTrendCard(props: { trend: DashboardTrendPoint[]; isPending: bo
           {props.isPending ? 'Memuat tren kehadiran…' : 'Belum ada data tren.'}
         </p>
       ) : (
-        <div className="h-64 w-full">
+        <div className="h-56 w-full sm:h-64 [&_.recharts-legend-wrapper]:hidden sm:[&_.recharts-legend-wrapper]:block">
           <ResponsiveContainer height="100%" width="100%">
             <AreaChart data={points} margin={{ left: -22, right: 8, top: 8 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#E4E8E6" vertical={false} />
               <XAxis
                 axisLine={{ stroke: '#E4E8E6' }}
                 dataKey="label"
+                minTickGap={16}
                 tick={{ fill: '#6E7A76', fontSize: 10 }}
                 tickLine={false}
               />

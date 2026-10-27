@@ -156,16 +156,25 @@ export function AttendlyShell(props: {
         setIsMobileMenuOpen(false);
       }
     };
+    // Widening past `lg` hides the drawer, so it must close itself to release the scroll lock.
+    const desktopQuery = window.matchMedia('(width >= 64rem)');
+    const closeIfDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        setIsMobileMenuOpen(false);
+      }
+    };
 
     if (isMobileMenuOpen) {
       closeButtonRef.current?.focus();
       document.body.style.overflow = 'hidden';
       document.addEventListener('keydown', handleKeyDown);
+      desktopQuery.addEventListener('change', closeIfDesktop);
     }
 
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener('keydown', handleKeyDown);
+      desktopQuery.removeEventListener('change', closeIfDesktop);
     };
   }, [isMobileMenuOpen]);
 
@@ -442,7 +451,7 @@ export function AttendlyShell(props: {
             onClick={() => {
               void auth.logout();
             }}
-            className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-transparent px-3 py-1.5 text-xs font-semibold text-[#6E7A76] transition-colors outline-none hover:border-red-200 hover:bg-red-50 hover:text-red-700 focus-visible:ring-2 focus-visible:ring-red-700"
+            className="inline-flex min-h-10 cursor-pointer items-center gap-1.5 rounded-xl border border-transparent px-3 py-1.5 text-xs font-semibold text-[#6E7A76] transition-colors outline-none hover:border-red-200 hover:bg-red-50 hover:text-red-700 focus-visible:ring-2 focus-visible:ring-red-700"
             title={t('sign_out')}
           >
             <LogOut className="size-3.5" />
@@ -454,7 +463,7 @@ export function AttendlyShell(props: {
       {/* Main Body with Sidebar + Content */}
       <div className="flex w-full flex-1">
         {/* Desktop Fixed Sidebar */}
-        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 shrink-0 flex-col justify-between overflow-y-auto border-r border-[#E4E8E6] bg-white p-4 lg:flex xl:w-72">
+        <aside className="sticky top-16 hidden h-[calc(100dvh-4rem)] w-64 shrink-0 flex-col justify-between overflow-y-auto border-r border-[#E4E8E6] bg-white p-4 lg:flex xl:w-72">
           <div className="space-y-6">
             {/* Academic Cycle Status Card */}
             <div className="rounded-xl border border-[#F2C96C]/40 bg-[#FDF8ED] p-3 shadow-xs">
@@ -544,7 +553,7 @@ export function AttendlyShell(props: {
                   onClick={() => {
                     setIsMobileMenuOpen(false);
                   }}
-                  className="cursor-pointer rounded-lg p-1.5 text-[#6E7A76] outline-none hover:bg-[#E9F0EE] focus-visible:ring-2 focus-visible:ring-[#173F36]"
+                  className="inline-flex min-h-10 min-w-10 cursor-pointer items-center justify-center rounded-lg p-1.5 text-[#6E7A76] outline-none hover:bg-[#E9F0EE] focus-visible:ring-2 focus-visible:ring-[#173F36]"
                   aria-label={t('close_navigation')}
                 >
                   <X className="size-5" />

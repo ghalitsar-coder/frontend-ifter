@@ -38,7 +38,7 @@ import { RekapWhatsAppBroadcastModal } from './RekapWhatsAppBroadcastModal';
  */
 function RekapErrorBanner(props: { error: Error }) {
   return (
-    <div className="bg-status-absent/40 font-caption text-error rounded-2xl px-4 py-3 text-xs font-semibold">
+    <div className="rounded-2xl bg-status-absent/40 px-4 py-3 font-caption text-xs font-semibold text-error">
       {props.error instanceof ApiError ? props.error.message : 'Gagal memuat data rekap'}
     </div>
   );
@@ -179,7 +179,7 @@ export function RekapManager() {
 
       {summaryQuery.isError && <RekapErrorBanner error={summaryQuery.error} />}
       {summaryQuery.isPending && classId !== '' && (
-        <div className="bg-surface-card font-caption text-text-muted rounded-2xl px-4 py-3 text-xs shadow-xs">
+        <div className="rounded-2xl bg-surface-card px-4 py-3 font-caption text-xs text-text-muted shadow-xs">
           Memuat data rekap…
         </div>
       )}
@@ -222,7 +222,7 @@ export function RekapManager() {
 
       {/* Floating Interactive Toast */}
       {toastMessage && (
-        <div className="text-on-primary fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-2xl bg-pine-deep px-5 py-3.5 shadow-2xl transition-all">
+        <div className="fixed right-4 bottom-6 left-4 z-50 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-2xl bg-pine-deep px-5 py-3.5 text-on-primary shadow-2xl transition-all sm:right-6 sm:left-auto sm:max-w-md">
           <CheckCircle2 className="size-5 text-amber-gold" />
           <span className="font-caption text-xs font-semibold">{toastMessage}</span>
         </div>

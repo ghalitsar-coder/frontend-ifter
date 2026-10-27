@@ -323,7 +323,7 @@ export function PiketManager() {
 
       {/* Floating Interactive Toast */}
       {toast && (
-        <div className="fixed right-6 bottom-6 z-50 flex items-center gap-3 rounded-xl bg-pine-deep px-5 py-4 text-on-primary shadow-2xl transition-all">
+        <div className="fixed right-4 bottom-6 left-4 z-50 flex max-w-[calc(100vw-2rem)] items-center gap-3 rounded-xl bg-pine-deep px-5 py-4 text-on-primary shadow-2xl transition-all sm:right-6 sm:left-auto sm:max-w-md">
           <CheckCircle2 className="size-5 text-amber-gold" />
           <div>
             <p className="text-xs font-bold">{toast.title}</p>

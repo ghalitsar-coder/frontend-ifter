@@ -67,7 +67,7 @@ export function ClassTable(props: {
     if (props.isLoading) {
       return (
         <tr>
-          <td colSpan={6} className="text-text-muted p-10 text-center">
+          <td colSpan={6} className="p-10 text-center text-text-muted">
             <span className="inline-flex items-center gap-2 text-sm">
               <Loader2 className="size-4 animate-spin" /> Memuat data kelas…
             </span>
@@ -87,9 +87,9 @@ export function ClassTable(props: {
     if (props.entries.length === 0) {
       return (
         <tr>
-          <td colSpan={6} className="text-text-muted p-10 text-center">
+          <td colSpan={6} className="p-10 text-center text-text-muted">
             <div className="flex flex-col items-center gap-2">
-              <GraduationCap className="text-text-muted/60 size-8" />
+              <GraduationCap className="size-8 text-text-muted/60" />
               <p className="text-sm font-semibold">Belum ada kelas pada filter ini.</p>
               <p className="text-xs">Ubah filter atau tambahkan kelas baru untuk memulai.</p>
             </div>
@@ -101,9 +101,9 @@ export function ClassTable(props: {
       <tr key={row.id} className="group transition-colors hover:bg-surface-container-low/60">
         <td className="p-3.5">
           <div className="flex flex-col">
-            <span className="text-text-primary font-bold">{row.name}</span>
+            <span className="font-bold text-text-primary">{row.name}</span>
             {row.major !== '' && (
-              <span className="text-text-muted text-[11px]">Jurusan {row.major}</span>
+              <span className="text-[11px] text-text-muted">Jurusan {row.major}</span>
             )}
           </div>
         </td>
@@ -112,9 +112,11 @@ export function ClassTable(props: {
             {row.gradeLabel}
           </span>
         </td>
-        <td className="text-text-primary p-3.5 text-xs font-medium">{row.academicYearName}</td>
+        <td className="hidden p-3.5 text-xs font-medium text-text-primary md:table-cell">
+          {row.academicYearName}
+        </td>
         {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell, not a control */}
-        <td className="p-3.5">
+        <td className="hidden p-3.5 md:table-cell">
           <div className="flex items-center gap-2.5">
             <span
               className={`flex size-8 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${avatarClass(row.hasHomeroom)}`}
@@ -126,7 +128,7 @@ export function ClassTable(props: {
             </span>
           </div>
         </td>
-        <td className="p-3.5">
+        <td className="hidden p-3.5 md:table-cell">
           <span
             className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${statusBadgeClass(row.isActive)}`}
           >
@@ -143,7 +145,7 @@ export function ClassTable(props: {
               }}
               title="Lihat siswa"
               aria-label={`Lihat siswa kelas ${row.name}`}
-              className="text-text-muted hover:bg-surface-container flex size-8 cursor-pointer items-center justify-center rounded-lg bg-surface-container-low transition-colors hover:text-pine-deep"
+              className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-pine-deep"
             >
               <Users className="size-4" />
             </button>
@@ -157,7 +159,7 @@ export function ClassTable(props: {
                   }}
                   title="Edit kelas"
                   aria-label={`Edit kelas ${row.name}`}
-                  className="text-text-muted hover:bg-surface-container flex size-8 cursor-pointer items-center justify-center rounded-lg bg-surface-container-low transition-colors hover:text-pine-deep"
+                  className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-pine-deep"
                 >
                   <Pencil className="size-4" />
                 </button>
@@ -169,7 +171,7 @@ export function ClassTable(props: {
                   disabled={!row.isActive}
                   title="Atur wali kelas"
                   aria-label={`Atur wali kelas ${row.name}`}
-                  className="text-text-muted hover:bg-surface-container flex size-8 cursor-pointer items-center justify-center rounded-lg bg-surface-container-low transition-colors hover:text-pine-deep disabled:cursor-not-allowed disabled:opacity-40"
+                  className="flex size-8 cursor-pointer items-center justify-center rounded-lg bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-pine-deep disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <UserCheck className="size-4" />
                 </button>
@@ -203,13 +205,13 @@ export function ClassTable(props: {
             <th scope="col" className="p-3.5 whitespace-nowrap">
               Tingkat
             </th>
-            <th scope="col" className="p-3.5 whitespace-nowrap">
+            <th scope="col" className="hidden p-3.5 whitespace-nowrap md:table-cell">
               Tahun Ajaran
             </th>
-            <th scope="col" className="p-3.5 whitespace-nowrap">
+            <th scope="col" className="hidden p-3.5 whitespace-nowrap md:table-cell">
               Wali Kelas
             </th>
-            <th scope="col" className="p-3.5 whitespace-nowrap">
+            <th scope="col" className="hidden p-3.5 whitespace-nowrap md:table-cell">
               Status
             </th>
             <th scope="col" className="p-3.5 text-center whitespace-nowrap">
@@ -217,7 +219,7 @@ export function ClassTable(props: {
             </th>
           </tr>
         </thead>
-        <tbody className="text-text-primary divide-y divide-border-subtle">{renderBody()}</tbody>
+        <tbody className="divide-y divide-border-subtle text-text-primary">{renderBody()}</tbody>
       </table>
     </div>
   );

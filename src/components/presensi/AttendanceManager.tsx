@@ -401,7 +401,7 @@ export function AttendanceManager() {
       />
 
       {toastMessage && (
-        <div className="fixed right-6 bottom-6 z-50 flex animate-in items-center gap-2.5 rounded-xl bg-foreground px-5 py-3 text-sm font-medium text-background shadow-xl duration-200 slide-in-from-bottom-5 fade-in">
+        <div className="fixed right-4 bottom-6 left-4 z-50 flex max-w-[calc(100vw-2rem)] animate-in items-center gap-2.5 rounded-xl bg-foreground px-5 py-3 text-sm font-medium text-background shadow-xl duration-200 slide-in-from-bottom-5 fade-in sm:right-6 sm:left-auto sm:max-w-md">
           <CheckCircle2 className="size-4 text-pastel-mint" />
           <span>{toastMessage}</span>
         </div>

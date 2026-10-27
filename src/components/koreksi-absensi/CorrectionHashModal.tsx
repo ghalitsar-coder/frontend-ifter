@@ -86,7 +86,7 @@ export function CorrectionHashModal(props: { row: CorrectionRow; onClose: () => 
             type="button"
             onClick={props.onClose}
             aria-label={t('btn_close')}
-            className="flex size-7 cursor-pointer items-center justify-center rounded-full bg-surface-container-low text-muted-foreground transition-colors hover:bg-pine-light hover:text-pine-deep"
+            className="flex size-7 cursor-pointer items-center justify-center rounded-full bg-surface-container-low text-muted-foreground transition-colors hover:bg-pine-light hover:text-pine-deep max-sm:size-10"
           >
             <X className="size-3.5" />
           </button>

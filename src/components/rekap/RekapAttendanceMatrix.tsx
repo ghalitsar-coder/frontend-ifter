@@ -4,49 +4,49 @@ import type { CalendarDayInfo, DayAttendanceStatus, StudentMatrixRow } from '@/t
 
 function renderStatusBadge(status: DayAttendanceStatus | undefined) {
   if (status === undefined) {
-    return <span className="font-caption text-text-muted text-[10px]">-</span>;
+    return <span className="font-caption text-[10px] text-text-muted">-</span>;
   }
   switch (status) {
     case 'H': {
       return (
-        <span className="bg-status-present font-caption inline-flex size-6 items-center justify-center rounded text-xs font-semibold text-pine-deep">
+        <span className="inline-flex size-6 items-center justify-center rounded bg-status-present font-caption text-xs font-semibold text-pine-deep">
           H
         </span>
       );
     }
     case 'T': {
       return (
-        <span className="bg-secondary-fixed font-caption inline-flex size-6 items-center justify-center rounded text-xs font-semibold text-[#78350F]">
+        <span className="inline-flex size-6 items-center justify-center rounded bg-secondary-fixed font-caption text-xs font-semibold text-[#78350F]">
           T
         </span>
       );
     }
     case 'S': {
       return (
-        <span className="bg-status-permission font-caption inline-flex size-6 items-center justify-center rounded text-xs font-semibold text-[#1E3A8A]">
+        <span className="inline-flex size-6 items-center justify-center rounded bg-status-permission font-caption text-xs font-semibold text-[#1E3A8A]">
           S
         </span>
       );
     }
     case 'I': {
       return (
-        <span className="bg-status-active/40 font-caption inline-flex size-6 items-center justify-center rounded text-xs font-semibold text-[#581C87]">
+        <span className="inline-flex size-6 items-center justify-center rounded bg-status-active/40 font-caption text-xs font-semibold text-[#581C87]">
           I
         </span>
       );
     }
     case 'A': {
       return (
-        <span className="bg-status-absent font-caption text-error inline-flex size-6 items-center justify-center rounded text-xs font-bold">
+        <span className="inline-flex size-6 items-center justify-center rounded bg-status-absent font-caption text-xs font-bold text-error">
           A
         </span>
       );
     }
     case 'L': {
-      return <span className="font-caption text-text-muted text-[10px]">-</span>;
+      return <span className="font-caption text-[10px] text-text-muted">-</span>;
     }
     default: {
-      return <span className="font-caption text-text-muted text-[10px]">-</span>;
+      return <span className="font-caption text-[10px] text-text-muted">-</span>;
     }
   }
 }
@@ -68,21 +68,21 @@ export function RekapAttendanceMatrix(props: {
   const t = useTranslations('RekapPage');
 
   return (
-    <section className="bg-surface-card flex flex-col overflow-hidden rounded-2xl shadow-xs">
+    <section className="flex flex-col overflow-hidden rounded-2xl bg-surface-card shadow-xs">
       {/* Table Header Filter & Info Bar */}
-      <div className="bg-canvas-base flex flex-col items-start justify-between gap-4 border-b border-border-subtle p-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col items-start justify-between gap-4 border-b border-border-subtle bg-canvas-base p-4 sm:flex-row sm:items-center">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-text-primary text-sm font-bold sm:text-base">
+          <span className="text-sm font-bold text-text-primary sm:text-base">
             {t('matrix_title')}
           </span>
-          <span className="bg-surface-card font-caption text-text-muted rounded-full px-2.5 py-0.5 text-xs font-medium shadow-xs">
+          <span className="rounded-full bg-surface-card px-2.5 py-0.5 font-caption text-xs font-medium text-text-muted shadow-xs">
             {t('matrix_total_students', { count: props.students.length })}
           </span>
-          <span className="font-caption text-text-muted hidden items-center gap-1 text-[11px] md:inline-flex">
-            <span className="bg-surface-container size-2 rounded" />
+          <span className="hidden items-center gap-1 font-caption text-[11px] text-text-muted md:inline-flex">
+            <span className="size-2 rounded bg-surface-container" />
             {t('matrix_weekend_note')}
           </span>
-          <span className="font-caption text-text-muted hidden items-center gap-1 text-[11px] md:inline-flex">
+          <span className="hidden items-center gap-1 font-caption text-[11px] text-text-muted md:inline-flex">
             <span className="size-2 rounded bg-amber-surface" />
             {t('matrix_eval_note')}
           </span>
@@ -91,9 +91,9 @@ export function RekapAttendanceMatrix(props: {
         {/* Search & Status Quick Filter */}
         <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
           <div className="relative min-w-[200px] flex-1 sm:flex-initial">
-            <Search className="text-text-muted absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+            <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-text-muted" />
             <input
-              className="bg-surface-card text-text-primary placeholder:text-text-muted h-9 w-full rounded-xl pr-3 pl-9 text-xs shadow-xs focus:ring-2 focus:ring-pine-deep/15 focus:outline-none"
+              className="h-9 w-full rounded-xl bg-surface-card pr-3 pl-9 text-xs text-text-primary shadow-xs placeholder:text-text-muted focus:ring-2 focus:ring-pine-deep/15 focus:outline-none"
               placeholder={t('search_placeholder')}
               type="search"
               value={props.searchQuery}
@@ -106,7 +106,7 @@ export function RekapAttendanceMatrix(props: {
           <div className="relative">
             <select
               aria-label={t('filter_all_status')}
-              className="bg-surface-card h-9 cursor-pointer appearance-none rounded-xl pr-7 pl-3 text-xs font-medium text-pine-deep shadow-xs focus:outline-none"
+              className="h-9 cursor-pointer appearance-none rounded-xl bg-surface-card pr-7 pl-3 text-xs font-medium text-pine-deep shadow-xs focus:outline-none"
               value={props.statusFilter}
               onChange={(e) => {
                 props.onStatusFilterChange(
@@ -128,7 +128,7 @@ export function RekapAttendanceMatrix(props: {
       {/* Horizontal Scrollable Table */}
       <div className="relative max-h-[640px] w-full overflow-x-auto scroll-smooth">
         <table className="w-full border-collapse text-left text-xs whitespace-nowrap">
-          <thead className="text-text-primary sticky top-0 z-30 bg-surface-container-low font-semibold shadow-xs">
+          <thead className="sticky top-0 z-30 bg-surface-container-low font-semibold text-text-primary shadow-xs">
             <tr>
               {/* Sticky Left Headers */}
               <th
@@ -138,13 +138,13 @@ export function RekapAttendanceMatrix(props: {
                 {t('col_no')}
               </th>
               <th
-                className="sticky left-12 z-40 w-28 bg-surface-container-low px-3 py-3.5 font-bold"
+                className="sticky left-12 z-40 hidden w-28 bg-surface-container-low px-3 py-3.5 font-bold sm:table-cell"
                 scope="col"
               >
                 {t('col_nis')}
               </th>
               <th
-                className="sticky left-40 z-40 min-w-[200px] bg-surface-container-low px-4 py-3.5 font-bold shadow-[4px_0_12px_rgba(0,0,0,0.03)]"
+                className="sticky left-12 z-40 min-w-[132px] bg-surface-container-low px-4 py-3.5 font-bold shadow-[4px_0_12px_rgba(0,0,0,0.03)] sm:left-40 sm:min-w-[200px]"
                 scope="col"
               >
                 {t('col_student_name')}
@@ -163,7 +163,7 @@ export function RekapAttendanceMatrix(props: {
                   scope="col"
                 >
                   {d.dayNumber}
-                  <div className="font-caption text-text-muted text-[9px] font-normal">
+                  <div className="font-caption text-[9px] font-normal text-text-muted">
                     {d.dayNameShort}
                   </div>
                 </th>
@@ -199,20 +199,20 @@ export function RekapAttendanceMatrix(props: {
                 I
               </th>
               <th
-                className="text-error sticky right-[180px] z-40 w-10 bg-surface-container-low px-2 py-3.5 text-center font-bold"
+                className="sticky right-[180px] z-40 w-10 bg-surface-container-low px-2 py-3.5 text-center font-bold text-error"
                 scope="col"
                 title="Alpa (A)"
               >
                 A
               </th>
               <th
-                className="text-text-primary sticky right-[115px] z-40 w-16 bg-surface-container-low px-3 py-3.5 text-center font-bold"
+                className="sticky right-[115px] z-40 w-16 bg-surface-container-low px-3 py-3.5 text-center font-bold text-text-primary"
                 scope="col"
               >
                 {t('col_percentage')}
               </th>
               <th
-                className="text-text-primary sticky right-0 z-40 w-28 bg-surface-container-low px-4 py-3.5 text-center font-bold"
+                className="sticky right-0 z-40 w-28 bg-surface-container-low px-4 py-3.5 text-center font-bold text-text-primary"
                 scope="col"
               >
                 {t('col_rapor_status')}
@@ -220,32 +220,32 @@ export function RekapAttendanceMatrix(props: {
             </tr>
           </thead>
 
-          <tbody className="text-text-primary divide-y divide-border-subtle/60">
+          <tbody className="divide-y divide-border-subtle/60 text-text-primary">
             {props.students.map((student, idx) => (
               <tr
                 key={student.id}
-                className="group hover:bg-canvas-base/80 cursor-pointer transition-colors"
+                className="group cursor-pointer transition-colors hover:bg-canvas-base/80"
                 onClick={() => {
                   props.onSelectStudent(student);
                 }}
               >
                 {/* Sticky Left Cells */}
-                <td className="bg-surface-card text-text-muted group-hover:bg-canvas-base sticky left-0 z-20 px-3 py-3 text-center font-medium">
+                <td className="sticky left-0 z-20 bg-surface-card px-3 py-3 text-center font-medium text-text-muted group-hover:bg-canvas-base">
                   {idx + 1}
                 </td>
-                <td className="bg-surface-card text-text-muted group-hover:bg-canvas-base sticky left-12 z-20 px-3 py-3 font-mono text-[11px]">
+                <td className="sticky left-12 z-20 hidden bg-surface-card px-3 py-3 font-mono text-[11px] text-text-muted group-hover:bg-canvas-base sm:table-cell">
                   {student.nis}
                 </td>
                 {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
-                <td className="bg-surface-card text-text-primary group-hover:bg-canvas-base sticky left-40 z-20 px-4 py-3 font-semibold shadow-[4px_0_12px_rgba(0,0,0,0.03)]">
+                <td className="sticky left-12 z-20 bg-surface-card px-4 py-3 font-semibold text-text-primary shadow-[4px_0_12px_rgba(0,0,0,0.03)] group-hover:bg-canvas-base sm:left-40">
                   <div className="flex items-center gap-2">
-                    <span className="font-caption flex size-6 shrink-0 items-center justify-center rounded-full bg-pine-light text-[10px] font-bold text-pine-deep">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-pine-light font-caption text-[10px] font-bold text-pine-deep">
                       {student.initials}
                     </span>
                     <span className="truncate">{student.name}</span>
                   </div>
                 </td>
-                <td className="text-text-muted px-2 py-3 text-center">{student.gender}</td>
+                <td className="px-2 py-3 text-center text-text-muted">{student.gender}</td>
 
                 {/* Day Cells (1..31) */}
                 {props.days.map((d) => (
@@ -258,37 +258,37 @@ export function RekapAttendanceMatrix(props: {
                 ))}
 
                 {/* Sticky Right Cells (Aggregates) */}
-                <td className="bg-surface-card group-hover:bg-canvas-base sticky right-[340px] z-20 px-2 py-3 text-center font-bold text-pine-deep shadow-[-4px_0_12px_rgba(0,0,0,0.03)]">
+                <td className="sticky right-[340px] z-20 bg-surface-card px-2 py-3 text-center font-bold text-pine-deep shadow-[-4px_0_12px_rgba(0,0,0,0.03)] group-hover:bg-canvas-base">
                   {student.totalHadir}
                 </td>
-                <td className="bg-surface-card group-hover:bg-canvas-base sticky right-[300px] z-20 px-2 py-3 text-center font-bold text-[#78350F]">
+                <td className="sticky right-[300px] z-20 bg-surface-card px-2 py-3 text-center font-bold text-[#78350F] group-hover:bg-canvas-base">
                   {student.totalTerlambat}
                 </td>
-                <td className="bg-surface-card group-hover:bg-canvas-base sticky right-[260px] z-20 px-2 py-3 text-center font-bold text-[#1E3A8A]">
+                <td className="sticky right-[260px] z-20 bg-surface-card px-2 py-3 text-center font-bold text-[#1E3A8A] group-hover:bg-canvas-base">
                   {student.totalSakit}
                 </td>
-                <td className="bg-surface-card text-text-muted group-hover:bg-canvas-base sticky right-[220px] z-20 px-2 py-3 text-center font-medium">
+                <td className="sticky right-[220px] z-20 bg-surface-card px-2 py-3 text-center font-medium text-text-muted group-hover:bg-canvas-base">
                   {student.totalIzin}
                 </td>
-                <td className="bg-surface-card text-error group-hover:bg-canvas-base sticky right-[180px] z-20 px-2 py-3 text-center font-medium">
+                <td className="sticky right-[180px] z-20 bg-surface-card px-2 py-3 text-center font-medium text-error group-hover:bg-canvas-base">
                   {student.totalAlpa}
                 </td>
-                <td className="bg-surface-card text-text-primary group-hover:bg-canvas-base sticky right-[115px] z-20 px-3 py-3 text-center font-bold">
+                <td className="sticky right-[115px] z-20 bg-surface-card px-3 py-3 text-center font-bold text-text-primary group-hover:bg-canvas-base">
                   {student.percentage}%
                 </td>
-                <td className="bg-surface-card group-hover:bg-canvas-base sticky right-0 z-20 px-3 py-3 text-center">
+                <td className="sticky right-0 z-20 bg-surface-card px-3 py-3 text-center group-hover:bg-canvas-base">
                   {student.raporStatus === 'safe' && (
-                    <span className="bg-status-present/60 font-caption inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold text-pine-deep">
+                    <span className="inline-flex items-center rounded-full bg-status-present/60 px-2.5 py-0.5 font-caption text-[11px] font-semibold text-pine-deep">
                       {t('status_safe')}
                     </span>
                   )}
                   {student.raporStatus === 'warning' && (
-                    <span className="font-caption inline-flex items-center rounded-full bg-amber-surface px-2.5 py-0.5 text-[11px] font-semibold text-amber-dark">
+                    <span className="inline-flex items-center rounded-full bg-amber-surface px-2.5 py-0.5 font-caption text-[11px] font-semibold text-amber-dark">
                       {t('status_warning')}
                     </span>
                   )}
                   {student.raporStatus === 'critical' && (
-                    <span className="bg-status-absent/60 font-caption text-error inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold">
+                    <span className="inline-flex items-center rounded-full bg-status-absent/60 px-2.5 py-0.5 font-caption text-[11px] font-semibold text-error">
                       {t('status_critical')}
                     </span>
                   )}

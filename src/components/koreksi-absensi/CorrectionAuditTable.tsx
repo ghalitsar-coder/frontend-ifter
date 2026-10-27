@@ -109,9 +109,9 @@ export function CorrectionAuditTable(props: {
               <th className="px-3 py-3">{t('col_student')}</th>
               <th className="px-3 py-3">{t('col_session')}</th>
               <th className="px-3 py-3">{t('col_change')}</th>
-              <th className="px-3 py-3">{t('col_reason')}</th>
-              <th className="px-3 py-3">{t('col_officer')}</th>
-              <th className="px-3 py-3">{t('col_verification')}</th>
+              <th className="hidden px-3 py-3 md:table-cell">{t('col_reason')}</th>
+              <th className="hidden px-3 py-3 md:table-cell">{t('col_officer')}</th>
+              <th className="hidden px-3 py-3 md:table-cell">{t('col_verification')}</th>
               <th className="px-3 py-3 text-right">{t('col_action')}</th>
             </tr>
           </thead>
@@ -172,18 +172,18 @@ export function CorrectionAuditTable(props: {
                     </div>
                   </td>
 
-                  <td className="max-w-[17rem] px-3 py-4">
+                  <td className="hidden max-w-[17rem] px-3 py-4 md:table-cell">
                     <p className="text-[11px] leading-relaxed text-foreground/80">{row.reason}</p>
                   </td>
 
-                  <td className="min-w-[8.5rem] px-3 py-4">
+                  <td className="hidden min-w-[8.5rem] px-3 py-4 md:table-cell">
                     <p className="text-xs font-semibold text-foreground">{row.sourceLabel}</p>
                     <p className="text-[10px] text-muted-foreground">
                       {row.closed ? 'Hari telah ditutup' : 'Hari masih terbuka'}
                     </p>
                   </td>
 
-                  <td className="px-3 py-4">
+                  <td className="hidden px-3 py-4 md:table-cell">
                     {row.closed ? (
                       <span className="inline-flex items-center gap-1 rounded-full bg-pine-light px-2 py-1 text-[10px] font-bold whitespace-nowrap text-pine-deep">
                         <CheckCircle2 className="size-3" />

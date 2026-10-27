@@ -50,8 +50,8 @@ export function DisciplineRecordModal(props: {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/50 p-4 backdrop-blur-xs duration-150 fade-in">
-      <div className="w-full max-w-xl animate-in overflow-hidden rounded-2xl border border-border bg-card shadow-2xl duration-150 zoom-in-95">
+    <div className="fixed inset-0 z-50 flex animate-in items-start justify-center overflow-y-auto bg-black/50 p-3 backdrop-blur-xs duration-150 fade-in sm:items-center sm:p-6">
+      <div className="my-auto flex max-h-[92dvh] w-full max-w-xl animate-in flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl duration-150 zoom-in-95">
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-border bg-surface-container-low p-6">
           <div className="flex items-center gap-3">
@@ -73,7 +73,7 @@ export function DisciplineRecordModal(props: {
         </div>
 
         {/* Modal Form */}
-        <form onSubmit={handleSubmit} className="space-y-4 p-6 text-xs">
+        <form onSubmit={handleSubmit} className="flex-1 space-y-4 overflow-y-auto p-6 text-xs">
           {/* Siswa Terlapor */}
           <div className="space-y-1.5">
             <label className="block font-bold text-foreground" htmlFor="incident-student-search">

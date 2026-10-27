@@ -100,7 +100,7 @@ export function MasterSiswaTable(props: {
   const endRecord = Math.min(props.currentPage * props.pageSize, props.totalFilteredCount);
 
   return (
-    <div className="bg-surface-card w-full overflow-hidden rounded-2xl border border-border-control shadow-xs">
+    <div className="w-full overflow-hidden rounded-2xl border border-border-control bg-surface-card shadow-xs">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[900px] border-collapse text-left text-sm">
           <thead>
@@ -114,7 +114,7 @@ export function MasterSiswaTable(props: {
                   className="size-4 cursor-pointer rounded border-border-control text-pine-deep accent-pine-deep focus:ring-pine-deep"
                 />
               </th>
-              <th scope="col" className="p-4 whitespace-nowrap">
+              <th scope="col" className="hidden p-4 whitespace-nowrap md:table-cell">
                 {t('th_nis_photo')}
               </th>
               <th scope="col" className="p-4 whitespace-nowrap">
@@ -123,16 +123,16 @@ export function MasterSiswaTable(props: {
               <th scope="col" className="p-4 whitespace-nowrap">
                 {t('th_class')}
               </th>
-              <th scope="col" className="p-4 whitespace-nowrap">
+              <th scope="col" className="hidden p-4 whitespace-nowrap md:table-cell">
                 {t('th_homeroom')}
               </th>
               <th scope="col" className="p-4 whitespace-nowrap">
                 {t('th_attendance')}
               </th>
-              <th scope="col" className="p-4 whitespace-nowrap">
+              <th scope="col" className="hidden p-4 whitespace-nowrap md:table-cell">
                 {t('th_discipline_points')}
               </th>
-              <th scope="col" className="p-4 whitespace-nowrap">
+              <th scope="col" className="hidden p-4 whitespace-nowrap md:table-cell">
                 {t('th_status')}
               </th>
               <th scope="col" className="p-4 text-center whitespace-nowrap">
@@ -140,12 +140,12 @@ export function MasterSiswaTable(props: {
               </th>
             </tr>
           </thead>
-          <tbody className="text-text-primary divide-y divide-border-subtle">
+          <tbody className="divide-y divide-border-subtle text-text-primary">
             {props.students.length === 0 ? (
               <tr>
-                <td colSpan={9} className="text-text-muted p-8 text-center">
+                <td colSpan={9} className="p-8 text-center text-text-muted">
                   <div className="flex flex-col items-center justify-center gap-2">
-                    <User className="text-text-muted/60 size-8" />
+                    <User className="size-8 text-text-muted/60" />
                     <p className="text-sm font-semibold">
                       {/* shortcut: no loading locale key in MasterSiswaPage namespace */}
                       {props.isLoading === true
@@ -153,7 +153,7 @@ export function MasterSiswaTable(props: {
                         : t('empty_students_title')}
                     </p>
                     {!props.isLoading && (
-                      <p className="text-text-muted text-xs">{t('empty_students_desc')}</p>
+                      <p className="text-xs text-text-muted">{t('empty_students_desc')}</p>
                     )}
                   </div>
                 </td>
@@ -184,7 +184,7 @@ export function MasterSiswaTable(props: {
 
                     {/* NIS & Photo */}
                     {/* oxlint-disable-next-line jsx-a11y/control-has-associated-label -- table cell groups the row's avatar, name and action controls */}
-                    <td className="p-4">
+                    <td className="hidden p-4 md:table-cell">
                       <div className="flex items-center gap-3">
                         <div className="relative flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border-control bg-pine-light text-xs font-bold text-pine-deep">
                           {student.avatarUrl ? (
@@ -207,10 +207,10 @@ export function MasterSiswaTable(props: {
                           )}
                         </div>
                         <div>
-                          <span className="text-text-muted block font-mono text-[11px] font-semibold">
+                          <span className="block font-mono text-[11px] font-semibold text-text-muted">
                             NIS
                           </span>
-                          <span className="text-text-primary font-mono text-sm font-semibold">
+                          <span className="font-mono text-sm font-semibold text-text-primary">
                             {student.nis}
                           </span>
                         </div>
@@ -230,7 +230,7 @@ export function MasterSiswaTable(props: {
                         >
                           {student.name}
                         </button>
-                        <p className="text-text-muted font-mono text-xs">NISN: {student.nisn}</p>
+                        <p className="font-mono text-xs text-text-muted">NISN: {student.nisn}</p>
                       </div>
                     </td>
 
@@ -242,7 +242,7 @@ export function MasterSiswaTable(props: {
                     </td>
 
                     {/* Homeroom */}
-                    <td className="text-text-muted p-4 text-sm font-medium">
+                    <td className="hidden p-4 text-sm font-medium text-text-muted md:table-cell">
                       {student.homeroomTeacher}
                     </td>
 
@@ -260,7 +260,7 @@ export function MasterSiswaTable(props: {
                             {student.attendanceCategory}
                           </span>
                         </div>
-                        <div className="bg-surface-container h-1.5 w-full overflow-hidden rounded-full">
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container">
                           <div
                             className={`h-1.5 rounded-full ${attendanceTones[attendanceToneFor(student.semesterAttendanceRate)].bar}`}
                             style={{ width: `${student.semesterAttendanceRate}%` }}
@@ -270,7 +270,7 @@ export function MasterSiswaTable(props: {
                     </td>
 
                     {/* Discipline points */}
-                    <td className="p-4">
+                    <td className="hidden p-4 md:table-cell">
                       <DisciplineBadge
                         points={student.disciplinePoints}
                         stage={student.disciplineStage}
@@ -278,7 +278,7 @@ export function MasterSiswaTable(props: {
                     </td>
 
                     {/* Status */}
-                    <td className="p-4">
+                    <td className="hidden p-4 md:table-cell">
                       <span
                         className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${statusBadgeClasses[student.status]}`}
                       >
@@ -305,7 +305,7 @@ export function MasterSiswaTable(props: {
                           onClick={() => {
                             props.onEditStudent(student);
                           }}
-                          className="text-text-muted hover:text-text-primary hover:bg-surface-container cursor-pointer rounded-md border border-border-control px-2.5 py-1.5 text-xs font-semibold transition-colors"
+                          className="cursor-pointer rounded-md border border-border-control px-2.5 py-1.5 text-xs font-semibold text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary"
                           title={t('btn_edit_data')}
                         >
                           {t('btn_edit')}
@@ -316,7 +316,7 @@ export function MasterSiswaTable(props: {
                             onClick={() => {
                               props.onManageAccount?.(student);
                             }}
-                            className="text-text-muted hover:text-text-primary hover:bg-surface-container cursor-pointer rounded-md border border-border-control px-2.5 py-1.5 text-xs font-semibold transition-colors"
+                            className="cursor-pointer rounded-md border border-border-control px-2.5 py-1.5 text-xs font-semibold text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary"
                             title="Kelola akun login siswa"
                           >
                             Akun
@@ -333,8 +333,8 @@ export function MasterSiswaTable(props: {
       </div>
 
       {/* Pagination Footer */}
-      <div className="bg-canvas-base/50 flex flex-col items-center justify-between gap-4 border-t border-border-control px-6 py-4 sm:flex-row">
-        <p className="text-text-muted text-sm">
+      <div className="flex flex-col items-center justify-between gap-4 border-t border-border-control bg-canvas-base/50 px-6 py-4 sm:flex-row">
+        <p className="text-sm text-text-muted">
           {t('pagination_showing', {
             start: startRecord,
             end: endRecord,
@@ -349,7 +349,7 @@ export function MasterSiswaTable(props: {
               props.onPageChange(props.currentPage - 1);
             }}
             aria-label={t('pagination_prev')}
-            className="text-text-muted hover:bg-surface-container flex size-8 cursor-pointer items-center justify-center rounded-lg border border-border-control transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex size-8 cursor-pointer items-center justify-center rounded-lg border border-border-control text-text-muted transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronLeft className="size-4" />
           </button>
@@ -366,7 +366,7 @@ export function MasterSiswaTable(props: {
                 className={`flex size-8 cursor-pointer items-center justify-center rounded-lg text-xs font-bold transition-colors ${
                   isActive
                     ? 'bg-pine-deep text-white shadow-xs'
-                    : 'text-text-primary hover:bg-surface-container border border-border-control'
+                    : 'border border-border-control text-text-primary hover:bg-surface-container'
                 }`}
               >
                 {p}
@@ -381,7 +381,7 @@ export function MasterSiswaTable(props: {
               props.onPageChange(props.currentPage + 1);
             }}
             aria-label={t('pagination_next')}
-            className="text-text-primary hover:bg-surface-container flex size-8 cursor-pointer items-center justify-center rounded-lg border border-border-control transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+            className="flex size-8 cursor-pointer items-center justify-center rounded-lg border border-border-control text-text-primary transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronRight className="size-4" />
           </button>

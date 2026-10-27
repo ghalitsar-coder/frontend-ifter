@@ -55,9 +55,9 @@ export function DispensationLetterPreview(props: {
           </p>
         </div>
 
-        <p className="mt-2.5 text-[8.5px]">{t('letter_intro')}</p>
+        <p className="mt-2.5 text-[11px] sm:text-[8.5px]">{t('letter_intro')}</p>
 
-        <table className="mt-2 w-full border-collapse text-[8.5px]">
+        <table className="mt-2 w-full border-collapse text-[11px] sm:text-[8.5px]">
           <tbody>
             {letterRows.map((row) => (
               <tr key={row.label}>

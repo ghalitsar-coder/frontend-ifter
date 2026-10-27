@@ -76,7 +76,7 @@ export function AttendanceStatementModal(props: {
                 type="button"
                 onClick={props.onClose}
                 aria-label={t('btn_close')}
-                className="flex size-7 cursor-pointer items-center justify-center rounded-full bg-surface-container-low text-muted-foreground transition-colors hover:bg-pine-light hover:text-pine-deep"
+                className="flex size-7 cursor-pointer items-center justify-center rounded-full bg-surface-container-low text-muted-foreground transition-colors hover:bg-pine-light hover:text-pine-deep max-sm:size-10"
               >
                 <X className="size-3.5" />
               </button>
@@ -127,7 +127,7 @@ export function AttendanceStatementModal(props: {
             <p className="mb-1 text-[10px] font-bold text-foreground">
               {t('statement_category')} <span className="text-red-600">*</span>
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={() => {
@@ -208,7 +208,7 @@ export function AttendanceStatementModal(props: {
                 {t('statement_duration', { days })}
               </span>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div>
                 <label
                   htmlFor="statement-start"
@@ -316,7 +316,7 @@ export function AttendanceStatementModal(props: {
                 <button
                   type="button"
                   aria-label={t('btn_view')}
-                  className="flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground hover:bg-card hover:text-pine-deep"
+                  className="flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground hover:bg-card hover:text-pine-deep max-sm:size-9"
                 >
                   <Eye className="size-3" />
                 </button>
@@ -326,7 +326,7 @@ export function AttendanceStatementModal(props: {
                     setFileName(null);
                   }}
                   aria-label={t('btn_delete_file')}
-                  className="flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground hover:bg-card hover:text-red-600"
+                  className="flex size-6 cursor-pointer items-center justify-center rounded-md text-muted-foreground hover:bg-card hover:text-red-600 max-sm:size-9"
                 >
                   <Trash2 className="size-3" />
                 </button>

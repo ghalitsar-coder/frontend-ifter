@@ -15,12 +15,12 @@ export function PresensiRfidModal(props: { onClose: () => void }) {
   const t = useTranslations('PresensiPage');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/40 p-margin backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-primary/40 p-3 backdrop-blur-sm sm:items-center sm:p-6">
       {/* oxlint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- modal closes on Escape */}
       <div
         aria-labelledby="rfid-title"
         aria-modal="true"
-        className="relative flex w-full max-w-sm animate-in flex-col items-center rounded-xl bg-surface-card p-space-xl text-center shadow-xl duration-150 zoom-in-95 fade-in"
+        className="relative my-auto flex max-h-[92dvh] w-full max-w-sm animate-in flex-col items-center overflow-y-auto rounded-xl bg-surface-card p-space-xl text-center shadow-xl duration-150 zoom-in-95 fade-in"
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             props.onClose();

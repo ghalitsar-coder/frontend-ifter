@@ -90,14 +90,14 @@ export function AuditLogManager() {
         </div>
       )}
 
-      <div className="bg-surface-card mb-4 rounded-2xl border border-border-control p-4 sm:p-5">
+      <div className="mb-4 rounded-2xl border border-border-control bg-surface-card p-4 sm:p-5">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-xl bg-pine-deep text-amber-gold shadow-xs">
             <ScrollText className="size-5" />
           </div>
           <div>
-            <h1 className="text-text-primary text-lg font-bold">Log Audit</h1>
-            <p className="text-text-muted text-xs">
+            <h1 className="text-lg font-bold text-text-primary">Log Audit</h1>
+            <p className="text-xs text-text-muted">
               Jejak perubahan data sistem — hanya dapat diakses admin
             </p>
           </div>
@@ -149,7 +149,7 @@ export function AuditLogManager() {
             placeholder="ID entitas"
             className="rounded-xl border border-border-control bg-surface-container-low px-3 py-2 text-xs focus:border-pine-deep focus:outline-hidden"
           />
-          <label className="text-text-muted flex flex-col gap-1 text-[11px] font-semibold">
+          <label className="flex flex-col gap-1 text-[11px] font-semibold text-text-muted">
             Dari tanggal
             <input
               type="date"
@@ -162,7 +162,7 @@ export function AuditLogManager() {
               className="rounded-xl border border-border-control bg-surface-container-low px-3 py-2 text-xs font-normal focus:border-pine-deep focus:outline-hidden"
             />
           </label>
-          <label className="text-text-muted flex flex-col gap-1 text-[11px] font-semibold">
+          <label className="flex flex-col gap-1 text-[11px] font-semibold text-text-muted">
             Sampai tanggal
             <input
               type="date"
@@ -185,7 +185,7 @@ export function AuditLogManager() {
             <button
               type="button"
               onClick={handleRefresh}
-              className="hover:bg-surface-container cursor-pointer rounded-xl border border-border-control px-3 py-2 text-xs font-semibold transition-colors"
+              className="cursor-pointer rounded-xl border border-border-control px-3 py-2 text-xs font-semibold transition-colors hover:bg-surface-container"
             >
               Muat
             </button>
@@ -194,7 +194,7 @@ export function AuditLogManager() {
       </div>
 
       {logsQuery.isPending && (
-        <div className="bg-surface-card text-text-muted mb-4 rounded-xl border border-border-control px-4 py-3 text-xs font-semibold">
+        <div className="mb-4 rounded-xl border border-border-control bg-surface-card px-4 py-3 text-xs font-semibold text-text-muted">
           Memuat log audit dari server…
         </div>
       )}
@@ -217,10 +217,10 @@ export function AuditLogManager() {
         </div>
       )}
 
-      <div className="bg-surface-card overflow-hidden rounded-2xl border border-border-control">
+      <div className="overflow-hidden rounded-2xl border border-border-control bg-surface-card">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-surface-container text-text-muted border-b border-border-control text-[11px] font-semibold tracking-wider uppercase">
+            <thead className="border-b border-border-control bg-surface-container text-[11px] font-semibold tracking-wider text-text-muted uppercase">
               <tr>
                 <th className="px-4 py-3">Waktu</th>
                 <th className="px-4 py-3">Aktor</th>
@@ -247,7 +247,7 @@ export function AuditLogManager() {
                     <td className="px-4 py-3">
                       <span className="font-semibold">{log.entity_type}</span>
                       {log.entity_id !== undefined && (
-                        <span className="text-text-muted ml-1 font-mono text-[10px]">
+                        <span className="ml-1 font-mono text-[10px] text-text-muted">
                           #{log.entity_id.slice(0, 8)}
                         </span>
                       )}
@@ -262,12 +262,12 @@ export function AuditLogManager() {
                             Lihat
                           </summary>
                           {before !== '' && (
-                            <pre className="bg-surface-container mt-2 max-h-40 overflow-auto rounded-lg p-2 font-mono text-[10px]">
+                            <pre className="mt-2 max-h-40 overflow-auto rounded-lg bg-surface-container p-2 font-mono text-[10px]">
                               {before}
                             </pre>
                           )}
                           {after !== '' && (
-                            <pre className="bg-surface-container mt-2 max-h-40 overflow-auto rounded-lg p-2 font-mono text-[10px]">
+                            <pre className="mt-2 max-h-40 overflow-auto rounded-lg bg-surface-container p-2 font-mono text-[10px]">
                               {after}
                             </pre>
                           )}
@@ -279,7 +279,7 @@ export function AuditLogManager() {
               })}
               {!logsQuery.isPending && logs.length === 0 && (
                 <tr>
-                  <td className="text-text-muted px-4 py-6 text-center" colSpan={6}>
+                  <td className="px-4 py-6 text-center text-text-muted" colSpan={6}>
                     Tidak ada entri log untuk filter ini.
                   </td>
                 </tr>
@@ -288,7 +288,7 @@ export function AuditLogManager() {
           </table>
         </div>
 
-        <div className="flex items-center justify-between border-t border-border-control px-4 py-3 text-xs">
+        <div className="flex flex-col items-stretch justify-between gap-3 border-t border-border-control px-4 py-3 text-xs sm:flex-row sm:items-center">
           <span className="text-text-muted">
             Menampilkan {total === 0 ? 0 : query.offset + 1}–
             {Math.min(query.offset + PAGE_SIZE, total)} dari {total} entri
@@ -300,7 +300,7 @@ export function AuditLogManager() {
               onClick={() => {
                 setPage((current) => Math.max(1, current - 1));
               }}
-              className="hover:bg-surface-container cursor-pointer rounded-lg border border-border-control px-3 py-1.5 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              className="cursor-pointer rounded-lg border border-border-control px-3 py-1.5 font-semibold transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               Sebelumnya
             </button>
@@ -313,7 +313,7 @@ export function AuditLogManager() {
               onClick={() => {
                 setPage((current) => Math.min(totalPages, current + 1));
               }}
-              className="hover:bg-surface-container cursor-pointer rounded-lg border border-border-control px-3 py-1.5 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              className="cursor-pointer rounded-lg border border-border-control px-3 py-1.5 font-semibold transition-colors hover:bg-surface-container disabled:cursor-not-allowed disabled:opacity-50"
             >
               Berikutnya
             </button>

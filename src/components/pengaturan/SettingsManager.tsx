@@ -113,7 +113,7 @@ export function SettingsManager() {
   return (
     <div className="w-full">
       {toastMessage && (
-        <div className="fixed right-6 bottom-6 z-50 flex animate-in items-center gap-3 rounded-xl border border-pine-hover bg-pine-deep px-4 py-3 text-white shadow-xl fade-in slide-in-from-bottom-3">
+        <div className="fixed right-4 bottom-6 left-4 z-50 flex max-w-[calc(100vw-2rem)] animate-in items-center gap-3 rounded-xl border border-pine-hover bg-pine-deep px-4 py-3 text-white shadow-xl fade-in slide-in-from-bottom-3 sm:right-6 sm:left-auto sm:max-w-md">
           <CheckCircle2 className="size-5 shrink-0 text-amber-gold" />
           <span className="text-xs font-medium sm:text-sm">{toastMessage}</span>
           <button

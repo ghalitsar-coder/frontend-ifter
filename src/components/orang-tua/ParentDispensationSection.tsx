@@ -80,7 +80,7 @@ export function ParentDispensationSection(props: { childId: string }) {
                 ))}
               </tbody>
             </table>
-            <div className="flex items-center justify-between gap-3 border-t border-border-control px-6 py-3">
+            <div className="flex flex-col items-stretch justify-between gap-3 border-t border-border-control px-6 py-3 sm:flex-row sm:items-center">
               <p className="text-[11px] font-semibold text-text-muted">
                 Menampilkan {offset + 1}–{offset + rows.length} dari {total} dispensasi
               </p>

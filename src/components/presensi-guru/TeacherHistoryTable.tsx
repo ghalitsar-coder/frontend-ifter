@@ -38,8 +38,8 @@ export function TeacherHistoryTable(props: { rows: TeacherHistoryRow[]; onDownlo
               <th className="py-3 pr-4">{t('history_col_day')}</th>
               <th className="px-4 py-3">{t('history_col_in')}</th>
               <th className="px-4 py-3">{t('history_col_out')}</th>
-              <th className="px-4 py-3">{t('history_col_method')}</th>
-              <th className="px-4 py-3">{t('history_col_hours')}</th>
+              <th className="hidden px-4 py-3 md:table-cell">{t('history_col_method')}</th>
+              <th className="hidden px-4 py-3 md:table-cell">{t('history_col_hours')}</th>
               <th className="py-3 pl-4">{t('history_col_status')}</th>
             </tr>
           </thead>
@@ -62,8 +62,12 @@ export function TeacherHistoryTable(props: { rows: TeacherHistoryRow[]; onDownlo
                 <td className="px-4 py-3.5 font-medium text-foreground tabular-nums">
                   {row.checkOut} WIB
                 </td>
-                <td className="px-4 py-3.5 text-muted-foreground">{row.method}</td>
-                <td className="px-4 py-3.5 font-semibold text-foreground">{row.hours}</td>
+                <td className="hidden px-4 py-3.5 text-muted-foreground md:table-cell">
+                  {row.method}
+                </td>
+                <td className="hidden px-4 py-3.5 font-semibold text-foreground md:table-cell">
+                  {row.hours}
+                </td>
                 <td className="py-3.5 pl-4">
                   {row.status === 'tepat_waktu' ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-pine-light px-2.5 py-1 text-[11px] font-bold whitespace-nowrap text-pine-deep">

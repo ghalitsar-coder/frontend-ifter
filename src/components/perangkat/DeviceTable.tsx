@@ -91,12 +91,12 @@ export function DeviceTable(props: {
               </span>
             </div>
           </td>
-          <td className="p-3.5">
+          <td className="hidden p-3.5 md:table-cell">
             <span className="inline-flex rounded-lg bg-surface-container-low px-2 py-0.5 font-mono text-[11px] font-semibold text-pine-deep">
               {device.identifier}
             </span>
           </td>
-          <td className="p-3.5 text-xs font-medium text-text-primary">
+          <td className="hidden p-3.5 text-xs font-medium text-text-primary md:table-cell">
             {deviceTypeLabel(device.device_type)}
           </td>
           <td className="p-3.5">
@@ -107,7 +107,7 @@ export function DeviceTable(props: {
               {deviceStatusLabel(device.status)}
             </span>
           </td>
-          <td className="p-3.5 text-xs font-medium text-text-primary">
+          <td className="hidden p-3.5 text-xs font-medium text-text-primary md:table-cell">
             {lastSeenLabel(device.last_seen_at)}
           </td>
           <td className="p-3.5">
@@ -164,16 +164,16 @@ export function DeviceTable(props: {
             <th scope="col" className="p-3.5 whitespace-nowrap">
               Perangkat
             </th>
-            <th scope="col" className="p-3.5 whitespace-nowrap">
+            <th scope="col" className="hidden p-3.5 whitespace-nowrap md:table-cell">
               Identifier
             </th>
-            <th scope="col" className="p-3.5 whitespace-nowrap">
+            <th scope="col" className="hidden p-3.5 whitespace-nowrap md:table-cell">
               Tipe
             </th>
             <th scope="col" className="p-3.5 whitespace-nowrap">
               Status
             </th>
-            <th scope="col" className="p-3.5 whitespace-nowrap">
+            <th scope="col" className="hidden p-3.5 whitespace-nowrap md:table-cell">
               Terakhir terlihat
             </th>
             <th scope="col" className="p-3.5 text-center whitespace-nowrap">

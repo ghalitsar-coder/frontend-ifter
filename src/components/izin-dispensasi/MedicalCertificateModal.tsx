@@ -63,7 +63,7 @@ export function MedicalCertificateModal(props: {
                 type="button"
                 onClick={props.onClose}
                 aria-label={t('btn_close')}
-                className="flex size-7 cursor-pointer items-center justify-center rounded-full bg-white/10 text-emerald-100/70 transition-colors hover:bg-white/20 hover:text-white"
+                className="flex size-7 cursor-pointer items-center justify-center rounded-full bg-white/10 text-emerald-100/70 transition-colors hover:bg-white/20 hover:text-white max-sm:size-10"
               >
                 <X className="size-3.5" />
               </button>
@@ -125,7 +125,7 @@ export function MedicalCertificateModal(props: {
               {t('med_category_label')}{' '}
               <span className="font-normal text-emerald-100/50">{t('med_required')}</span>
             </p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               <button
                 type="button"
                 onClick={() => {
@@ -159,7 +159,7 @@ export function MedicalCertificateModal(props: {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
             <div>
               <label
                 htmlFor="med-start"
@@ -243,7 +243,7 @@ export function MedicalCertificateModal(props: {
                 <button
                   type="button"
                   aria-label={t('btn_view')}
-                  className="flex size-6 cursor-pointer items-center justify-center rounded-md text-emerald-100/60 hover:bg-white/10 hover:text-white"
+                  className="flex size-6 cursor-pointer items-center justify-center rounded-md text-emerald-100/60 hover:bg-white/10 hover:text-white max-sm:size-9"
                 >
                   <Eye className="size-3" />
                 </button>
@@ -253,7 +253,7 @@ export function MedicalCertificateModal(props: {
                     setFileName(null);
                   }}
                   aria-label={t('btn_delete_file')}
-                  className="flex size-6 cursor-pointer items-center justify-center rounded-md text-emerald-100/60 hover:bg-white/10 hover:text-rose-200"
+                  className="flex size-6 cursor-pointer items-center justify-center rounded-md text-emerald-100/60 hover:bg-white/10 hover:text-rose-200 max-sm:size-9"
                 >
                   <Trash2 className="size-3" />
                 </button>
@@ -309,7 +309,7 @@ export function MedicalCertificateModal(props: {
               type="button"
               disabled={!canSubmit}
               onClick={props.onSubmit}
-              className="hover:bg-amber-hover inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-amber-gold px-4 py-2 text-[11px] font-bold text-pine-deep shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-amber-gold px-4 py-2 text-[11px] font-bold text-pine-deep shadow-sm transition-colors hover:bg-amber-hover disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ShieldCheck className="size-3.5" />
               {t('med_submit')}

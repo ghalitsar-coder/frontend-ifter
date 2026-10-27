@@ -769,7 +769,7 @@ export const MasterGuruImportModal = (props: {
               </div>
             </div>
 
-            <div className="grid shrink-0 grid-cols-3 gap-2.5">
+            <div className="grid shrink-0 grid-cols-1 gap-2.5 sm:grid-cols-3">
               <div className="rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-center">
                 <span className="block text-[10px] font-medium text-stone-500">Total Baris</span>
                 <span className="text-base font-extrabold text-stone-900 sm:text-lg">

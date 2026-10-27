@@ -223,8 +223,8 @@ export function DispensationQueueCard(props: {
             <thead>
               <tr className="border-b border-border-subtle text-[8px] tracking-wider text-muted-foreground uppercase">
                 <th className="py-1.5 pr-2 font-bold">Siswa</th>
-                <th className="py-1.5 pr-2 font-bold">Tipe</th>
-                <th className="py-1.5 pr-2 font-bold">Periode</th>
+                <th className="hidden py-1.5 pr-2 font-bold md:table-cell">Tipe</th>
+                <th className="hidden py-1.5 pr-2 font-bold md:table-cell">Periode</th>
                 <th className="py-1.5 pr-2 font-bold">Status</th>
                 <th className="py-1.5 font-bold">Aksi</th>
               </tr>
@@ -236,8 +236,12 @@ export function DispensationQueueCard(props: {
                     <span className="block font-bold text-foreground">{row.studentName}</span>
                     <span className="block text-[9px] text-muted-foreground">{row.className}</span>
                   </td>
-                  <td className="py-2 pr-2 font-semibold text-foreground">{row.typeLabel}</td>
-                  <td className="py-2 pr-2 text-muted-foreground">{row.period}</td>
+                  <td className="hidden py-2 pr-2 font-semibold text-foreground md:table-cell">
+                    {row.typeLabel}
+                  </td>
+                  <td className="hidden py-2 pr-2 text-muted-foreground md:table-cell">
+                    {row.period}
+                  </td>
                   <td className="py-2 pr-2">
                     <span
                       className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-bold ${statusTone(row.status)}`}

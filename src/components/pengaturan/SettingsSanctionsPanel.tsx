@@ -108,7 +108,7 @@ function SanctionRuleRow(props: {
           aria-label="Poin minimum"
         />
       </td>
-      <td className="px-2 py-2">
+      <td className="hidden px-2 py-2 md:table-cell">
         <input
           type="number"
           min={0}
@@ -122,7 +122,7 @@ function SanctionRuleRow(props: {
           aria-label="Poin maksimum (kosong = tanpa batas atas)"
         />
       </td>
-      <td className="px-2 py-2">
+      <td className="hidden px-2 py-2 md:table-cell">
         <input
           type="text"
           maxLength={100}
@@ -135,7 +135,7 @@ function SanctionRuleRow(props: {
           aria-label="Tindakan"
         />
       </td>
-      <td className="px-2 py-2">
+      <td className="hidden px-2 py-2 md:table-cell">
         <input
           type="text"
           maxLength={30}
@@ -149,7 +149,7 @@ function SanctionRuleRow(props: {
           aria-label="Level"
         />
       </td>
-      <td className="px-2 py-2">
+      <td className="hidden px-2 py-2 md:table-cell">
         <input
           type="checkbox"
           checked={row.is_active}
@@ -290,10 +290,10 @@ export function SettingsSanctionsPanel() {
                 <tr className="border-b border-border-subtle text-[10px] font-bold tracking-wider text-muted-foreground uppercase">
                   <th className="px-4 py-2">Nama</th>
                   <th className="px-2 py-2">Poin Min</th>
-                  <th className="px-2 py-2">Poin Maks</th>
-                  <th className="px-2 py-2">Tindakan</th>
-                  <th className="px-2 py-2">Level</th>
-                  <th className="px-2 py-2">Aktif</th>
+                  <th className="hidden px-2 py-2 md:table-cell">Poin Maks</th>
+                  <th className="hidden px-2 py-2 md:table-cell">Tindakan</th>
+                  <th className="hidden px-2 py-2 md:table-cell">Level</th>
+                  <th className="hidden px-2 py-2 md:table-cell">Aktif</th>
                   {canEdit && <th className="px-2 py-2" aria-label="Aksi" />}
                 </tr>
               </thead>

@@ -101,7 +101,7 @@ export function ParentAccountTable(props: {
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-3 border-t border-border-control pt-3">
+      <div className="flex flex-col items-stretch justify-between gap-3 border-t border-border-control pt-3 sm:flex-row sm:items-center">
         <p className="text-[11px] font-semibold text-text-muted">
           Menampilkan {props.rows.length} dari {props.total} akun
         </p>

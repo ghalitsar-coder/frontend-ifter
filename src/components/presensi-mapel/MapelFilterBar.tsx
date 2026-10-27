@@ -4,11 +4,12 @@ import { useMasterGuruTeachers } from '@/lib/api/master-guru';
 import { useMasterKelasList } from '@/lib/api/master-kelas';
 import { defaultMonthRange, useSubjects } from '@/lib/api/presensi-mapel';
 
-const labelClass = 'flex flex-col gap-1 text-[11px] font-semibold text-text-muted';
+const labelClass =
+  'flex min-w-0 flex-1 basis-40 flex-col gap-1 text-[11px] font-semibold text-text-muted';
 const controlClass =
-  'h-9 min-w-0 rounded-xl border border-border-control bg-surface-card px-2 text-xs font-semibold text-pine-deep outline-none focus-visible:ring-2 focus-visible:ring-pine-deep';
+  'h-11 min-w-0 rounded-xl border border-border-control bg-surface-card px-2 text-xs font-semibold text-pine-deep outline-none focus-visible:ring-2 focus-visible:ring-pine-deep';
 const dateClass =
-  'h-9 rounded-xl border border-border-control bg-surface-card px-2 text-xs font-semibold text-text-primary outline-none focus-visible:ring-2 focus-visible:ring-pine-deep';
+  'h-11 rounded-xl border border-border-control bg-surface-card px-2 text-xs font-semibold text-text-primary outline-none focus-visible:ring-2 focus-visible:ring-pine-deep';
 
 /** The date-and-scope filters shared by the session list and the recap. */
 export type MapelFilterValue = {

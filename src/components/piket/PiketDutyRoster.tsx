@@ -99,18 +99,18 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
   };
 
   return (
-    <div className="bg-surface-card rounded-2xl p-6 shadow-xs">
+    <div className="rounded-2xl bg-surface-card p-6 shadow-xs">
       <div className="flex flex-col justify-between gap-2 pb-4 sm:flex-row sm:items-center">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
             <span className="size-2 rounded-full bg-pine-deep" />
-            <h2 className="text-text-primary text-lg font-bold">Rotasi Guru Piket</h2>
+            <h2 className="text-lg font-bold text-text-primary">Rotasi Guru Piket</h2>
           </div>
-          <p className="font-caption text-text-muted text-xs">
+          <p className="font-caption text-xs text-text-muted">
             Daftar penugasan guru piket harian dari server (weekday ISO 1 = Senin s.d. 7 = Ahad).
           </p>
         </div>
-        <span className="font-caption inline-flex w-fit items-center gap-1.5 rounded-full bg-pine-light px-2.5 py-1 text-xs font-semibold text-pine-deep">
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-pine-light px-2.5 py-1 font-caption text-xs font-semibold text-pine-deep">
           <ClipboardList className="size-3.5" />
           {assignmentsQuery.data === undefined
             ? 'Memuat...'
@@ -120,7 +120,7 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
 
       {/* Roster list (GET /duty-assignments) */}
       {assignmentsQuery.isError && (
-        <p className="text-error mb-4 rounded-xl bg-red-500/10 p-3 text-xs font-medium">
+        <p className="mb-4 rounded-xl bg-red-500/10 p-3 text-xs font-medium text-error">
           {assignmentsQuery.error instanceof ApiError
             ? assignmentsQuery.error.message
             : 'Gagal memuat daftar penugasan piket.'}
@@ -130,13 +130,13 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
       {!assignmentsQuery.isError && (
         <div className="space-y-3 pb-5">
           {groups.length === 0 && !assignmentsQuery.isPending && (
-            <p className="bg-canvas-base text-text-muted rounded-xl p-3 text-xs">
+            <p className="rounded-xl bg-canvas-base p-3 text-xs text-text-muted">
               Belum ada penugasan guru piket.
             </p>
           )}
           {groups.map((group) => (
             <div key={group.weekday} className="flex flex-col gap-2 sm:flex-row sm:items-start">
-              <span className="font-caption bg-canvas-base text-text-primary flex h-8 shrink-0 items-center justify-center rounded-lg px-3 text-xs font-bold sm:w-20">
+              <span className="flex h-8 shrink-0 items-center justify-center rounded-lg bg-canvas-base px-3 font-caption text-xs font-bold text-text-primary sm:w-20">
                 {group.label}
               </span>
               <div className="flex flex-wrap gap-2">
@@ -176,7 +176,7 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
                       {stillOpen && (
                         <button
                           aria-label={`Akhiri penugasan ${assignment.teacher_name}`}
-                          className="text-error flex size-5 cursor-pointer items-center justify-center rounded-full bg-white/70 shadow-xs transition-colors hover:bg-red-600 hover:text-white"
+                          className="flex size-8 cursor-pointer items-center justify-center rounded-full bg-white/70 text-error shadow-xs transition-colors hover:bg-red-600 hover:text-white max-sm:size-10"
                           type="button"
                           onClick={() => {
                             handleEnd(assignment.id, assignment.teacher_name);
@@ -201,13 +201,13 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
       >
         <div className="space-y-1 md:col-span-2">
           <label
-            className="text-text-primary block text-[11px] font-semibold"
+            className="block text-[11px] font-semibold text-text-primary"
             htmlFor="duty-teacher-select"
           >
             Guru Piket
           </label>
           <select
-            className="bg-canvas-base text-text-primary h-11 w-full rounded-xl px-3 text-xs font-medium shadow-inner focus:outline-none"
+            className="h-11 w-full rounded-xl bg-canvas-base px-3 text-xs font-medium text-text-primary shadow-inner focus:outline-none"
             id="duty-teacher-select"
             value={teacherId}
             onChange={(event) => {
@@ -228,13 +228,13 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
 
         <div className="space-y-1">
           <label
-            className="text-text-primary block text-[11px] font-semibold"
+            className="block text-[11px] font-semibold text-text-primary"
             htmlFor="duty-weekday-select"
           >
             Hari
           </label>
           <select
-            className="bg-canvas-base text-text-primary h-11 w-full rounded-xl px-3 text-xs font-medium shadow-inner focus:outline-none"
+            className="h-11 w-full rounded-xl bg-canvas-base px-3 text-xs font-medium text-text-primary shadow-inner focus:outline-none"
             id="duty-weekday-select"
             value={weekday}
             onChange={(event) => {
@@ -251,13 +251,13 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
 
         <div className="space-y-1">
           <label
-            className="text-text-primary block text-[11px] font-semibold"
+            className="block text-[11px] font-semibold text-text-primary"
             htmlFor="duty-start-date"
           >
             Mulai Tanggal
           </label>
           <input
-            className="bg-canvas-base text-text-primary h-11 w-full rounded-xl px-3 text-xs font-medium shadow-inner focus:outline-none"
+            className="h-11 w-full rounded-xl bg-canvas-base px-3 text-xs font-medium text-text-primary shadow-inner focus:outline-none"
             id="duty-start-date"
             type="date"
             value={startDate}
@@ -269,14 +269,14 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
 
         <div className="space-y-1">
           <label
-            className="text-text-primary block text-[11px] font-semibold"
+            className="block text-[11px] font-semibold text-text-primary"
             htmlFor="duty-end-date"
           >
             Berakhir (opsional)
           </label>
           <div className="flex gap-2">
             <input
-              className="bg-canvas-base text-text-primary h-11 w-full rounded-xl px-3 text-xs font-medium shadow-inner focus:outline-none"
+              className="h-11 w-full rounded-xl bg-canvas-base px-3 text-xs font-medium text-text-primary shadow-inner focus:outline-none"
               id="duty-end-date"
               type="date"
               value={endDate}
@@ -285,7 +285,7 @@ export function PiketDutyRoster(props: { onToast: (title: string, desc: string) 
               }}
             />
             <button
-              className="text-on-primary flex h-11 shrink-0 items-center gap-2 rounded-xl bg-pine-deep px-4 text-xs font-bold shadow-xs transition-all hover:bg-pine-hover disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-11 shrink-0 items-center gap-2 rounded-xl bg-pine-deep px-4 text-xs font-bold text-on-primary shadow-xs transition-all hover:bg-pine-hover disabled:cursor-not-allowed disabled:opacity-50"
               type="submit"
               disabled={!canSubmit || createDuty.isPending}
             >

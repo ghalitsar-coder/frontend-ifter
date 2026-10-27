@@ -20,7 +20,7 @@ export function ClassStudentsModal(props: { classRecord: Class; onClose: () => v
   const renderContent = (): ReactNode => {
     if (studentsQuery.isLoading) {
       return (
-        <div className="text-text-muted flex items-center justify-center gap-2 p-10 text-sm">
+        <div className="flex items-center justify-center gap-2 p-10 text-sm text-text-muted">
           <Loader2 className="size-4 animate-spin" /> Memuat siswa…
         </div>
       );
@@ -34,7 +34,7 @@ export function ClassStudentsModal(props: { classRecord: Class; onClose: () => v
     }
     if (students.length === 0) {
       return (
-        <div className="text-text-muted p-10 text-center text-sm">
+        <div className="p-10 text-center text-sm text-text-muted">
           Belum ada siswa yang terdaftar di kelas ini.
         </div>
       );
@@ -63,12 +63,12 @@ export function ClassStudentsModal(props: { classRecord: Class; onClose: () => v
         <tbody className="divide-y divide-border-subtle">
           {students.map((student, index) => (
             <tr key={student.id} className="hover:bg-surface-container-low/60">
-              <td className="text-text-muted p-3">{index + 1}</td>
-              <td className="text-text-primary p-3 font-mono text-xs">{student.student_number}</td>
-              <td className="text-text-primary p-3 font-semibold">{student.full_name}</td>
-              <td className="text-text-muted p-3 text-xs">{student.enrollment_start}</td>
+              <td className="p-3 text-text-muted">{index + 1}</td>
+              <td className="p-3 font-mono text-xs text-text-primary">{student.student_number}</td>
+              <td className="p-3 font-semibold text-text-primary">{student.full_name}</td>
+              <td className="p-3 text-xs text-text-muted">{student.enrollment_start}</td>
               <td className="p-3">
-                <span className="text-text-primary inline-flex rounded-full border border-border-control bg-surface-container-low px-2 py-0.5 text-[11px] font-semibold">
+                <span className="inline-flex rounded-full border border-border-control bg-surface-container-low px-2 py-0.5 text-[11px] font-semibold text-text-primary">
                   {studentStatusLabel(student.status)}
                 </span>
               </td>
@@ -87,7 +87,7 @@ export function ClassStudentsModal(props: { classRecord: Class; onClose: () => v
       aria-labelledby="class-students-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-pine-deep/60 p-3 backdrop-blur-md sm:p-6"
     >
-      <div className="bg-surface-card flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl shadow-2xl">
+      <div className="flex max-h-[92vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-surface-card shadow-2xl">
         <div className="h-1.5 w-full bg-gradient-to-r from-pine-deep via-amber-gold to-pine-deep" />
         <div className="flex items-start justify-between gap-4 border-b border-border-control px-5 py-4 sm:px-6">
           <div className="flex items-start gap-3">
@@ -98,7 +98,7 @@ export function ClassStudentsModal(props: { classRecord: Class; onClose: () => v
               <h2 id="class-students-title" className="text-lg font-bold text-pine-deep">
                 Siswa Kelas {props.classRecord.name}
               </h2>
-              <p className="text-text-muted text-xs">
+              <p className="text-xs text-text-muted">
                 {studentsQuery.isLoading
                   ? 'Memuat daftar siswa…'
                   : `${students.length} siswa terdaftar`}
@@ -109,13 +109,13 @@ export function ClassStudentsModal(props: { classRecord: Class; onClose: () => v
             type="button"
             onClick={props.onClose}
             aria-label="Tutup"
-            className="text-text-muted hover:bg-surface-container hover:text-text-primary flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low transition-colors"
+            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary"
           >
             <X className="size-4" />
           </button>
         </div>
 
-        <div className="overflow-y-auto">{renderContent()}</div>
+        <div className="overflow-auto">{renderContent()}</div>
       </div>
     </div>
   );
