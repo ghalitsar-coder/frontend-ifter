@@ -93,7 +93,11 @@ export function PresensiStudentRow(props: {
         </span>
       </div>
 
-      <div className="flex w-full items-center gap-3.5 md:col-span-5">
+      <div className="hidden md:flex md:col-span-1 md:items-center">
+        <span className="font-label-md text-label-md text-on-surface-variant">{student.nisn}</span>
+      </div>
+
+      <div className="flex w-full items-center gap-3.5 md:col-span-3">
         <div
           className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full border font-label-md text-label-md font-bold transition-transform group-hover:scale-105 ${style.avatarClass}`}
         >
@@ -115,10 +119,10 @@ export function PresensiStudentRow(props: {
           <div
             className={`flex items-center gap-2 font-caption text-caption text-text-muted ${isUnrecorded ? 'mt-0.5' : ''}`}
           >
-            <span className={`font-medium ${isUnrecorded ? 'text-amber-dark' : ''}`}>
+            <span className={`font-medium ${isUnrecorded ? 'text-amber-dark' : ''} md:hidden`}>
               {t('nisn_inline', { nisn: student.nisn })}
             </span>
-            <span>•</span>
+            <span className="md:hidden">•</span>
             <span
               className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[12px] font-semibold ${style.badgeClass}`}
             >
@@ -137,9 +141,15 @@ export function PresensiStudentRow(props: {
         />
       </div>
 
-      <div className="flex w-full items-center justify-end md:col-span-1">
+      <div className="flex w-full items-center justify-end gap-2 md:col-span-2">
+        <span
+          className="min-w-0 flex-1 truncate text-right font-caption text-caption text-text-muted"
+          title={student.note ?? undefined}
+        >
+          {student.note ?? t('roster_keterangan_empty')}
+        </span>
         <button
-          className={`rounded-lg p-2.5 md:p-2 ${noteAction.buttonClass}`}
+          className={`shrink-0 rounded-lg p-2.5 md:p-2 ${noteAction.buttonClass}`}
           disabled={props.disabled}
           onClick={props.onOpenNote}
           title={t(noteAction.titleKey)}

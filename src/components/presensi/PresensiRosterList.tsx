@@ -35,9 +35,10 @@ export function PresensiRosterList(props: {
     <div className="flex flex-col overflow-hidden rounded-2xl border-[1.5px] border-border-control bg-surface shadow-[0_4px_16px_-2px_rgba(23,63,54,0.06)]">
       <div className="hidden gap-4 bg-[linear-gradient(90deg,#173F36_0%,#1F4F44_100%)] px-6 py-3.5 font-caption text-caption font-semibold tracking-wider text-white uppercase md:grid md:grid-cols-12 md:border-b-2 md:border-amber-gold">
         <div className="md:col-span-1">{t('roster_column_number')}</div>
-        <div className="md:col-span-5">{t('roster_column_identity')}</div>
+        <div className="md:col-span-1">{t('roster_column_nis')}</div>
+        <div className="md:col-span-3">{t('roster_column_identity')}</div>
         <div className="text-center md:col-span-5">{t('roster_column_status')}</div>
-        <div className="text-right md:col-span-1">{t('roster_column_note')}</div>
+        <div className="text-right md:col-span-2">{t('roster_column_keterangan')}</div>
       </div>
 
       <div className="divide-y divide-border-divider">
