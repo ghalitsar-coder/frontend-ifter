@@ -69,19 +69,19 @@ export async function AttendlyShell(props: { children: React.ReactNode }) {
             {/* shortcut: placeholder legal/help targets until dedicated pages exist, then point each to its own route */}
             <Link
               className="font-caption text-caption text-on-surface-variant transition-colors hover:text-on-surface"
-              href="/about"
+              href="/"
             >
               {t('footer_help')}
             </Link>
             <Link
               className="font-caption text-caption text-on-surface-variant transition-colors hover:text-on-surface"
-              href="/about"
+              href="/"
             >
               {t('footer_privacy')}
             </Link>
             <Link
               className="font-caption text-caption text-on-surface-variant transition-colors hover:text-on-surface"
-              href="/about"
+              href="/"
             >
               {t('footer_terms')}
             </Link>
