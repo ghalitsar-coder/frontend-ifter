@@ -51,7 +51,7 @@ export const LandingMobileMenu = (props: { items: LandingMenuItem[] }) => {
             <li>
               <Link
                 className="flex min-h-11 items-center rounded-xl px-space-sm font-label-md text-label-md text-primary transition-colors hover:bg-pine-light"
-                href="/presensi"
+                href="/login"
                 onClick={() => {
                   setIsOpen(false);
                 }}

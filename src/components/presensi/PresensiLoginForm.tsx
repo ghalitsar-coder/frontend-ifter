@@ -20,10 +20,9 @@ const TAB_CLASSES = {
  * Scandinavian credential form of the login screen: the role switcher decides which identity the
  * single backend `username` carries, and the submit button reports the pending and accepted phases.
  *
- * @param props - Opens the RFID tap dialog.
  * @returns Form column with alternative sign-in options and the compliance footer.
  */
-export function PresensiLoginForm(props: { onRfidTap: () => void }) {
+export function PresensiLoginForm() {
   const t = useTranslations('PresensiPage');
   const router = useRouter();
   const [role, setRole] = useState<PresensiLoginRole>('teacher');
@@ -232,7 +231,7 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 gap-space-sm sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-space-sm">
           <button
             aria-label={t('login_google_title')}
             className="group flex w-full items-center justify-center gap-space-xs rounded-xl bg-surface-container-low px-space-md py-2.5 text-left transition-colors hover:bg-surface-container disabled:pointer-events-none disabled:opacity-60"
@@ -264,29 +263,6 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
               <span className="truncate font-caption text-caption text-text-muted">
                 {t('login_google_sub')}
               </span>
-            </span>
-          </button>
-
-          <button
-            className="flex w-full items-center justify-between rounded-xl bg-amber-surface px-space-md py-2.5 text-left transition-colors hover:bg-secondary-fixed/30"
-            onClick={props.onRfidTap}
-            type="button"
-          >
-            <span className="flex min-w-0 items-center gap-space-xs">
-              <span className="material-symbols-outlined text-[22px] text-amber-dark">
-                contactless
-              </span>
-              <span className="flex min-w-0 flex-col">
-                <span className="truncate font-label-md text-label-md font-semibold text-amber-dark">
-                  {t('login_rfid_title')}
-                </span>
-                <span className="truncate font-caption text-caption text-text-muted">
-                  {t('login_rfid_sub')}
-                </span>
-              </span>
-            </span>
-            <span className="shrink-0 rounded-full bg-amber-gold px-1.5 py-0.5 font-caption text-[11px] font-bold text-pine-deep">
-              {t('login_rfid_badge')}
             </span>
           </button>
         </div>

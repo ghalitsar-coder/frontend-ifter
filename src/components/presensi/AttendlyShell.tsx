@@ -34,12 +34,6 @@ export async function AttendlyShell(props: { children: React.ReactNode }) {
               </Link>
               <Link
                 className="font-label-md text-label-md text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
-                href="/presensi"
-              >
-                {t('nav_classes')}
-              </Link>
-              <Link
-                className="font-label-md text-label-md text-on-surface-variant transition-colors duration-150 hover:text-on-surface"
                 href="/dashboard/presensi"
               >
                 {t('nav_recap')}

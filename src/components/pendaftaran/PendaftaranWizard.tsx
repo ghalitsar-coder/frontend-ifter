@@ -129,7 +129,7 @@ export function PendaftaranWizard() {
       {step === 'selesai' && (
         <PendaftaranSuccessStep
           onStart={() => {
-            router.push('/presensi');
+            router.push('/login');
           }}
           school={{
             email: draft.email,
