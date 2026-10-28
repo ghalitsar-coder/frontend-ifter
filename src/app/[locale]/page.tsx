@@ -5,10 +5,10 @@ import { FeaturesSection } from '@/components/landing/FeaturesSection';
 import { GallerySection } from '@/components/landing/GallerySection';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
-import { LandingHeader } from '@/components/landing/LandingHeader';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { TrustSection } from '@/components/landing/TrustSection';
 import { WorkflowSection } from '@/components/landing/WorkflowSection';
+import { SiteHeader } from '@/components/shared/SiteHeader';
 
 type IndexPageProps = {
   params: Promise<{ locale: string }>;
@@ -30,7 +30,7 @@ export default async function IndexPage(props: IndexPageProps) {
       id="beranda"
       lang="id"
     >
-      <LandingHeader />
+      <SiteHeader />
       <main className="min-h-[calc(100dvh-20rem)] w-full bg-surface pt-20">
         <div className="flex w-full flex-col overflow-hidden">
           <HeroSection />
