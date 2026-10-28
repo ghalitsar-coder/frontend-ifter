@@ -42,7 +42,7 @@ export function SiteHeader() {
             <span className="font-headline-sm text-headline-sm leading-none tracking-tight text-primary">
               Attendly
             </span>
-            <span className="font-caption text-caption text-text-muted">
+            <span className="hidden font-caption text-caption text-text-muted sm:block">
               Presensi &amp; Disiplin Sekolah
             </span>
           </span>
@@ -64,10 +64,11 @@ export function SiteHeader() {
             Masuk Portal Presensi
           </Link>
           <Link
-            className="hidden h-11 items-center justify-center rounded-xl bg-secondary-container px-space-lg font-label-md text-label-md font-semibold whitespace-nowrap text-primary shadow-[0_4px_16px_rgba(242,201,108,0.25)] transition-all hover:bg-amber-hover hover:text-primary sm:inline-flex"
+            className="inline-flex h-11 items-center justify-center rounded-xl bg-secondary-container px-space-md font-label-md text-label-md font-semibold whitespace-nowrap text-primary shadow-[0_4px_16px_rgba(242,201,108,0.25)] transition-all hover:bg-amber-hover hover:text-primary sm:px-space-lg"
             href="/pendaftaran"
           >
-            Daftar Sekolah
+            <span className="hidden sm:inline">Daftar Sekolah</span>
+            <span className="sm:hidden">Daftar</span>
           </Link>
 
           <div className="flex items-center xl:hidden">
