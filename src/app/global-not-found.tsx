@@ -7,6 +7,7 @@ import '@/styles/global.css';
 
 const quickLinks = [
   { href: '/dashboard/presensi', icon: 'fact_check', labelKey: 'quick_presensi' },
+  { href: '/dashboard/kedisiplinan', icon: 'gavel', labelKey: 'quick_kedisiplinan' },
   { href: '/pendaftaran', icon: 'account_balance', labelKey: 'quick_pendaftaran' },
 ] as const;
 
@@ -92,7 +93,7 @@ export default async function GlobalNotFound() {
                   <span className="material-symbols-outlined text-[18px] text-amber-dark">
                     {link.icon}
                   </span>
-                  {t(link.labelKey)}
+                  {link.labelKey === 'quick_presensi' ? t('quick_presensi') : link.labelKey === 'quick_kedisiplinan' ? t('quick_kedisiplinan') : t('quick_pendaftaran')}
                 </a>
               ))}
             </div>
