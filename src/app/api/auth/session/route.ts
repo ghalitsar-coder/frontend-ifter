@@ -1,3 +1,4 @@
+import { decodeBackendToken } from '@/libs/DashboardAccess';
 import * as z from 'zod';
 import { clearBackendToken, readBackendToken, setBackendToken } from '@/libs/BackendSession';
 import { Env } from '@/libs/Env';
@@ -14,7 +15,9 @@ const credentialsSchema = z.object({
  * @returns `{ authenticated }`, decided by cookie presence alone.
  */
 export async function GET(): Promise<Response> {
-  return Response.json({ authenticated: (await readBackendToken()) !== undefined });
+  const token = await readBackendToken();
+  const session = decodeBackendToken(token);
+  return Response.json({ authenticated: Boolean(token && session && !session.expired) });
 }
 
 /**

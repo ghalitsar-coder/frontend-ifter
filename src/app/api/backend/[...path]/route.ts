@@ -83,3 +83,14 @@ export async function POST(request: Request, props: BackendPassthroughProps): Pr
 export async function PUT(request: Request, props: BackendPassthroughProps): Promise<Response> {
   return await forward(request, props);
 }
+
+/**
+ * Proxy a PATCH to the backend with the session token.
+ *
+ * @param request - Browser request.
+ * @param props - Catch-all backend path segments.
+ * @returns The Go response body and status.
+ */
+export async function PATCH(request: Request, props: BackendPassthroughProps): Promise<Response> {
+  return await forward(request, props);
+}

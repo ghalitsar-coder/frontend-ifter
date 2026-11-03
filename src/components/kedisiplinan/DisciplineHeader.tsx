@@ -1,4 +1,4 @@
-import { FileSpreadsheet, PlusCircle, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import { ClipboardCheck, FileSpreadsheet, PlusCircle, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 /**
@@ -10,6 +10,7 @@ import { useTranslations } from 'next-intl';
 export function DisciplineHeader(props: {
   onExportExcel: () => void;
   onOpenCategoryRules: () => void;
+  onOpenClassInspection: () => void;
   onOpenRecordModal: () => void;
 }) {
   const t = useTranslations('DisciplinePage');
@@ -54,6 +55,15 @@ export function DisciplineHeader(props: {
           >
             <FileSpreadsheet className="size-4 text-pine-deep" />
             <span>{t('btn_export_excel')}</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={props.onOpenClassInspection}
+            className="inline-flex items-center gap-2 rounded-xl border border-pine-deep/30 bg-pine-light/60 px-4 py-2.5 text-sm font-semibold text-pine-deep shadow-xs transition-colors hover:bg-pine-light"
+          >
+            <ClipboardCheck className="size-4.5 text-pine-deep" />
+            <span>{t('btn_class_inspection')}</span>
           </button>
 
           <button

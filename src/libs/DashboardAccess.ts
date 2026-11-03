@@ -5,7 +5,7 @@ export const SESSION_COOKIE_NAME = 'ifter_token';
 // shortcut: page-level gate is UX only — the Go backend re-checks the JWT role on every API call.
 // Roles outside this table only reach the unrestricted dashboard pages.
 const RESTRICTED_PAGES: Record<string, string[]> = {
-  kedisiplinan: ['admin', 'guru'],
+  kedisiplinan: ['admin', 'guru', 'kesiswaan'],
   presensi: ['admin', 'guru'],
 };
 

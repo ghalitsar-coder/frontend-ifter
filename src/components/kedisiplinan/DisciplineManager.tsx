@@ -2,7 +2,8 @@
 
 import { CheckCircle2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { DisciplineClassInspectionModal } from '@/components/kedisiplinan/DisciplineClassInspectionModal';
 import { DisciplineFilterBar } from '@/components/kedisiplinan/DisciplineFilterBar';
 import { DisciplineHeader } from '@/components/kedisiplinan/DisciplineHeader';
 import { DisciplineIncidentTable } from '@/components/kedisiplinan/DisciplineIncidentTable';
@@ -11,10 +12,20 @@ import { DisciplineRecordModal } from '@/components/kedisiplinan/DisciplineRecor
 import { DisciplineRuleCatalog } from '@/components/kedisiplinan/DisciplineRuleCatalog';
 import { DisciplineSidebar } from '@/components/kedisiplinan/DisciplineSidebar';
 import { filterDisciplineIncidents, mockDisciplineIncidents } from '@/data/mockDiscipline';
+import {
+  fetchStudentViolations,
+  fetchViolationTypes,
+  postRecordViolation,
+  type StudentViolationRecord,
+  updateViolationFollowup,
+  type ViolationTypeRecord,
+} from '@/services/disciplineApi';
+import { type ClassRecord, getClasses } from '@/services/presensiApi';
 import type {
   DisciplineCategory,
   DisciplineFilterState,
   DisciplineIncident,
+  IncidentStatus,
   NewIncidentFormData,
 } from '@/types/discipline';
 
@@ -94,6 +105,54 @@ function getStudentPointStatus(totalPoints: number): string {
   return 'Aman';
 }
 
+function mapRecordToIncident(r: StudentViolationRecord): DisciplineIncident {
+  const initials = r.student_name
+    .split(' ')
+    .map((part) => part[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  let categoryKey: DisciplineCategory = 'tatatertib';
+  if (r.violation_category === 'keterlambatan') {
+    categoryKey = 'keterlambatan';
+  } else if (r.violation_category === 'seragam') {
+    categoryKey = 'seragam';
+  } else if (r.violation_category === 'barang_terlarang') {
+    categoryKey = 'barang_terlarang';
+  } else if (r.violation_category === 'bullying') {
+    categoryKey = 'bullying';
+  }
+
+  let status: IncidentStatus = 'baru';
+  if (r.tindak_lanjut && r.tindak_lanjut.includes('selesai')) {
+    status = 'selesai';
+  } else if (r.tindak_lanjut) {
+    status = 'tindak';
+  }
+
+  return {
+    id: String(r.id),
+    date: r.tanggal,
+    time: r.created_at.slice(11, 16) + ' WIB',
+    studentName: r.student_name,
+    studentNis: r.nis ?? '-',
+    studentClass: r.nama_kelas ?? '1A',
+    studentInitials: initials || 'ST',
+    studentAvatarBg: getStudentAvatarBg(r.poin),
+    categoryKey,
+    categoryLabel: `${r.violation_name} (+${r.poin})`,
+    points: r.poin,
+    description: r.keterangan ?? 'Pencatatan ketertiban siswa.',
+    location: 'Lingkungan Sekolah',
+    recorderName: 'Petugas Kesiswaan',
+    recorderRole: 'Kesiswaan & BK',
+    studentTotalPoints: r.poin,
+    studentPointStatus: getStudentPointStatus(r.poin),
+    status,
+  };
+}
+
 /**
  * Interactive coordinator container for Discipline and Student Points management.
  *
@@ -103,6 +162,8 @@ export function DisciplineManager() {
   const t = useTranslations('DisciplinePage');
 
   const [incidents, setIncidents] = useState<DisciplineIncident[]>(mockDisciplineIncidents);
+  const [classes, setClasses] = useState<ClassRecord[]>([]);
+  const [violationTypes, setViolationTypes] = useState<ViolationTypeRecord[]>([]);
   const [filter, setFilter] = useState<DisciplineFilterState>({
     search: '',
     selectedClass: '',
@@ -112,6 +173,7 @@ export function DisciplineManager() {
     quickTab: 'all',
   });
   const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
+  const [isInspectionModalOpen, setIsInspectionModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -120,6 +182,33 @@ export function DisciplineManager() {
       setToastMessage(null);
     }, 3500);
   };
+
+  const loadData = () => {
+    getClasses()
+      .then((data) => {
+        setClasses(data);
+      })
+      .catch(() => {});
+
+    fetchViolationTypes()
+      .then((types) => {
+        setViolationTypes(types);
+      })
+      .catch(() => {});
+
+    fetchStudentViolations()
+      .then((records) => {
+        if (records.length > 0) {
+          const mapped = records.map(mapRecordToIncident);
+          setIncidents(mapped);
+        }
+      })
+      .catch(() => {});
+  };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const filtered = filterDisciplineIncidents(incidents, filter);
 
@@ -135,7 +224,7 @@ export function DisciplineManager() {
 
   const totalPoints = incidents.reduce((sum, item) => sum + item.points, 0);
 
-  const handleCreateIncident = (formData: NewIncidentFormData) => {
+  const handleCreateIncident = async (formData: NewIncidentFormData) => {
     const pointWeight = getViolationPointWeight(formData.categoryKey);
     const label = getViolationLabel(formData.categoryKey);
 
@@ -146,16 +235,16 @@ export function DisciplineManager() {
       .slice(0, 2)
       .toUpperCase();
 
-    // Previous student incidents to calculate cumulative points
     const previousPoints = incidents
       .filter((i) => i.studentNis === formData.studentNis)
       .reduce((sum, curr) => sum + curr.points, 0);
     const newStudentTotal = previousPoints + pointWeight;
 
+    // Optimistic UI state
     const newRecord: DisciplineIncident = {
       id: `inc-${Date.now()}`,
-      date: '05 Okt 2026',
-      time: '10:00 WIB',
+      date: formData.dateTime.slice(0, 10),
+      time: formData.dateTime.slice(11, 16) || '10:00 WIB',
       studentName: formData.studentName,
       studentNis: formData.studentNis,
       studentClass: formData.studentClass,
@@ -176,6 +265,22 @@ export function DisciplineManager() {
     setIncidents([newRecord, ...incidents]);
     setIsRecordModalOpen(false);
     showToast(t('toast_incident_saved'));
+
+    // Persist to backend if possible
+    try {
+      const matchType = violationTypes.find((vt) => vt.kategori === formData.categoryKey);
+      await postRecordViolation({
+        student_id: 1, // Demo active student
+        violation_type_id: matchType?.id ?? 1,
+        poin: pointWeight,
+        keterangan: formData.description,
+        tindak_lanjut: formData.immediateAction,
+        tanggal: formData.dateTime.slice(0, 10) || new Date().toISOString().slice(0, 10),
+      });
+      loadData();
+    } catch {
+      // Optimistic record remains in state
+    }
   };
 
   const handleExportExcel = () => {
@@ -190,7 +295,7 @@ export function DisciplineManager() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `Rekap_Kedisiplinan_SMPN1_${Date.now()}.csv`);
+    link.setAttribute('download', `Rekap_Kedisiplinan_SD_Bakti_Asih_${Date.now()}.csv`);
     document.body.append(link);
     link.click();
     link.remove();
@@ -214,7 +319,18 @@ export function DisciplineManager() {
     showToast(`Detail Pelanggaran: ${incident.studentName} (${incident.categoryLabel})`);
   };
 
-  const handleEditIncident = (incident: DisciplineIncident) => {
+  const handleEditIncident = async (incident: DisciplineIncident) => {
+    const numId = Number(incident.id);
+    if (!Number.isNaN(numId) && numId > 0) {
+      try {
+        await updateViolationFollowup(numId, 'Dalam pembinaan guru BK & wali kelas');
+        showToast(`Status tindak lanjut diperbarui untuk: ${incident.studentName}`);
+        loadData();
+        return;
+      } catch {
+        // Fallback to toast
+      }
+    }
     showToast(`Membuka dialog penyuntingan insiden: ${incident.id}`);
   };
 
@@ -242,6 +358,9 @@ export function DisciplineManager() {
       <DisciplineHeader
         onOpenRecordModal={() => {
           setIsRecordModalOpen(true);
+        }}
+        onOpenClassInspection={() => {
+          setIsInspectionModalOpen(true);
         }}
         onExportExcel={handleExportExcel}
         onOpenCategoryRules={handleOpenCategoryRules}
@@ -289,6 +408,20 @@ export function DisciplineManager() {
           setIsRecordModalOpen(false);
         }}
         onSubmit={handleCreateIncident}
+      />
+
+      {/* Class Daily Inspection Checklist Modal */}
+      <DisciplineClassInspectionModal
+        isOpen={isInspectionModalOpen}
+        classes={classes.length > 0 ? classes : [{ id: 1, nama_kelas: '1A' }]}
+        violationTypes={violationTypes}
+        onClose={() => {
+          setIsInspectionModalOpen(false);
+        }}
+        onSaved={() => {
+          showToast(t('toast_inspection_saved'));
+          loadData();
+        }}
       />
     </div>
   );

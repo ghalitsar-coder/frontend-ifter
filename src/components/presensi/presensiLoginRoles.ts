@@ -1,7 +1,7 @@
 /**
- * Who is signing in: a teacher identified by NIP or a school operator identified by email.
+ * Who is signing in: a teacher, kesiswaan staff, or a school operator/admin.
  */
-export type PresensiLoginRole = 'admin' | 'teacher';
+export type PresensiLoginRole = 'admin' | 'teacher' | 'kesiswaan';
 
 type LoginRoleField = {
   helpKey: 'login_email_help' | 'login_nip_help';
@@ -24,6 +24,14 @@ export const LOGIN_ROLE_FIELDS: Record<PresensiLoginRole, LoginRoleField> = {
     placeholderKey: 'login_email_placeholder',
     submitKey: 'login_submit_admin',
     type: 'email',
+  },
+  kesiswaan: {
+    helpKey: 'login_nip_help',
+    icon: 'gavel',
+    labelKey: 'login_nip_label',
+    placeholderKey: 'login_nip_placeholder',
+    submitKey: 'login_submit_teacher',
+    type: 'text',
   },
   teacher: {
     helpKey: 'login_nip_help',

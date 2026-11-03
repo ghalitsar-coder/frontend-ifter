@@ -12,6 +12,8 @@ const baseConfig: NextConfig = {
   reactStrictMode: true,
   reactCompiler: process.env.NODE_ENV === 'production', // Keep the development environment fast
   experimental: {
+    // Disable interactive upgrade prompt so dev server starts without blocking
+    agentUpgrade: false,
     // The root layout lives under [locale], so unmatched URLs need a self-contained global 404.
     globalNotFound: true,
     // Clean up unused compilation work from memory and disk caches.

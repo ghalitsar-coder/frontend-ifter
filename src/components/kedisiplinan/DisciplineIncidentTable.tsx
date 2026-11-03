@@ -195,7 +195,7 @@ export function DisciplineIncidentTable(props: {
                         <div>
                           <div className="font-bold text-foreground">{incident.studentName}</div>
                           <div className="text-[11px] text-muted-foreground">
-                            {incident.studentClass} â€¢ NIS: {incident.studentNis}
+                            {incident.studentClass} • NIS: {incident.studentNis}
                           </div>
                         </div>
                       </div>
@@ -215,7 +215,7 @@ export function DisciplineIncidentTable(props: {
                         {incident.description}
                       </p>
                       <p className="mt-0.5 flex items-center text-[11px] text-muted-foreground">
-                        <span className="truncate">ðŸ“ {incident.location}</span>
+                        <span className="truncate">Lokasi: {incident.location}</span>
                       </p>
                     </td>
 

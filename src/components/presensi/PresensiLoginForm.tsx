@@ -42,11 +42,15 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
     setErrorKey(null);
 
     try {
-      await signIn({ password, username: credential });
+      const user = await signIn({ password, username: credential });
       setAccepted(true);
       // Seed the gate cache so /dashboard/presensi mounts the workspace without a refetch round trip.
       queryClient.setQueryData(AUTH_QUERY_KEY, true);
-      router.replace('/dashboard/presensi');
+      if (user.roles.includes('kesiswaan')) {
+        router.replace('/dashboard/kedisiplinan?role=kesiswaan');
+      } else {
+        router.replace('/dashboard/presensi');
+      }
     } catch (error) {
       setErrorKey(presensiErrorKey(error));
       setPending(false);
@@ -76,7 +80,7 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
           className="mb-space-lg flex items-center gap-1 rounded-xl bg-surface-container p-1"
           role="tablist"
         >
-          {(['teacher', 'admin'] as const).map((tab) => (
+          {(['teacher', 'kesiswaan', 'admin'] as const).map((tab) => (
             <button
               aria-controls="login-form"
               aria-selected={role === tab}
@@ -89,9 +93,9 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
               type="button"
             >
               <span className="material-symbols-outlined text-[18px]">
-                {tab === 'teacher' ? 'school' : 'shield'}
+                {tab === 'teacher' ? 'school' : tab === 'kesiswaan' ? 'gavel' : 'shield'}
               </span>
-              <span>{t(tab === 'teacher' ? 'login_role_teacher' : 'login_role_admin')}</span>
+                <span>{tab === 'teacher' ? t('login_role_teacher') : tab === 'kesiswaan' ? t('login_role_kesiswaan') : t('login_role_admin')}</span>
             </button>
           ))}
         </div>
