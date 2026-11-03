@@ -285,11 +285,13 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
           {
             icon: 'checklist_rtl',
             label: 'Pemeriksaan Harian',
+            href: '/dashboard/kedisiplinan/pemeriksaan',
             badge: { label: 'Kelas', tone: 'present' },
           },
           {
             icon: 'menu_book',
             label: 'Buku Pedoman Tata Tertib',
+            href: '/dashboard/kedisiplinan/pedoman',
           },
         ],
       },
@@ -299,16 +301,19 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
           {
             icon: 'warning',
             label: 'Siswa Waspada & SP',
+            href: '/dashboard/kedisiplinan/waspada',
             badge: { label: '3 Kasus', tone: 'error' },
           },
           {
             icon: 'mark_email_read',
             label: 'Pemanggilan Orang Tua',
+            href: '/dashboard/kedisiplinan/panggilan',
             badge: { label: '2 Siap', tone: 'amber' },
           },
           {
             icon: 'history_edu',
             label: 'Rekam Bimbingan BK',
+            href: '/dashboard/kedisiplinan/bimbingan',
           },
         ],
       },
@@ -318,6 +323,7 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
           {
             icon: 'table_view',
             label: 'Matriks Kedisiplinan',
+            href: '/dashboard/kedisiplinan/matriks',
             badge: { label: 'XLSX', tone: 'surface', box: true },
           },
         ],
