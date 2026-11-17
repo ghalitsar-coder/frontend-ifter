@@ -7,6 +7,7 @@ export const SESSION_COOKIE_NAME = 'ifter_token';
 const RESTRICTED_PAGES: Record<string, string[]> = {
   kedisiplinan: ['admin', 'guru'],
   presensi: ['admin', 'guru'],
+  qr: ['tu'],
 };
 
 type DecodedToken = {
@@ -60,4 +61,30 @@ export function isAllowedPage(roles: string[], page: string): boolean {
 
   // School admins registered through the wizard may carry any role name containing `admin`.
   return roles.some((role) => allowedRoles.includes(role) || role.includes('admin'));
+}
+
+/**
+ * Choose the first dashboard destination that matches the signed-in staff role.
+ *
+ * @param roles - Roles from the signed-in backend account.
+ * @returns The role-specific dashboard URL.
+ */
+export function dashboardHrefForRoles(roles: string[]): string {
+  if (roles.includes('tu')) {
+    return '/dashboard/qr?role=tu';
+  }
+
+  if (roles.includes('guru')) {
+    return '/dashboard/presensi?role=guru';
+  }
+
+  if (roles.some((role) => role.includes('admin'))) {
+    return '/dashboard/presensi';
+  }
+
+  if (roles.includes('kepala_sekolah')) {
+    return '/dashboard?role=kepsek';
+  }
+
+  return '/dashboard';
 }
