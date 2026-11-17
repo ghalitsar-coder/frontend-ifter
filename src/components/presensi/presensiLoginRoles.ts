@@ -1,5 +1,5 @@
 /**
- * Who is signing in: a teacher identified by NIP or a school operator identified by email.
+ * Who is signing in: a teacher identified by NIP or a school operator identified by username/email.
  */
 export type PresensiLoginRole = 'admin' | 'teacher';
 
@@ -14,7 +14,7 @@ type LoginRoleField = {
 
 /**
  * Credential-field copy and input type per role, mirroring the segmented control of the Stitch
- * login screen. The backend takes one `username`, so the NIP and the email share that field.
+ * login screen. The backend takes one `username`, which may be a NIP, username, or email.
  */
 export const LOGIN_ROLE_FIELDS: Record<PresensiLoginRole, LoginRoleField> = {
   admin: {
@@ -23,7 +23,7 @@ export const LOGIN_ROLE_FIELDS: Record<PresensiLoginRole, LoginRoleField> = {
     labelKey: 'login_email_label',
     placeholderKey: 'login_email_placeholder',
     submitKey: 'login_submit_admin',
-    type: 'email',
+    type: 'text',
   },
   teacher: {
     helpKey: 'login_nip_help',

@@ -7,6 +7,7 @@ import { presensiErrorKey } from '@/components/presensi/presensiErrors';
 import type { PresensiErrorKey } from '@/components/presensi/presensiErrors';
 import { LOGIN_ROLE_FIELDS } from '@/components/presensi/presensiLoginRoles';
 import type { PresensiLoginRole } from '@/components/presensi/presensiLoginRoles';
+import { dashboardHrefForRoles } from '@/libs/DashboardAccess';
 import { Link, useRouter } from '@/libs/I18nNavigation';
 import { AUTH_QUERY_KEY, signIn } from '@/services/presensiApi';
 
@@ -42,11 +43,11 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
     setErrorKey(null);
 
     try {
-      await signIn({ password, username: credential });
+      const session = await signIn({ password, username: credential });
       setAccepted(true);
-      // Seed the gate cache so /dashboard/presensi mounts the workspace without a refetch round trip.
+      // Seed the gate cache so the destination page can render without a refetch round trip.
       queryClient.setQueryData(AUTH_QUERY_KEY, true);
-      router.replace('/dashboard/presensi');
+      router.replace(dashboardHrefForRoles(session.roles));
     } catch (error) {
       setErrorKey(presensiErrorKey(error));
       setPending(false);
