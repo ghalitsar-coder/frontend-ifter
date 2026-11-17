@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-11-09T02:15:00Z",
+  "generatedOnPlatform": "win32",
+  "projectType": "webapp",
+  "runtime": {
+    "kind": "node",
+    "executable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\node.exe",
+    "expectedVersion": "v24.22.2"
+  },
+  "setup": [],
+  "assertions": [
+    {
+      "name": "typescript-check",
+      "kind": "process",
+      "command": "npm",
+      "args": ["run", "check:types"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 180
+    },
+    {
+      "name": "tests-pass",
+      "kind": "process",
+      "command": "npm",
+      "args": ["test"],
+      "verificationMethod": "test-results",
+      "expected": "0",
+      "timeoutSeconds": 300
+    },
+    {
+      "name": "lint-check",
+      "kind": "process",
+      "command": "npm",
+      "args": ["run", "lint"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 300
+    },
+    {
+      "name": "sign-in-page-200",
+      "kind": "http-probe",
+      "startCommand": "npm",
+      "startArgs": ["run", "start", "--", "--hostname", "127.0.0.1", "--port", "3001"],
+      "url": "http://127.0.0.1:3001/fr/sign-in",
+      "verificationMethod": "http-status",
+      "expected": "200",
+      "timeoutSeconds": 60
+    },
+    {
+      "name": "recap-page-redirects-unauthenticated",
+      "kind": "http-probe",
+      "startCommand": "npm",
+      "startArgs": ["run", "start", "--", "--hostname", "127.0.0.1", "--port", "3001"],
+      "url": "http://127.0.0.1:3001/fr/dashboard/rekap",
+      "verificationMethod": "http-status",
+      "expected": "307",
+      "timeoutSeconds": 60
+    }
+  ]
+}

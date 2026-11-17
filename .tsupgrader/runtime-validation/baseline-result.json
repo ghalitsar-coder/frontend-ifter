@@ -1,0 +1,215 @@
+{
+  "planHash": "3549fa89a05a8240f8309ea02c7dcb2bc40fe25471314315a9a22f21b283dc6e",
+  "phase": "baseline",
+  "recordedAtUtc": "2026-11-09T02:14:07.4492593Z",
+  "retryCount": 0,
+  "resetBaseline": true,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "typescript-check",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "npm warn Unknown env config \u0022scripts-prepend-node-path\u0022. This will stop working in the next major version of npm. See \u0060npm help npmrc\u0060 for supported config options.\r\n\r\n\u003E check:types\r\n\u003E tsc --noEmit --pretty\r\n\r\n",
+        "durationMs": 1438
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "npm warn Unknown env config \u0022scripts-prepend-node-path\u0022. This will stop working in the next major version of npm. See \u0060npm help npmrc\u0060 for supported config options.\r\n\r\n\u003E test\r\n\u003E vitest run\r\n\r\n\r\n RUN  v4.1.10 C:/Users/Pongo/Documents/SEMESTER7/ifter/frontend-ifter\r\n\r\n \u2713 |unit| src/libs/DashboardAccess.test.ts (8 tests) 8ms\r\n \u2713 |unit| src/services/presensiApi.test.ts (9 tests) 9ms\r\n \u2713 |unit| src/components/pendaftaran/pendaftaranState.test.ts (13 tests) 9ms\r\n \u2713 |unit| src/services/recapApi.test.ts (7 tests) 24ms\r\n \u2713 |unit| src/components/presensi/presensiDispensation.test.ts (29 tests) 101ms\r\n \u2713 |unit| src/utils/Helpers.test.ts (2 tests) 5ms\r\n \u2713 |ui (chromium)| src/templates/BaseTemplate.test.tsx (2 tests) 53ms\r\n\r\n Test Files  7 passed (7)\r\n      Tests  70 passed (70)\r\n   Start at  09:13:53\r\n   Duration  2.88s (transform 660ms, setup 0ms, import 2.70s, tests 209ms, environment 1ms)\r\n\r\n",
+        "durationMs": 4378,
+        "testResults": {
+          "testFramework": "vitest",
+          "runnerDetectedFrom": "package_json",
+          "testsTotal": 70,
+          "testsPassed": 70,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": false
+        }
+      },
+      {
+        "name": "lint-check",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": false,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 1,
+        "outputSample": "npm warn Unknown env config \u0022scripts-prepend-node-path\u0022. This will stop working in the next major version of npm. See \u0060npm help npmrc\u0060 for supported config options.\r\n\r\n\u003E lint\r\n\u003E ultracite check --type-aware --type-check\r\n\r\nChecking formatting...\r\n\r\n.coderabbit.yaml (0ms)\r\n.github/FUNDING.yml (0ms)\r\n.github/actions/setup-project/action.yml (0ms)\r\n.github/dependabot.yml (0ms)\r\n.github/workflows/CI.yml (1ms)\r\n.github/workflows/crowdin.yml (1ms)\r\n.github/workflows/release.yml (0ms)\r\n.storybook/main.ts (0ms)\r\n.storybook/preview.ts (1ms)\r\n.storybook/vitest.config.ts (1ms)\r\n.storybook/vitest.setup.ts (1ms)\r\n.tsupgrader/runtime-validation/baseline-result.json (0ms)\r\n.tsupgrader/runtime-validation/eval-plan.json (0ms)\r\n.tsupgrader/runtime-validation/standalone-result.json (0ms)\r\n.vscode/extensions.json (0ms)\r\n.vscode/launch.json (0ms)\r\n.vscode/settings.json (1ms)\r\n.vscode/tasks.json (0ms)\r\ncodecov.yml (0ms)\r\ncommitlint.config.ts (0ms)\r\ncomponents.json (0ms)\r\ncrowdin.yml (0ms)\r\nknip.config.ts (1ms)\r\nlefthook.yml (0ms)\r\nnext.config.ts (1ms)\r\noxfmt.config.ts (0ms)\r\noxlint.config.ts (2ms)\r\npackage.json (2ms)\r\nplaywright.config.ts (1ms)\r\nsrc/app/[locale]/(auth)/(center)/layout.tsx (2ms)\r\nsrc/app/[locale]/(auth)/(center)/sign-in/page.tsx (0ms)\r\nsrc/app/[locale]/(auth)/(center)/sign-up/page.tsx (0ms)\r\nsrc/app/[locale]/(auth)/dashboard/layout.tsx (0ms)\r\nsrc/app/[locale]/(auth)/dashboard/page.tsx (2ms)\r\nsrc/app/[locale]/(auth)/dashboard/presensi/page.tsx (3ms)\r\nsrc/app/[locale]/(auth)/dashboard/rekap/page.tsx (0ms)\r\nsrc/app/[locale]/(auth)/dashboard/segera/page.tsx (4ms)\r\nsrc/app/[locale]/(auth)/pendaftaran/layout.tsx (0ms)\r\nsrc/app/[locale]/(auth)/pendaftaran/page.tsx (0ms)\r\nsrc/app/[locale]/layout.tsx (1ms)\r\nsrc/app/[locale]/page.tsx (545ms)\r\nsrc/app/api/auth/register/route.ts (0ms)\r\nsrc/app/api/auth/session/route.ts (0ms)\r\nsrc/app/api/backend/[...path]/route.ts (0ms)\r\nsrc/app/global-error.tsx (0ms)\r\nsrc/app/global-not-found.tsx (597ms)\r\nsrc/app/robots.ts (0ms)\r\nsrc/app/sitemap.ts (0ms)\r\nsrc/components/DemoBadge.tsx (518ms)\r\nsrc/components/Hello.tsx (0ms)\r\nsrc/components/LocaleSwitcher.tsx (517ms)\r\nsrc/components/QueryProvider.tsx (0ms)\r\nsrc/components/dashboard/DashboardShell.tsx (8ms)\r\nsrc/components/dashboard/ProfileMenu.tsx (3ms)\r\nsrc/components/dashboard/navigation.ts (0ms)\r\nsrc/components/landing/CtaSection.tsx (7ms)\r\nsrc/components/landing/FeaturesSection.tsx (17ms)\r\nsrc/components/landing/GallerySection.tsx (15ms)\r\nsrc/components/landing/HeroSection.tsx (24ms)\r\nsrc/components/landing/LandingFooter.tsx (12ms)\r\nsrc/components/landing/MaterialIcon.tsx (8ms)\r\nsrc/components/landing/TestimonialsSection.tsx (9ms)\r\nsrc/components/landing/TrustSection.tsx (7ms)\r\nsrc/components/landing/WorkflowSection.tsx (8ms)\r\nsrc/components/pendaftaran/PendaftaranDocumentsStep.tsx (21ms)\r\nsrc/components/pendaftaran/PendaftaranIdentityStep.tsx (15ms)\r\nsrc/components/pendaftaran/PendaftaranOtpStep.tsx (35ms)\r\nsrc/components/pendaftaran/PendaftaranStepRibbon.tsx (6ms)\r\nsrc/components/pendaftaran/PendaftaranSuccessStep.tsx (33ms)\r\nsrc/components/pendaftaran/PendaftaranWizard.tsx (10ms)\r\nsrc/components/pendaftaran/pendaftaranState.test.ts (0ms)\r\nsrc/components/pendaftaran/pendaftaranState.ts (0ms)\r\nsrc/components/presensi/AttendlyBrand.tsx (8ms)\r\nsrc/components/presensi/AttendlyHeader.tsx (9ms)\r\nsrc/components/presensi/AttendlyMobileNav.tsx (10ms)\r\nsrc/components/presensi/AttendlyShell.tsx (3ms)\r\nsrc/components/presensi/PresensiAuthGate.tsx (0ms)\r\nsrc/components/presensi/PresensiClassHero.tsx (4ms)\r\nsrc/components/presensi/PresensiDispensationFileSection.tsx (13ms)\r\nsrc/components/presensi/PresensiDispensationForm.tsx (15ms)\r\nsrc/components/presensi/PresensiDispensationModal.tsx (2ms)\r\nsrc/components/presensi/PresensiDispensationRecord.tsx (6ms)\r\nsrc/components/presensi/PresensiDispensationRegister.tsx (25ms)\r\nsrc/components/presensi/PresensiDispensationUpload.tsx (18ms)\r\nsrc/components/presensi/PresensiDispensationVerified.tsx (12ms)\r\nsrc/components/presensi/PresensiLoginAside.tsx (17ms)\r\nsrc/components/presensi/PresensiLoginForm.tsx (9ms)\r\nsrc/components\n\u2026[truncated]",
+        "durationMs": 4245
+      },
+      {
+        "name": "sign-in-page-200",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!DOCTYPE html\u003E\u003Chtml class=\u0022_0bjUvq_variable\u0022 lang=\u0022fr\u0022\u003E\u003Chead\u003E\u003Cmeta charSet=\u0022utf-8\u0022/\u003E\u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1\u0022/\u003E\u003Clink rel=\u0022stylesheet\u0022 href=\u0022/_next/static/chunks/0n2zh2xbs_kf9.css\u0022 data-precedence=\u0022next\u0022/\u003E\u003Clink rel=\u0022stylesheet\u0022 href=\u0022/_next/static/chunks/1h9vx83ej37b6.css\u0022 data-precedence=\u0022next\u0022/\u003E\u003Clink href=\u0022https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800\u0026amp;display=swap\u0022 rel=\u0022stylesheet\u0022 data-precedence=\u0022default\u0022/\u003E\u003Clink rel=\u0022preload\u0022 as=\u0022script\u0022 fetchPriority=\u0022low\u0022 href=\u0022/_next/static/chunks/1w0_ntxvueq0o.js\u0022/\u003E\u003Cscript src=\u0022/_next/static/chunks/1za6q9te369pa.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/39z0j8snm_gjn.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/1jd1gm9_d73zn.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/3e_-xn5hc6xmt.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/turbopack-2h-u0he6dowwt.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/03uyutte74t-y.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/0ambr01rogdhk.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/2qmcqa7yjfrk7.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/3jg1hdwe1_dpi.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/01bt7ohqfjgyd.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Cscript src=\u0022/_next/static/chunks/157x5f3gbijhm.js\u0022 async=\u0022\u0022\u003E\u003C/script\u003E\u003Ctitle\u003ESe connecter\u003C/title\u003E\u003Cmeta name=\u0022description\u0022 content=\u0022Connectez-vous \u00E0 votre compte avec facilit\u00E9.\u0022/\u003E\u003Clink rel=\u0022apple-touch-icon\u0022 href=\u0022/apple-touch-icon.png\u0022/\u003E\u003Clink rel=\u0022icon\u0022 href=\u0022/favicon-32x32.png\u0022 type=\u0022image/png\u0022 sizes=\u002232x32\u0022/\u003E\u003Clink rel=\u0022icon\u0022 href=\u0022/favicon-16x16.png\u0022 type=\u0022image/png\u0022 sizes=\u002216x16\u0022/\u003E\u003Clink rel=\u0022icon\u0022 href=\u0022/favicon.ico\u0022/\u003E\u003Cmeta name=\u0022next-size-adjust\u0022 content=\u0022\u0022/\u003E\u003Cmeta name=\u0022sentry-trace\u0022 content=\u002245fae3a21ff848c8bb6ed634acea4168-88d51c178deaf812-1\u0022/\u003E\u003Cmeta name=\u0022baggage\u0022 content=\u0022sentry-environment=production,sentry-release=33392860e49ab97e8c0696991222f592be37f7eb,sentry-trace_id=45fae3a21ff848c8bb6ed634acea4168,sentry-transaction=%2F%5Blocale%5D%2Fsign-in,sentry-sampled=true,sentry-sample_rand=0.40798457270419763,sentry-sample_rate=1\u0022/\u003E\u003Cscript src=\u0022/_next/static/chunks/0cz1d0mv5g_q7.js\u0022 noModule=\u0022\u0022\u003E\u003C/script\u003E\u003C/head\u003E\u003Cbody\u003E\u003Cdiv hidden=\u0022\u0022\u003E\u003C!--$--\u003E\u003C!--/$--\u003E\u003C/div\u003E\u003Cdiv class=\u0022flex min-h-screen items-center justify-center\u0022\u003E\u003Cdiv class=\u0022attendly flex min-h-screen flex-col bg-canvas-base text-body-md text-on-surface antialiased\u0022\u003E\u003Cheader class=\u0022fixed inset-x-0 top-0 z-50 border-b border-border-subtle bg-surface/90 shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-md\u0022\u003E\u003Cdiv class=\u0022mx-auto flex h-16 max-w-[1200px] items-center justify-between px-margin\u0022\u003E\u003Cdiv class=\u0022flex items-center gap-8\u0022\u003E\u003Ca aria-label=\u0022Beranda Attendly\u0022 class=\u0022rounded-lg transition-transform focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none active:scale-[0.98]\u0022 href=\u0022/fr\u0022\u003E\u003Cspan class=\u0022flex items-center gap-3\u0022\u003E\u003Cspan class=\u0022flex items-center justify-center rounded-xl bg-pine-deep text-amber-gold size-8\u0022\u003E\u003Csvg xmlns=\u0022http://www.w3.org/2000/svg\u0022 width=\u002224\u0022 height=\u002224\u0022 viewBox=\u00220 0 24 24\u0022 fill=\u0022none\u0022 stroke=\u0022currentColor\u0022 stroke-width=\u00222\u0022 stroke-linecap=\u0022round\u0022 stroke-linejoin=\u0022round\u0022 class=\u0022lucide lucide-graduation-cap size-5\u0022 aria-hidden=\u0022true\u0022\u003E\u003Cpath d=\u0022M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\u0022\u003E\u003C/path\u003E\u003Cpath d=\u0022M22 10v6\u0022\u003E\u003C/path\u003E\u003Cpath d=\u0022M6 12.5V16a6 3 0 0 0 12 0v-3.5\u0022\u003E\u003C/path\u003E\u003C/svg\u003E\u003C/span\u003E\u003Cspan class=\u0022font-headline-sm font-semibold tracking-tight text-pine-deep text-headline-sm\u0022\u003EAttendly\u003C/span\u003E\u003C/span\u003E\u003C/a\u003E\u003Cnav class=\u0022hidden items-center gap-6 md:flex\u0022\u003E\u003Ca class=\u0022rounded-md font-label-md text-label-md text-on-surface-variant transition-colors duration-150 hover:text-on-surface active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none\u0022 href=\u0022/fr/dashboard\u0022\u003EDashboard\u003C/a\u003E\u003Ca class=\u0022rounded-md font-label-md text-label-md text-on-surface-variant transition-colors duration-150 hover:text-on-surface active:scale-[0.98] focus-visible:ring-2 focus-visible:ring-\n\u2026[truncated]",
+        "durationMs": 3878
+      },
+      {
+        "name": "recap-page-redirects-unauthenticated",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 307\n/sign-in\n--- server output ---\nnpm warn Unknown env config \u0022scripts-prepend-node-path\u0022. This will stop working in the next major version of npm. See \u0060npm help npmrc\u0060 for supported config options.\r\n\r\n\u003E start\r\n\u003E next start --hostname 127.0.0.1 --port 3001\r\n\r\n\u25B2 Next.js 16.4.0\r\n- Local:         http://127.0.0.1:3001\r\n- Network:       http://127.0.0.1:3001\r\n\u2713 Ready in 210ms\r\n\u2713 Running next.config.ts took 825ms\r\n",
+        "durationMs": 2565
+      }
+    ],
+    "executions": [
+      {
+        "source": "typescript-check",
+        "resolvedExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "args": [
+          "run",
+          "check:types"
+        ],
+        "cwd": "C:\\Users\\Pongo\\Documents\\SEMESTER7\\ifter\\frontend-ifter",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\node.exe",
+        "nodeVersion": "v24.22.2",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "packageManagerVersion": "11.19.1",
+        "cleanup": {
+          "RootProcessId": 28304,
+          "Completed": true,
+          "ProcessesObserved": 8,
+          "ProcessesTerminated": 1,
+          "Failure": null
+        }
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "args": [
+          "test"
+        ],
+        "cwd": "C:\\Users\\Pongo\\Documents\\SEMESTER7\\ifter\\frontend-ifter",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\node.exe",
+        "nodeVersion": "v24.22.2",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "packageManagerVersion": "11.19.1",
+        "cleanup": {
+          "RootProcessId": 29424,
+          "Completed": true,
+          "ProcessesObserved": 20,
+          "ProcessesTerminated": 1,
+          "Failure": null
+        }
+      },
+      {
+        "source": "lint-check",
+        "resolvedExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "args": [
+          "run",
+          "lint"
+        ],
+        "cwd": "C:\\Users\\Pongo\\Documents\\SEMESTER7\\ifter\\frontend-ifter",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\node.exe",
+        "nodeVersion": "v24.22.2",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "packageManagerVersion": "11.19.1",
+        "cleanup": {
+          "RootProcessId": 23936,
+          "Completed": true,
+          "ProcessesObserved": 30,
+          "ProcessesTerminated": 1,
+          "Failure": null
+        }
+      },
+      {
+        "source": "sign-in-page-200",
+        "resolvedExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "args": [
+          "run",
+          "start",
+          "--",
+          "--hostname",
+          "127.0.0.1",
+          "--port",
+          "3001"
+        ],
+        "cwd": "C:\\Users\\Pongo\\Documents\\SEMESTER7\\ifter\\frontend-ifter",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\node.exe",
+        "nodeVersion": "v24.22.2",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "packageManagerVersion": "11.19.1",
+        "cleanup": {
+          "RootProcessId": 27248,
+          "Completed": true,
+          "ProcessesObserved": 10,
+          "ProcessesTerminated": 5,
+          "Failure": null
+        }
+      },
+      {
+        "source": "recap-page-redirects-unauthenticated",
+        "resolvedExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "args": [
+          "run",
+          "start",
+          "--",
+          "--hostname",
+          "127.0.0.1",
+          "--port",
+          "3001"
+        ],
+        "cwd": "C:\\Users\\Pongo\\Documents\\SEMESTER7\\ifter\\frontend-ifter",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32",
+        "nodeExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\node.exe",
+        "nodeVersion": "v24.22.2",
+        "packageManager": "npm",
+        "packageManagerExecutable": "C:\\Users\\Pongo\\AppData\\Roaming\\fnm\\node-versions\\v24.22.2\\installation\\npm.cmd",
+        "packageManagerVersion": "11.19.1",
+        "cleanup": {
+          "RootProcessId": 6640,
+          "Completed": true,
+          "ProcessesObserved": 10,
+          "ProcessesTerminated": 5,
+          "Failure": null
+        }
+      }
+    ]
+  }
+}
