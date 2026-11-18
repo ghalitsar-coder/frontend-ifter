@@ -28,7 +28,7 @@ export async function generateMetadata(props: SignInPageProps): Promise<Metadata
 
 /**
  * Sign-in route of the Attendly portal: the credential screen on its own URL, and a signed-in
- * browser is sent straight to the attendance workspace.
+ * browser is sent straight to the appropriate role workspace.
  *
  * @param props - Route params including locale.
  * @returns Login screen inside the Attendly shell.

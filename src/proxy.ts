@@ -28,7 +28,9 @@ function gateDashboard(request: NextRequest): NextResponse | null {
   const session = decodeBackendToken(request.cookies.get(SESSION_COOKIE_NAME)?.value);
 
   if (session === null || session.expired) {
-    return NextResponse.redirect(new URL('/sign-in', request.url));
+    const redirectResponse = NextResponse.redirect(new URL('/sign-in', request.url));
+    redirectResponse.cookies.delete(SESSION_COOKIE_NAME);
+    return redirectResponse;
   }
 
   if (!isAllowedPage(session.roles, segments[1] ?? '')) {

@@ -1,4 +1,4 @@
-export const dashboardRoles = ['admin', 'guru', 'kepsek', 'tu'] as const;
+export const dashboardRoles = ['admin', 'guru', 'kepsek', 'tu', 'kesiswaan'] as const;
 
 export type DashboardRole = (typeof dashboardRoles)[number];
 
@@ -84,6 +84,7 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
         items: [
           { icon: 'fact_check', label: 'Presensi Harian & Rekap', href: '/dashboard/presensi' },
           { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
+          { icon: 'gavel', label: 'Aturan & Sanksi (Poin)', href: '/dashboard/kedisiplinan' },
           {
             icon: 'table_view',
             label: 'Import / Export Excel',
@@ -132,6 +133,12 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
             icon: 'group',
             label: 'Data Siswa Kelas Saya',
             badge: { label: '32', tone: 'muted' },
+          },
+          {
+            icon: 'warning',
+            label: 'Catat Pelanggaran Siswa',
+            href: '/dashboard/kedisiplinan',
+            dot: 'absent',
           },
           { icon: 'summarize', label: 'Laporan Rapor & Absen' },
         ],
@@ -186,6 +193,12 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
             label: 'Evaluasi Kehadiran & Guru',
             href: '/dashboard/presensi',
             badge: { label: '98.2%', tone: 'muted', box: true },
+          },
+          {
+            icon: 'emergency_home',
+            label: 'Monitoring Kasus Kritis (SP)',
+            href: '/dashboard/kedisiplinan',
+            badge: { label: '2 SP2', tone: 'error' },
           },
         ],
       },
@@ -252,5 +265,79 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
       },
     ],
     callout: { kind: 'sync', label: 'Status Dapodik', value: 'Tersinkron' },
+  },
+  kesiswaan: {
+    workspace: 'Kesiswaan & BK Workspace',
+    activeClassName: 'bg-pine-hover text-on-primary font-medium',
+    activeIconClassName: 'text-amber-gold',
+    headerRole: 'Bagian Kesiswaan & Tata Tertib',
+    user: {
+      initials: 'IR',
+      name: 'Ibu Rina, S.Pd.',
+      meta: 'Kesiswaan & Tata Tertib • NIP 19800404...',
+      avatarClassName: 'bg-amber-gold text-pine-deep',
+    },
+    sections: [
+      {
+        title: 'Pusat Tata Tertib',
+        items: [
+          {
+            icon: 'gavel',
+            label: 'Dashboard Kedisiplinan',
+            href: '/dashboard/kedisiplinan',
+            dot: 'amber',
+          },
+          {
+            icon: 'checklist_rtl',
+            label: 'Pemeriksaan Harian',
+            href: '/dashboard/kedisiplinan/pemeriksaan',
+            badge: { label: 'Kelas', tone: 'present' },
+          },
+          {
+            icon: 'menu_book',
+            label: 'Buku Pedoman Tata Tertib',
+            href: '/dashboard/kedisiplinan/pedoman',
+          },
+        ],
+      },
+      {
+        title: 'Monitoring & Bimbingan (BK)',
+        items: [
+          {
+            icon: 'warning',
+            label: 'Siswa Waspada & SP',
+            href: '/dashboard/kedisiplinan/waspada',
+            badge: { label: '3 Kasus', tone: 'error' },
+          },
+          {
+            icon: 'mark_email_read',
+            label: 'Pemanggilan Orang Tua',
+            href: '/dashboard/kedisiplinan/panggilan',
+            badge: { label: '2 Siap', tone: 'amber' },
+          },
+          {
+            icon: 'history_edu',
+            label: 'Rekam Bimbingan BK',
+            href: '/dashboard/kedisiplinan/bimbingan',
+          },
+        ],
+      },
+      {
+        title: 'Laporan & Matriks',
+        items: [
+          {
+            icon: 'table_view',
+            label: 'Matriks Kedisiplinan',
+            href: '/dashboard/kedisiplinan/matriks',
+            badge: { label: 'XLSX', tone: 'surface', box: true },
+          },
+        ],
+      },
+    ],
+    callout: {
+      kind: 'mandate',
+      title: 'Mandat Kesiswaan',
+      text: 'Bertanggung jawab penuh atas penegakan tata tertib sekolah, checklist atribut kelas, dan pemanggilan orang tua siswa.',
+    },
   },
 };

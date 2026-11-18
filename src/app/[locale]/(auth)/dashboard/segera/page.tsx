@@ -18,6 +18,7 @@ export async function generateMetadata(props: ComingSoonPageProps): Promise<Meta
   const t = await getTranslations({ locale, namespace: 'ComingSoonPage' });
 
   return {
+    description: t('meta_description'),
     title: t('meta_title'),
   };
 }
@@ -39,7 +40,7 @@ export default async function ComingSoonPage(props: ComingSoonPageProps) {
     <div className="flex flex-col items-center gap-4 py-24 text-center">
       <span className="material-symbols-outlined text-[40px] text-text-muted">construction</span>
       <h1 className="text-xl font-bold text-text-primary">
-        {t('title', { item: item ?? t('meta_title') })}
+        {t('title', { item: item ?? t('fallback_item') })}
       </h1>
       <p className="max-w-md text-sm text-text-muted">{t('description')}</p>
       <Link
