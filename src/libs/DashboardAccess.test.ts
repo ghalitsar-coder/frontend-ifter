@@ -40,6 +40,7 @@ describe(isAllowedPage, () => {
   it('allows guru and admin on the workbench pages', () => {
     expect(isAllowedPage(['guru'], 'presensi')).toBeTruthy();
     expect(isAllowedPage(['admin'], 'kedisiplinan')).toBeTruthy();
+    expect(isAllowedPage(['kesiswaan'], 'kedisiplinan')).toBeTruthy();
   });
 
   it('denies other roles on restricted pages', () => {
