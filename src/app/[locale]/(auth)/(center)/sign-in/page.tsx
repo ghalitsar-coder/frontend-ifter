@@ -3,7 +3,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { AttendlyShell } from '@/components/presensi/AttendlyShell';
 import { PresensiLoginScreen } from '@/components/presensi/PresensiLoginScreen';
 import { readBackendToken } from '@/libs/BackendSession';
-import { decodeBackendToken } from '@/libs/DashboardAccess';
+import { dashboardHrefForRoles, decodeBackendToken } from '@/libs/DashboardAccess';
 import { redirect } from '@/libs/I18nNavigation';
 
 type SignInPageProps = {
@@ -38,15 +38,13 @@ export default async function SignInPage(props: SignInPageProps) {
   setRequestLocale(locale);
 
   const token = await readBackendToken();
-  if (token) {
-    const session = decodeBackendToken(token);
-    if (session && !session.expired) {
-      if (session.roles.includes('kesiswaan')) {
-        redirect({ href: '/dashboard/kedisiplinan?role=kesiswaan', locale });
-      } else {
-        redirect({ href: '/dashboard/presensi', locale });
-      }
-    }
+  const session = decodeBackendToken(token);
+
+  if (session !== null && !session.expired) {
+    redirect({
+      href: dashboardHrefForRoles(session.roles),
+      locale,
+    });
   }
 
   return (

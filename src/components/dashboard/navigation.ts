@@ -83,6 +83,8 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
         title: 'Presensi & Regulasi',
         items: [
           { icon: 'fact_check', label: 'Presensi Harian & Rekap', href: '/dashboard/presensi' },
+          { icon: 'summarize', label: 'Rekap Bulanan & Verifikasi', href: '/dashboard/rekap' },
+          { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
           { icon: 'gavel', label: 'Aturan & Sanksi (Poin)', href: '/dashboard/kedisiplinan' },
           {
             icon: 'table_view',
@@ -145,6 +147,7 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
       {
         title: 'Presensi Pribadi',
         items: [
+          { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
           {
             icon: 'fingerprint',
             label: 'Presensi Mandiri Guru',
@@ -185,6 +188,7 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
       {
         title: 'Evaluasi & Pengawasan',
         items: [
+          { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
           {
             icon: 'supervisor_account',
             label: 'Evaluasi Kehadiran & Guru',
@@ -231,6 +235,9 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
         title: 'Layanan Administrasi',
         items: [
           { icon: 'receipt_long', label: 'Dashboard Layanan TU', href: '/dashboard?role=tu' },
+          { icon: 'summarize', label: 'Rekap Bulanan & Verifikasi', href: '/dashboard/rekap?role=tu' },
+          { icon: 'qr_code_2', label: 'Presensi Guru dengan QR', href: '/dashboard/qr' },
+          { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
           {
             icon: 'mark_email_read',
             label: 'Verifikasi Berkas Izin & SK',

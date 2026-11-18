@@ -100,6 +100,45 @@ export type RegisterSchoolInput = {
   phone: string;
 };
 
+/** Staff QR attendance session created by the TU operator. */
+export type StaffQrSession = {
+  id: number;
+  tanggal: string;
+  tipe_sesi: 'masuk' | 'pulang';
+  jam_buka: string;
+  jam_tutup: string;
+  batas_terlambat?: string | null;
+  rotasi_detik: number;
+  status: string;
+  created_at: string;
+};
+
+/** Short-lived QR code returned for an active staff session. */
+export type StaffQrCode = {
+  session_id: number;
+  payload: string;
+  image_png: string;
+  valid_until: string;
+};
+
+/** Result recorded by POST /v1/staff/attendance/scan. */
+export type StaffQrScanResult = {
+  staff_id: number;
+  tipe_sesi: 'masuk' | 'pulang';
+  tanggal: string;
+  status: 'hadir' | 'terlambat' | 'pulang';
+  waktu_scan: string;
+};
+
+export type CreateStaffQrSessionInput = {
+  tanggal: string;
+  tipe_sesi: 'masuk' | 'pulang';
+  jam_buka: string;
+  jam_tutup: string;
+  batas_terlambat?: string;
+  rotasi_detik: number;
+};
+
 /**
  * Backend failure that carries the machine-readable code instead of a prose message,
  * so the screen can translate `code` and react to `status`.
@@ -236,6 +275,60 @@ export async function recordAttendances(
   );
 
   return requireData(envelope);
+}
+
+/**
+ * Create a TU managed QR session for staff check-in or check-out.
+ *
+ * @param input - Attendance date, session type and time window.
+ * @returns The created staff QR session.
+ */
+export async function createStaffQrSession(
+  input: CreateStaffQrSessionInput,
+): Promise<StaffQrSession> {
+  return requireData(
+    await requestEnvelope<StaffQrSession>('v1/staff/qr-sessions', {
+      body: JSON.stringify(input),
+      method: 'POST',
+    }),
+  );
+}
+
+/**
+ * Fetch the current rotating QR image for a staff session.
+ *
+ * @param sessionId - Backend staff QR session id.
+ * @returns The current payload and QR image.
+ */
+export async function getStaffQrCode(sessionId: number): Promise<StaffQrCode> {
+  return requireData(await requestEnvelope<StaffQrCode>(`v1/staff/qr-sessions/${sessionId}/code`));
+}
+
+/**
+ * Close an active staff QR session.
+ *
+ * @param sessionId - Backend staff QR session id.
+ * @returns Nothing when the session is closed.
+ */
+export async function closeStaffQrSession(sessionId: number): Promise<void> {
+  await requestEnvelope<{ id: number; status: string }>(`v1/staff/qr-sessions/${sessionId}/close`, {
+    method: 'POST',
+  });
+}
+
+/**
+ * Record staff attendance from the signed QR payload.
+ *
+ * @param payload - Signed QR value read by the scanner.
+ * @returns The backend attendance record.
+ */
+export async function scanStaffQr(payload: string): Promise<StaffQrScanResult> {
+  return requireData(
+    await requestEnvelope<StaffQrScanResult>('v1/staff/attendance/scan', {
+      body: JSON.stringify({ payload }),
+      method: 'POST',
+    }),
+  );
 }
 
 /**
