@@ -41,13 +41,15 @@ export function StaffQrWorkspace() {
     queryKey: [...QR_QUERY_KEY, session?.id],
     gcTime: 0,
     refetchInterval: 3000,
+    staleTime: ({ state }) =>
+      state.data ? Math.max(0, Date.parse(state.data.valid_until) - state.dataUpdatedAt) : 0,
     retry: false,
   });
   const validCode =
     !code.isError &&
     code.data !== undefined &&
     code.data.session_id === session?.id &&
-    Date.parse(code.data.valid_until) > code.dataUpdatedAt
+    !code.isStale
       ? code.data
       : undefined;
   let codeErrorMessage = t('code_unavailable');

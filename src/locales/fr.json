@@ -186,7 +186,8 @@
     "error_check_in_required": "Catat kehadiran masuk sebelum pulang.",
     "error_forbidden": "Akun ini tidak terhubung dengan pegawai aktif sekolah.",
     "error_generic": "Kehadiran belum dapat dicatat.",
-    "error_invalid_qr": "QR tidak valid atau kedaluwarsa.",
+    "error_invalid_qr": "QR ini tidak valid. Gunakan QR absensi yang sedang ditampilkan petugas.",
+    "error_expired_qr": "QR sudah berganti. Pindai kode terbaru di layar petugas.",
     "error_not_found": "Sesi QR atau akun pegawai tidak ditemukan.",
     "error_outside_window": "Sesi QR berada di luar jadwal aktif.",
     "error_session_closed": "Sesi QR sudah ditutup.",
@@ -209,7 +210,7 @@
     "upload_image": "Unggah gambar QR",
     "image_hint": "Alternatif kamera: pilih gambar QR aktif, maksimal 10 MB.",
     "image_invalid": "Pilih gambar berukuran maksimal 10 MB.",
-    "image_unreadable": "QR tidak terbaca pada gambar.",
+    "image_unreadable": "QR belum terbaca. Dekatkan kamera sampai kode terlihat jelas dan keempat sudutnya masuk dalam foto.",
     "sign_in": "Masuk kembali",
     "nav_teacher_attendance": "Absensi guru"
   },

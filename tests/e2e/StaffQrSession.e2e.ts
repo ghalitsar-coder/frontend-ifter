@@ -95,6 +95,30 @@ test.describe('Staff QR session', () => {
     });
   }
 
+  test('removes an expired code while the next code is unavailable', async ({ page }) => {
+    await page.route(activePath, async (route) => {
+      await route.fulfill({ json: { data: session } });
+    });
+    let expiry = '';
+    await page.route(codePath, async (route) => {
+      expiry ||= new Date(Date.now() + 2000).toISOString();
+      await route.fulfill({
+        json: {
+          data: {
+            session_id: session.id,
+            payload: 'signed',
+            image_png: image,
+            valid_until: expiry,
+          },
+        },
+      });
+    });
+    await page.goto('/dashboard/qr?role=tu');
+    const code = page.getByRole('img', { name: 'Rotating staff attendance QR code' });
+    await expect(code).toBeVisible();
+    await expect(code).toBeHidden({ timeout: 2900 });
+  });
+
   test('keeps a closed session closed after refresh', async ({ page }) => {
     let active: StaffQrSession | null = session;
     await page.route(activePath, async (route) => {

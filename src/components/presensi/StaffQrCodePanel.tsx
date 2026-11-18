@@ -43,7 +43,7 @@ export function StaffQrCodePanel(props: {
             <div className="my-5 rounded-2xl border border-border-subtle bg-white p-3 shadow-inner">
               <Image
                 alt={t('qr_alt')}
-                className="size-64 max-w-full"
+                className="aspect-square h-auto w-80 max-w-full [image-rendering:pixelated]"
                 src={props.code.image_png}
                 width={256}
                 height={256}

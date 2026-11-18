@@ -15,6 +15,7 @@ type ScanErrorKey =
   | 'error_forbidden'
   | 'error_generic'
   | 'error_invalid_qr'
+  | 'error_expired_qr'
   | 'error_not_found'
   | 'error_outside_window'
   | 'error_session_closed'
@@ -37,6 +38,9 @@ function scanErrorKey(error: unknown): ScanErrorKey {
     }
     case 'invalid_qr': {
       return 'error_invalid_qr';
+    }
+    case 'expired_qr': {
+      return 'error_expired_qr';
     }
     case 'not_found': {
       return 'error_not_found';
@@ -91,6 +95,7 @@ export function StaffQrScanWorkspace() {
           error_forbidden: t('error_forbidden'),
           error_generic: t('error_generic'),
           error_invalid_qr: t('error_invalid_qr'),
+          error_expired_qr: t('error_expired_qr'),
           error_not_found: t('error_not_found'),
           error_outside_window: t('error_outside_window'),
           error_session_closed: t('error_session_closed'),
@@ -146,9 +151,8 @@ export function StaffQrScanWorkspace() {
     setSubmitting(true);
     const imageUrl = URL.createObjectURL(file);
     try {
-      const { BrowserQRCodeReader } = await import('@zxing/browser');
-      const decoded = await new BrowserQRCodeReader().decodeFromImageUrl(imageUrl);
-      await submitPayload(decoded.getText());
+      const { decodeQrPhoto } = await import('@/components/presensi/decodeQrPhoto');
+      await submitPayload(await decodeQrPhoto(imageUrl));
     } catch {
       setScanError(t('image_unreadable'));
     } finally {

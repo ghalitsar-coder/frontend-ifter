@@ -82,7 +82,11 @@ export function useQrCamera(props: {
       // Request permission in the click handler, before loading the decoder.
       request.stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
-        video: { facingMode: { ideal: 'environment' } },
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 960 },
+        },
       });
       if (request.cancelled) {
         releaseCamera(request);
@@ -90,14 +94,15 @@ export function useQrCamera(props: {
       }
 
       setState('scanning');
-      const { BrowserQRCodeReader } = await import('@zxing/browser');
+      const { StaffQrVideoReader } = await import('@/components/presensi/StaffQrVideoReader');
       const preview = props.videoRef.current;
       if (request.cancelled || preview === null) {
         releaseCamera(request);
         return;
       }
 
-      request.controls = await new BrowserQRCodeReader().decodeFromStream(
+      const reader = new StaffQrVideoReader(undefined, { delayBetweenScanAttempts: 250 });
+      request.controls = await reader.decodeFromStream(
         request.stream,
         preview,
         (decoded, _error, controls) => {

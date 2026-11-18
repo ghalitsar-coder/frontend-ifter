@@ -240,7 +240,7 @@ test.describe('Teacher attendance', () => {
         await page.getByRole('button', { name: 'Aktifkan kamera' }).click();
         const chooser = await fileChooser;
         expect(await chooser.element().getAttribute('capture')).toBe('environment');
-        await chooser.setFiles(fixture);
+        await chooser.setFiles('tests/fixtures/attendance-qr-photo.jpg');
         await expect(page.getByText('Kehadiran berhasil dicatat')).toBeVisible();
         expect(requests).toBe(1);
         await expect(page.locator('video')).toBeHidden();
@@ -318,12 +318,14 @@ test.describe('Teacher attendance', () => {
       await page.route(scanPath, async (route) => {
         await route.fulfill({
           status: 400,
-          json: { error: { code: 'invalid_qr', message: 'untranslated backend message' } },
+          json: { error: { code: 'expired_qr', message: 'untranslated backend message' } },
         });
       });
       await page.goto('/dashboard/absen?role=guru');
       await page.locator('#attendance-qr-image').setInputFiles(fixture);
-      await expect(page.getByText('QR tidak valid atau kedaluwarsa.')).toBeVisible();
+      await expect(
+        page.getByText('QR sudah berganti. Pindai kode terbaru di layar petugas.'),
+      ).toBeVisible();
       await expect(page.getByText('Kehadiran berhasil dicatat')).toHaveCount(0);
       await expect(page.getByText('untranslated backend message')).toHaveCount(0);
     });
@@ -340,7 +342,7 @@ test.describe('Teacher attendance', () => {
         mimeType: 'image/png',
         buffer: Buffer.from('invalid image'),
       });
-      await expect(page.getByText('QR tidak terbaca pada gambar.')).toBeVisible();
+      await expect(page.getByText('QR belum terbaca.', { exact: false })).toBeVisible();
       expect(requests).toBe(0);
     });
   });
