@@ -5,6 +5,7 @@ export const SESSION_COOKIE_NAME = 'ifter_token';
 // shortcut: page-level gate is UX only — the Go backend re-checks the JWT role on every API call.
 // Roles outside this table only reach the unrestricted dashboard pages.
 const RESTRICTED_PAGES: Record<string, string[]> = {
+  absen: ['admin', 'guru'],
   kedisiplinan: ['admin', 'guru', 'kesiswaan'],
   presensi: ['admin', 'guru'],
   qr: ['tu'],
@@ -32,13 +33,18 @@ export function decodeBackendToken(token?: string): DecodedToken | null {
   try {
     const base64 = payloadSegment.replaceAll('-', '+').replaceAll('_', '/');
     const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), '=');
-    const claims = JSON.parse(atob(padded)) as { exp?: number; roles?: unknown };
+    const claims: unknown = JSON.parse(atob(padded));
+
+    if (typeof claims !== 'object' || claims === null) {
+      return null;
+    }
 
     return {
-      expired: typeof claims.exp === 'number' && claims.exp * 1000 <= Date.now(),
-      roles: Array.isArray(claims.roles)
-        ? claims.roles.filter((r): r is string => typeof r === 'string')
-        : [],
+      expired: 'exp' in claims && typeof claims.exp === 'number' && claims.exp * 1000 <= Date.now(),
+      roles:
+        'roles' in claims && Array.isArray(claims.roles)
+          ? claims.roles.filter((r): r is string => typeof r === 'string')
+          : [],
     };
   } catch {
     return null;

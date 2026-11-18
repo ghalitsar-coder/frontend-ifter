@@ -15,6 +15,7 @@ export type NavBadgeTone =
 export type NavItem = {
   icon: string;
   label: string;
+  labelKey?: 'nav_teacher_attendance';
   href?: string;
 
   badge?: { label: string; tone: NavBadgeTone; box?: boolean };
@@ -146,11 +147,11 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
       {
         title: 'Presensi Pribadi',
         items: [
-          { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
           {
-            icon: 'fingerprint',
-            label: 'Presensi Mandiri Guru',
-            badge: { label: '06:48 WIB', tone: 'present', box: true },
+            icon: 'qr_code_scanner',
+            label: '',
+            labelKey: 'nav_teacher_attendance',
+            href: '/dashboard/absen',
           },
         ],
       },

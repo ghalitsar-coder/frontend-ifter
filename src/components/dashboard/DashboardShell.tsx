@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { MaterialIcon } from '@/components/landing/MaterialIcon';
@@ -33,6 +34,8 @@ const NavItemRow = (props: {
   activeIconClassName: string;
   onNavigate?: () => void;
 }) => {
+  const t = useTranslations('StaffQrScanPage');
+  const label = props.item.labelKey === undefined ? props.item.label : t('nav_teacher_attendance');
   const rowClassName = `flex items-center rounded-xl py-2 font-label-md text-label-md transition-colors active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-amber-gold/60 focus-visible:outline-none ${
     props.collapsed ? 'justify-center px-0' : 'justify-between px-3'
   } ${
@@ -48,7 +51,7 @@ const NavItemRow = (props: {
           className={`shrink-0 text-[18px] ${props.active ? props.activeIconClassName : ''}`}
           name={props.item.icon}
         />
-        {props.collapsed ? null : <span className="truncate">{props.item.label}</span>}
+        {props.collapsed ? null : <span className="truncate">{label}</span>}
       </div>
       {props.collapsed ? null : (
         <>
@@ -80,12 +83,7 @@ const NavItemRow = (props: {
   );
 
   const link = (
-    <Link
-      aria-label={props.item.label}
-      className={rowClassName}
-      href={props.href}
-      onClick={props.onNavigate}
-    >
+    <Link aria-label={label} className={rowClassName} href={props.href} onClick={props.onNavigate}>
       {content}
     </Link>
   );
@@ -97,7 +95,7 @@ const NavItemRow = (props: {
   return (
     <Tooltip>
       <TooltipTrigger render={link} />
-      <TooltipContent side="right">{props.item.label}</TooltipContent>
+      <TooltipContent side="right">{label}</TooltipContent>
     </Tooltip>
   );
 };
