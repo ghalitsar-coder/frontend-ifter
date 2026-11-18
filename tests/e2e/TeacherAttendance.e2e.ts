@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
 import { readFileSync } from 'node:fs';
+import { networkInterfaces } from 'node:os';
 import { expect, test } from '@playwright/test';
 
 const fixture = 'tests/fixtures/attendance-qr.png';
@@ -130,6 +131,136 @@ test.describe('Teacher attendance', () => {
       ).toBeVisible();
       await expect(page.getByRole('button', { name: 'Unggah gambar QR' })).toBeEnabled();
     });
+
+    for (const action of ['cancel', 'navigate']) {
+      test(`releases a late camera grant after ${action}`, async ({ page }) => {
+        await page.setViewportSize({ width: 390, height: 844 });
+        await page.addInitScript(() => {
+          navigator.mediaDevices.getUserMedia = async () => {
+            document.documentElement.dataset.cameraUserActivation = String(
+              navigator.userActivation.isActive,
+            );
+            const pending = Promise.withResolvers<MediaStream>();
+            window.addEventListener(
+              'grant-test-camera',
+              () => {
+                const canvas = document.createElement('canvas');
+                const stream = canvas.captureStream(1);
+                pending.resolve(stream);
+                window.setTimeout(() => {
+                  document.documentElement.dataset.cameraReleased = String(
+                    stream.getTracks().every((track) => track.readyState === 'ended'),
+                  );
+                }, 0);
+              },
+              { once: true },
+            );
+            return await pending.promise;
+          };
+        });
+        await page.goto('/dashboard/absen?role=guru');
+        await expect(page.locator('html')).not.toHaveAttribute('data-camera-user-activation');
+        await page.getByRole('button', { name: 'Aktifkan kamera' }).click();
+        await expect(page.locator('html')).toHaveAttribute('data-camera-user-activation', 'true');
+        await expect(
+          page.getByText('Menunggu izin kamera. Pilih Izinkan pada permintaan browser.'),
+        ).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Unggah gambar QR' })).toBeDisabled();
+        if (action === 'cancel') {
+          await page.getByRole('button', { name: 'Batalkan kamera' }).click();
+          await expect(page.getByRole('button', { name: 'Aktifkan kamera' })).toBeEnabled();
+        } else {
+          await page.getByRole('button', { name: 'Buka navigasi', exact: true }).click();
+          await page.locator('a[href*="/dashboard/presensi"]').first().click();
+          await expect(page).toHaveURL(/\/dashboard\/presensi(?:\?.*)?$/u);
+        }
+        await page.evaluate(() => {
+          window.dispatchEvent(new Event('grant-test-camera'));
+        });
+        await expect(page.locator('html')).toHaveAttribute('data-camera-released', 'true');
+      });
+    }
+
+    for (const width of [390, 1440]) {
+      test(`records a camera photo over local HTTP at ${width}px`, async ({
+        page,
+        context,
+        baseURL,
+      }) => {
+        const addresses = Object.values(networkInterfaces()).flatMap(
+          (entries) =>
+            entries
+              ?.filter((entry) => entry.family === 'IPv4' && !entry.internal)
+              .map((entry) => entry.address) ?? [],
+        );
+        const address = addresses.find((value) => value.startsWith('192.168.')) ?? addresses[0];
+        test.skip(address === undefined, 'Requires a local network address');
+        if (address === undefined) {
+          return;
+        }
+        const url = new URL('/dashboard/absen?role=guru', baseURL ?? 'http://localhost:3008');
+        url.hostname = address;
+        await context.addCookies([
+          {
+            httpOnly: true,
+            name: 'ifter_token',
+            url: url.origin,
+            value: sessionToken(['guru']),
+          },
+        ]);
+        await page.setViewportSize({ width, height: 900 });
+        const errors: string[] = [];
+        page.on('pageerror', (error) => errors.push(error.message));
+        page.on('console', (message) => {
+          if (message.type() === 'error') {
+            errors.push(message.text());
+          }
+        });
+        let requests = 0;
+        await page.route(scanPath, async (route) => {
+          requests += 1;
+          expect(route.request().postDataJSON()).toStrictEqual({
+            payload: 'ifter-attendance-test-payload',
+          });
+          await route.fulfill({
+            json: {
+              data: {
+                staff_id: 1,
+                status: 'hadir',
+                tanggal: '2026-11-19',
+                tipe_sesi: 'masuk',
+                waktu_scan: '2026-11-19T06:50:00+07:00',
+              },
+            },
+          });
+        });
+        await page.goto(url.toString());
+        expect(await page.evaluate(() => window.isSecureContext)).toBeFalsy();
+        const fileChooser = page.waitForEvent('filechooser');
+        await page.getByRole('button', { name: 'Aktifkan kamera' }).click();
+        const chooser = await fileChooser;
+        expect(await chooser.element().getAttribute('capture')).toBe('environment');
+        await chooser.setFiles(fixture);
+        await expect(page.getByText('Kehadiran berhasil dicatat')).toBeVisible();
+        expect(requests).toBe(1);
+        await expect(page.locator('video')).toBeHidden();
+        expect(
+          await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),
+        ).toBeTruthy();
+        expect(errors).toStrictEqual([]);
+        await page.screenshot({
+          path: `test-results/absen-camera-http-${width}.png`,
+          fullPage: true,
+        });
+        // Cancelling the native photo picker leaves the scanner ready for another attempt.
+        const nextChooser = page.waitForEvent('filechooser');
+        await page.getByRole('button', { name: 'Pindai QR lainnya' }).click();
+        const cancelledChooser = await nextChooser;
+        await cancelledChooser.setFiles([]);
+        await expect(page.getByRole('button', { name: 'Aktifkan kamera' })).toBeEnabled();
+        expect(requests).toBe(1);
+      });
+    }
 
     test('decodes a camera QR once and stops the preview', async ({ page }) => {
       const imageUrl = `data:image/png;base64,${readFileSync(fixture).toString('base64')}`;
