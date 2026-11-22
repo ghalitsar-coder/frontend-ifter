@@ -235,6 +235,7 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
         title: 'Layanan Administrasi',
         items: [
           { icon: 'receipt_long', label: 'Dashboard Layanan TU', href: '/dashboard?role=tu' },
+          { icon: 'summarize', label: 'Rekap Absensi Siswa', href: '/dashboard/rekap' },
           { icon: 'qr_code_2', label: 'Presensi Guru dengan QR', href: '/dashboard/qr' },
           { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
           {
