@@ -121,7 +121,8 @@
     "summary_orderly": "Tertib",
     "col_conduct": "Tata Tertib / HP",
     "inspection_modal_subtitle": "Inspeksi kelengkapan seragam, kerapian rambut, dan tata tertib rombel",
-    "summary_violations": "Ada Catatan"
+    "summary_violations": "Ada Catatan",
+    "toast_forbidden": "Akses ditolak: hanya Guru BK / Kesiswaan yang dapat mengelola data kedisiplinan siswa."
   },
   "StaffQrPage": {
     "eyebrow": "Présence du personnel · QR",

@@ -5,7 +5,7 @@ export const SESSION_COOKIE_NAME = 'ifter_token';
 // shortcut: page-level gate is UX only — the Go backend re-checks the JWT role on every API call.
 // Roles outside this table only reach the unrestricted dashboard pages.
 const RESTRICTED_PAGES: Record<string, string[]> = {
-  kedisiplinan: ['admin', 'guru', 'kesiswaan'],
+  kedisiplinan: ['kesiswaan'],
   presensi: ['admin', 'guru'],
   qr: ['tu'],
 };
@@ -57,6 +57,11 @@ export function isAllowedPage(roles: string[], page: string): boolean {
 
   if (allowedRoles === undefined) {
     return true;
+  }
+
+  // Student discipline management is strictly restricted to BK / Kesiswaan staff.
+  if (page === 'kedisiplinan') {
+    return roles.some((role) => allowedRoles.includes(role));
   }
 
   // School admins registered through the wizard may carry any role name containing `admin`.

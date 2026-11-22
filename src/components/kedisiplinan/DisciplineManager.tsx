@@ -13,6 +13,7 @@ import { DisciplineRuleCatalog } from '@/components/kedisiplinan/DisciplineRuleC
 import { DisciplineSidebar } from '@/components/kedisiplinan/DisciplineSidebar';
 import { filterDisciplineIncidents, mockDisciplineIncidents } from '@/data/mockDiscipline';
 import {
+  DisciplineApiError,
   fetchStudentViolations,
   fetchViolationTypes,
   postRecordViolation,
@@ -262,9 +263,8 @@ export function DisciplineManager() {
       status: 'baru',
     };
 
-    setIncidents([newRecord, ...incidents]);
+    setIncidents((prev) => [newRecord, ...prev]);
     setIsRecordModalOpen(false);
-    showToast(t('toast_incident_saved'));
 
     // Persist to backend if possible
     try {
@@ -277,9 +277,16 @@ export function DisciplineManager() {
         tindak_lanjut: formData.immediateAction,
         tanggal: formData.dateTime.slice(0, 10) || new Date().toISOString().slice(0, 10),
       });
+      showToast(t('toast_incident_saved'));
       loadData();
-    } catch {
-      // Optimistic record remains in state
+    } catch (error) {
+      if (error instanceof DisciplineApiError && error.status === 403) {
+        setIncidents((prev) => prev.filter((item) => item.id !== newRecord.id));
+        showToast(t('toast_forbidden'));
+      } else {
+        // Optimistic record remains in state when backend is unavailable (demo mode)
+        showToast(t('toast_incident_saved'));
+      }
     }
   };
 
@@ -327,8 +334,12 @@ export function DisciplineManager() {
         showToast(`Status tindak lanjut diperbarui untuk: ${incident.studentName}`);
         loadData();
         return;
-      } catch {
-        // Fallback to toast
+      } catch (error) {
+        if (error instanceof DisciplineApiError && error.status === 403) {
+          showToast(t('toast_forbidden'));
+          return;
+        }
+        // Fallback to toast when backend is unavailable
       }
     }
     showToast(`Membuka dialog penyuntingan insiden: ${incident.id}`);

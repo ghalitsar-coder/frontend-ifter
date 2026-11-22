@@ -85,7 +85,6 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
           { icon: 'fact_check', label: 'Presensi Harian & Rekap', href: '/dashboard/presensi' },
           { icon: 'summarize', label: 'Rekap Bulanan & Verifikasi', href: '/dashboard/rekap' },
           { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
-          { icon: 'gavel', label: 'Aturan & Sanksi (Poin)', href: '/dashboard/kedisiplinan' },
           {
             icon: 'table_view',
             label: 'Import / Export Excel',
@@ -134,12 +133,6 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
             icon: 'group',
             label: 'Data Siswa Kelas Saya',
             badge: { label: '32', tone: 'muted' },
-          },
-          {
-            icon: 'warning',
-            label: 'Catat Pelanggaran Siswa',
-            href: '/dashboard/kedisiplinan',
-            dot: 'absent',
           },
           { icon: 'summarize', label: 'Laporan Rapor & Absen' },
         ],
@@ -194,12 +187,6 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
             label: 'Evaluasi Kehadiran & Guru',
             href: '/dashboard/presensi',
             badge: { label: '98.2%', tone: 'muted', box: true },
-          },
-          {
-            icon: 'emergency_home',
-            label: 'Monitoring Kasus Kritis (SP)',
-            href: '/dashboard/kedisiplinan',
-            badge: { label: '2 SP2', tone: 'error' },
           },
         ],
       },
