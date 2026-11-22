@@ -69,7 +69,7 @@ function formatScanTime(value: string): string {
   }).format(new Date(value));
 }
 
-function ScanSuccessToast(props: { result: StaffQrScanResult }) {
+function ScanSuccessToast(props: { result: StaffQrScanResult; statusLabel: string }) {
   const t = useTranslations('StaffQrScanPage');
   const [visible, setVisible] = useState(true);
   useEffect(() => {
@@ -86,8 +86,19 @@ function ScanSuccessToast(props: { result: StaffQrScanResult }) {
   }
   return (
     <PresensiToast
-      description={formatScanTime(props.result.waktu_scan)}
-      title={props.result.tipe_sesi === 'masuk' ? t('toast_check_in') : t('toast_check_out')}
+      description={
+        props.result.tipe_sesi === 'masuk'
+          ? t('check_in_time', {
+              time: new Intl.DateTimeFormat('id-ID', {
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'Asia/Jakarta',
+              }).format(new Date(props.result.waktu_scan)),
+            })
+          : formatScanTime(props.result.waktu_scan)
+      }
+      late={props.result.status === 'terlambat'}
+      title={props.result.tipe_sesi === 'masuk' ? props.statusLabel : t('toast_check_out')}
       visible
     />
   );
@@ -203,7 +214,7 @@ export function StaffQrScanWorkspace() {
 
   return (
     <section className="mx-auto w-full max-w-5xl space-y-6">
-      {result && <ScanSuccessToast result={result} />}
+      {result && <ScanSuccessToast result={result} statusLabel={statusLabels[result.status]} />}
       <header>
         <p className="mb-2 flex items-center gap-2 font-eyebrow text-xs font-bold tracking-[0.16em] text-amber-dark uppercase">
           <MaterialIcon name="qr_code_scanner" /> {t('eyebrow')}
@@ -353,9 +364,14 @@ export function StaffQrScanWorkspace() {
         <aside className="space-y-5 rounded-2xl border border-border-subtle bg-surface-card p-5 shadow-sm sm:p-6">
           {result ? (
             <div className="space-y-5">
-              <div className="flex items-center gap-3 rounded-xl bg-status-present/50 p-4 text-pine-deep">
+              <div
+                className={`flex items-center gap-3 rounded-xl p-4 ${result.status === 'terlambat' ? 'bg-amber-surface text-amber-dark' : 'bg-status-present/50 text-pine-deep'}`}
+              >
                 <span className="flex size-11 items-center justify-center rounded-full bg-white">
-                  <MaterialIcon className="text-[24px]" name="check_circle" />
+                  <MaterialIcon
+                    className="text-[24px]"
+                    name={result.status === 'terlambat' ? 'schedule' : 'check_circle'}
+                  />
                 </span>
                 <div>
                   <p className="font-label-md text-sm font-bold">{t('success_title')}</p>

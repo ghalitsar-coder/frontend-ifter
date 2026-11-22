@@ -106,6 +106,7 @@ test.describe('Teacher attendance', () => {
     }
 
     test('shows a late check-in under the French route', async ({ page }) => {
+      await page.setViewportSize({ width: 390, height: 844 });
       await page.route(scanPath, async (route) => {
         await route.fulfill({
           json: {
@@ -122,7 +123,12 @@ test.describe('Teacher attendance', () => {
       await page.goto('/fr/dashboard/absen?role=guru');
       await page.locator('#attendance-qr-image').setInputFiles(fixture);
       await expect(page.getByText('Kehadiran berhasil dicatat')).toBeVisible();
-      await expect(page.getByText('Terlambat', { exact: true })).toBeVisible();
+      await expect(page.getByRole('complementary').getByText('Hadir terlambat')).toBeVisible();
+      const toast = page.getByRole('status').filter({ hasText: 'Hadir terlambat' });
+      await expect(toast).toContainText('Masuk pukul 07.30 WIB');
+      await expect(toast).toHaveClass(/bg-amber-surface/u);
+      await expect(toast).toBeInViewport();
+      await page.screenshot({ path: 'test-results/absen-terlambat-390.png', fullPage: true });
     });
 
     test('keeps image scanning available after camera denial', async ({ page }) => {
@@ -269,6 +275,7 @@ test.describe('Teacher attendance', () => {
     }
 
     test('decodes a camera QR once and stops the preview', async ({ page }) => {
+      await page.setViewportSize({ width: 1440, height: 900 });
       const imageUrl = `data:image/png;base64,${readFileSync(fixture).toString('base64')}`;
       await page.addInitScript((source) => {
         navigator.mediaDevices.getUserMedia = async () => {
@@ -314,13 +321,14 @@ test.describe('Teacher attendance', () => {
       await page.goto('/dashboard/absen?role=guru');
       await page.getByRole('button', { name: 'Aktifkan kamera' }).click();
       await expect(page.getByText('Kehadiran berhasil dicatat')).toBeVisible();
-      await expect(page.getByText('Hadir', { exact: true })).toBeVisible();
+      await expect(page.getByRole('complementary').getByText('Hadir tepat waktu')).toBeVisible();
       await expect(
-        page.getByRole('status').filter({ hasText: 'Absensi masuk berhasil dicatat' }),
+        page.getByRole('status').filter({ hasText: 'Hadir tepat waktu' }),
       ).toBeInViewport();
       await expect(page.getByRole('button', { name: 'Hentikan kamera' })).toHaveCount(0);
       await expect(page.locator('video')).toBeHidden();
       expect(requests).toBe(1);
+      await page.screenshot({ path: 'test-results/absen-tepat-waktu-1440.png', fullPage: true });
     });
 
     test('shows an expired QR error without confirming attendance', async ({ page }) => {
@@ -336,7 +344,9 @@ test.describe('Teacher attendance', () => {
         page.getByText('QR sudah berganti. Pindai kode terbaru di layar petugas.'),
       ).toBeVisible();
       await expect(page.getByText('Kehadiran berhasil dicatat')).toHaveCount(0);
-      await expect(page.getByRole('status').filter({ hasText: 'berhasil dicatat' })).toHaveCount(0);
+      await expect(
+        page.getByRole('status').filter({ hasText: /Hadir|Absensi pulang/u }),
+      ).toHaveCount(0);
       await expect(page.getByText('untranslated backend message')).toHaveCount(0);
     });
 
