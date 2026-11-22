@@ -362,7 +362,7 @@ function VerifyButton(props: {
 export function RecapDashboard(props: { readOnly?: boolean }) {
   const t = useTranslations('RecapPage');
   const queryClient = useQueryClient();
-  const [mode, setMode] = useState<RecapMode>('classes');
+  const [mode, setMode] = useState<RecapMode>('students');
   const [bulan, setBulan] = useState(() => new Date().getMonth() + 1);
   const [tahun, setTahun] = useState(() => new Date().getFullYear());
   const [classFilter, setClassFilter] = useState<number | 'all'>('all');

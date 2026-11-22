@@ -8,6 +8,7 @@ const RESTRICTED_PAGES: Record<string, string[]> = {
   kedisiplinan: ['admin', 'guru'],
   presensi: ['admin', 'guru'],
   qr: ['tu'],
+  rekap: ['admin', 'tu'],
 };
 
 type DecodedToken = {
