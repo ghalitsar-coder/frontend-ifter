@@ -1,8 +1,9 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { MaterialIcon } from '@/components/landing/MaterialIcon';
+import { PresensiToast } from '@/components/presensi/PresensiToast';
 import { useQrCamera } from '@/components/presensi/useQrCamera';
 import { Button } from '@/components/ui/button';
 import { Link } from '@/libs/I18nNavigation';
@@ -66,6 +67,30 @@ function formatScanTime(value: string): string {
     timeStyle: 'short',
     timeZone: 'Asia/Jakarta',
   }).format(new Date(value));
+}
+
+function ScanSuccessToast(props: { result: StaffQrScanResult }) {
+  const t = useTranslations('StaffQrScanPage');
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setVisible(false);
+    }, 4000);
+    return () => {
+      window.clearTimeout(timeout);
+    };
+  }, []);
+
+  if (!visible) {
+    return null;
+  }
+  return (
+    <PresensiToast
+      description={formatScanTime(props.result.waktu_scan)}
+      title={props.result.tipe_sesi === 'masuk' ? t('toast_check_in') : t('toast_check_out')}
+      visible
+    />
+  );
 }
 
 /**
@@ -178,6 +203,7 @@ export function StaffQrScanWorkspace() {
 
   return (
     <section className="mx-auto w-full max-w-5xl space-y-6">
+      {result && <ScanSuccessToast result={result} />}
       <header>
         <p className="mb-2 flex items-center gap-2 font-eyebrow text-xs font-bold tracking-[0.16em] text-amber-dark uppercase">
           <MaterialIcon name="qr_code_scanner" /> {t('eyebrow')}
@@ -326,7 +352,7 @@ export function StaffQrScanWorkspace() {
 
         <aside className="space-y-5 rounded-2xl border border-border-subtle bg-surface-card p-5 shadow-sm sm:p-6">
           {result ? (
-            <div aria-live="polite" className="space-y-5">
+            <div className="space-y-5">
               <div className="flex items-center gap-3 rounded-xl bg-status-present/50 p-4 text-pine-deep">
                 <span className="flex size-11 items-center justify-center rounded-full bg-white">
                   <MaterialIcon className="text-[24px]" name="check_circle" />

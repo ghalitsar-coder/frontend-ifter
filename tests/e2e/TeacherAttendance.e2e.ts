@@ -85,6 +85,10 @@ test.describe('Teacher attendance', () => {
         await page.getByRole('button', { name: 'Unggah gambar QR' }).click();
         const chooser = await fileChooser;
         await chooser.setFiles(fixture);
+        const notification = page
+          .getByRole('status')
+          .filter({ hasText: 'Absensi pulang berhasil dicatat' });
+        await expect(notification).toBeInViewport();
         await expect(page.getByText('Kehadiran berhasil dicatat')).toBeVisible();
         await expect(page.getByText('Pulang tercatat')).toBeVisible();
         expect(requests).toBe(1);
@@ -96,6 +100,8 @@ test.describe('Teacher attendance', () => {
           window.scrollTo(0, 0);
         });
         await page.screenshot({ path: `test-results/absen-${width}.png`, fullPage: true });
+        await expect(notification).toHaveCount(0);
+        await expect(page.getByText('Kehadiran berhasil dicatat')).toBeVisible();
       });
     }
 
@@ -309,6 +315,9 @@ test.describe('Teacher attendance', () => {
       await page.getByRole('button', { name: 'Aktifkan kamera' }).click();
       await expect(page.getByText('Kehadiran berhasil dicatat')).toBeVisible();
       await expect(page.getByText('Hadir', { exact: true })).toBeVisible();
+      await expect(
+        page.getByRole('status').filter({ hasText: 'Absensi masuk berhasil dicatat' }),
+      ).toBeInViewport();
       await expect(page.getByRole('button', { name: 'Hentikan kamera' })).toHaveCount(0);
       await expect(page.locator('video')).toBeHidden();
       expect(requests).toBe(1);
@@ -327,6 +336,7 @@ test.describe('Teacher attendance', () => {
         page.getByText('QR sudah berganti. Pindai kode terbaru di layar petugas.'),
       ).toBeVisible();
       await expect(page.getByText('Kehadiran berhasil dicatat')).toHaveCount(0);
+      await expect(page.getByRole('status').filter({ hasText: 'berhasil dicatat' })).toHaveCount(0);
       await expect(page.getByText('untranslated backend message')).toHaveCount(0);
     });
 

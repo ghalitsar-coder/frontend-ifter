@@ -193,6 +193,8 @@
     "error_session_closed": "Sesi QR sudah ditutup.",
     "error_unauthorized": "Sesi masuk sudah berakhir.",
     "success_title": "Kehadiran berhasil dicatat",
+    "toast_check_in": "Absensi masuk berhasil dicatat",
+    "toast_check_out": "Absensi pulang berhasil dicatat",
     "session_type": "Sesi absensi",
     "type_check_in": "Masuk",
     "type_check_out": "Pulang",
