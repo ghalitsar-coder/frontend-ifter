@@ -1,0 +1,8 @@
+allowBuilds:
+  '@parcel/watcher': true
+  '@sentry/cli': true
+  '@swc/core': true
+  esbuild: true
+  lefthook: true
+overrides:
+  hono: 4.12.31

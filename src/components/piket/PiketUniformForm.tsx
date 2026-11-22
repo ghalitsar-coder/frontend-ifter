@@ -39,9 +39,9 @@ function UniformStudentPicker(props: {
 }) {
   return (
     <div className="max-h-36 space-y-1 overflow-y-auto">
-      {props.isPending && <p className="text-text-muted text-xs">Memuat data siswa...</p>}
+      {props.isPending && <p className="text-xs text-text-muted">Memuat data siswa...</p>}
       {props.students?.length === 0 && (
-        <p className="text-text-muted text-xs">Siswa tidak ditemukan.</p>
+        <p className="text-xs text-text-muted">Siswa tidak ditemukan.</p>
       )}
       {(props.students ?? []).map((student) => (
         <button
@@ -58,7 +58,7 @@ function UniformStudentPicker(props: {
         >
           <span>
             {student.full_name}
-            <span className="text-text-muted ml-2 font-mono">{student.student_number}</span>
+            <span className="ml-2 font-mono text-text-muted">{student.student_number}</span>
           </span>
           {student.current_class === undefined ? null : (
             <span className="text-text-muted">{student.current_class.name}</span>
@@ -80,14 +80,14 @@ function UniformReportCard(props: {
   targetLabel: string;
 }) {
   return (
-    <div className="bg-canvas-base rounded-xl p-3 text-xs">
+    <div className="rounded-xl bg-canvas-base p-3 text-xs">
       <div className="flex flex-wrap items-center justify-between gap-1">
-        <span className="text-text-primary font-semibold">
+        <span className="font-semibold text-text-primary">
           {props.report.scope === 'student' ? 'Siswa' : 'Guru'}: {props.targetLabel}
         </span>
         <span className="text-text-muted">oleh {props.teacherName}</span>
       </div>
-      <p className="text-text-muted mt-1">{props.report.note ?? '(tanpa catatan)'}</p>
+      <p className="mt-1 text-text-muted">{props.report.note ?? '(tanpa catatan)'}</p>
     </div>
   );
 }
@@ -108,18 +108,18 @@ function UniformReportsSection(props: {
 }) {
   return (
     <div className="mt-5 space-y-2 border-t border-border-subtle pt-4">
-      <h3 className="text-text-primary flex items-center gap-2 text-xs font-bold">
+      <h3 className="flex items-center gap-2 text-xs font-bold text-text-primary">
         <ClipboardList className="size-4 text-pine-deep" />
         Laporan seragam {props.date}
       </h3>
-      {props.isPending && <p className="text-text-muted text-xs">Memuat laporan...</p>}
+      {props.isPending && <p className="text-xs text-text-muted">Memuat laporan...</p>}
       {props.isError && (
-        <p className="text-error rounded-xl bg-red-500/10 p-3 text-xs font-medium">
+        <p className="rounded-xl bg-red-500/10 p-3 text-xs font-medium text-error">
           {uniformErrorMessage(props.error, 'Gagal memuat laporan seragam.')}
         </p>
       )}
       {!props.isPending && !props.isError && props.reports.length === 0 && (
-        <p className="bg-canvas-base text-text-muted rounded-xl p-3 text-xs">
+        <p className="rounded-xl bg-canvas-base p-3 text-xs text-text-muted">
           Belum ada catatan seragam pada tanggal ini.
         </p>
       )}
@@ -249,11 +249,11 @@ export function PiketUniformForm(props: {
   }
 
   return (
-    <div className="bg-surface-card rounded-2xl p-6 shadow-xs">
+    <div className="rounded-2xl bg-surface-card p-6 shadow-xs">
       <div className="flex items-center justify-between pb-4">
         <div className="space-y-0.5">
-          <h2 className="text-text-primary text-lg font-bold">{t('form_title')}</h2>
-          <p className="font-caption text-text-muted text-xs">
+          <h2 className="text-lg font-bold text-text-primary">{t('form_title')}</h2>
+          <p className="font-caption text-xs text-text-muted">
             Catatan pelanggaran seragam dikirim ke POST /uniform-reports; daftar harian dibaca dari
             GET /uniform-reports?date.
           </p>
@@ -268,13 +268,13 @@ export function PiketUniformForm(props: {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
             <label
-              className="text-text-primary block text-xs font-semibold"
+              className="block text-xs font-semibold text-text-primary"
               htmlFor="uniform-for-date"
             >
               Tanggal Laporan
             </label>
             <input
-              className="bg-canvas-base text-text-primary h-11 w-full rounded-xl px-3 text-xs font-medium shadow-inner focus:outline-none"
+              className="h-11 w-full rounded-xl bg-canvas-base px-3 text-xs font-medium text-text-primary shadow-inner focus:outline-none"
               id="uniform-for-date"
               type="date"
               value={forDate}
@@ -285,13 +285,13 @@ export function PiketUniformForm(props: {
           </div>
           <div className="space-y-1.5">
             <label
-              className="text-text-primary block text-xs font-semibold"
+              className="block text-xs font-semibold text-text-primary"
               htmlFor="uniform-teacher-select"
             >
               Guru Piket Pelapor
             </label>
             <select
-              className="bg-canvas-base text-text-primary h-11 w-full rounded-xl px-3 text-xs font-medium shadow-inner focus:outline-none"
+              className="h-11 w-full rounded-xl bg-canvas-base px-3 text-xs font-medium text-text-primary shadow-inner focus:outline-none"
               id="uniform-teacher-select"
               value={teacherId}
               onChange={(e) => {
@@ -313,8 +313,8 @@ export function PiketUniformForm(props: {
 
         {/* Scope segment (student | teacher — backend enum) */}
         <div className="space-y-1.5">
-          <span className="text-text-primary block text-xs font-semibold">Lingkup Laporan</span>
-          <div className="bg-canvas-base grid h-11 grid-cols-2 gap-1 rounded-xl p-1">
+          <span className="block text-xs font-semibold text-text-primary">Lingkup Laporan</span>
+          <div className="grid h-11 grid-cols-2 gap-1 rounded-xl bg-canvas-base p-1">
             {(['student', 'teacher'] as const).map((option) => (
               <button
                 key={option}
@@ -340,15 +340,15 @@ export function PiketUniformForm(props: {
           <>
             <div className="space-y-1.5">
               <label
-                className="text-text-primary block text-xs font-semibold"
+                className="block text-xs font-semibold text-text-primary"
                 htmlFor="siswa-search"
               >
                 {t('form_student_label')}
               </label>
               <div className="relative">
-                <UserSearch className="text-text-muted absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2" />
+                <UserSearch className="absolute top-1/2 left-3.5 size-4.5 -translate-y-1/2 text-text-muted" />
                 <input
-                  className="bg-canvas-base text-text-primary h-11 w-full rounded-xl pr-4 pl-10 text-xs font-medium shadow-inner focus:outline-none"
+                  className="h-11 w-full rounded-xl bg-canvas-base pr-4 pl-10 text-xs font-medium text-text-primary shadow-inner focus:outline-none"
                   id="siswa-search"
                   placeholder={t('form_student_placeholder')}
                   type="search"
@@ -375,10 +375,10 @@ export function PiketUniformForm(props: {
             catalog API), keep mock; selections are folded into the note text. */}
         <div className="space-y-2 pt-1">
           <div className="flex items-center justify-between">
-            <span className="text-text-primary text-xs font-semibold">
+            <span className="text-xs font-semibold text-text-primary">
               {t('form_infraction_title')}
             </span>
-            <span className="font-caption text-text-muted text-xs">
+            <span className="font-caption text-xs text-text-muted">
               {t('form_infraction_desc')}
             </span>
           </div>
@@ -390,7 +390,7 @@ export function PiketUniformForm(props: {
               return (
                 <label
                   key={item.id}
-                  className="bg-canvas-base flex cursor-pointer items-center justify-between rounded-xl p-3 transition-colors hover:bg-pine-light/40"
+                  className="flex cursor-pointer items-center justify-between rounded-xl bg-canvas-base p-3 transition-colors hover:bg-pine-light/40"
                 >
                   <div className="flex items-center gap-3">
                     <input
@@ -401,13 +401,13 @@ export function PiketUniformForm(props: {
                         handleToggle(item.id);
                       }}
                     />
-                    <span className="text-text-primary text-xs">{item.label}</span>
+                    <span className="text-xs text-text-primary">{item.label}</span>
                   </div>
                   <span
-                    className={`font-caption rounded-md px-2 py-0.5 text-xs font-bold ${
+                    className={`rounded-md px-2 py-0.5 font-caption text-xs font-bold ${
                       isChecked
                         ? 'bg-amber-surface text-amber-dark'
-                        : 'text-text-muted bg-surface-container-low'
+                        : 'bg-surface-container-low text-text-muted'
                     }`}
                   >
                     +{item.points} Poin
@@ -429,11 +429,11 @@ export function PiketUniformForm(props: {
 
         {/* Notes */}
         <div className="space-y-1.5">
-          <label className="text-text-primary block text-xs font-semibold" htmlFor="catatan-piket">
+          <label className="block text-xs font-semibold text-text-primary" htmlFor="catatan-piket">
             {t('form_notes_label')}
           </label>
           <textarea
-            className="bg-canvas-base text-text-primary focus:bg-surface-card w-full resize-none rounded-xl p-3 text-xs shadow-inner focus:outline-none"
+            className="w-full resize-none rounded-xl bg-canvas-base p-3 text-xs text-text-primary shadow-inner focus:bg-surface-card focus:outline-none"
             id="catatan-piket"
             placeholder={t('form_notes_placeholder')}
             rows={2}
@@ -443,14 +443,14 @@ export function PiketUniformForm(props: {
               setNotes(e.target.value);
             }}
           />
-          <span className="font-caption text-text-muted block text-right text-[10px]">
+          <span className="block text-right font-caption text-[10px] text-text-muted">
             {notes.length}/500
           </span>
         </div>
 
         {/* Submit Button */}
         <button
-          className="text-on-primary flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-pine-deep text-xs font-bold shadow-md transition-all hover:bg-pine-hover disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-pine-deep text-xs font-bold text-on-primary shadow-md transition-all hover:bg-pine-hover disabled:cursor-not-allowed disabled:opacity-50"
           id="btn-submit-infraction"
           type="submit"
           disabled={!canSubmit}

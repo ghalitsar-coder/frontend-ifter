@@ -63,7 +63,7 @@ export function ClassHomeroomModal(props: {
       aria-labelledby="class-homeroom-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-pine-deep/60 p-3 backdrop-blur-md sm:p-6"
     >
-      <div className="bg-surface-card flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl shadow-2xl">
+      <div className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-surface-card shadow-2xl">
         <div className="h-1.5 w-full bg-gradient-to-r from-pine-deep via-amber-gold to-pine-deep" />
         <div className="flex items-start justify-between gap-4 border-b border-border-control px-5 py-4 sm:px-6">
           <div className="flex items-start gap-3">
@@ -74,7 +74,7 @@ export function ClassHomeroomModal(props: {
               <h2 id="class-homeroom-title" className="text-lg font-bold text-pine-deep">
                 Penugasan Wali Kelas
               </h2>
-              <p className="text-text-muted text-xs">
+              <p className="text-xs text-text-muted">
                 {props.classRecord.name} • {props.classRecord.academic_year_name}
               </p>
             </div>
@@ -83,7 +83,7 @@ export function ClassHomeroomModal(props: {
             type="button"
             onClick={props.onClose}
             aria-label="Tutup"
-            className="text-text-muted hover:bg-surface-container hover:text-text-primary flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low transition-colors"
+            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary"
           >
             <X className="size-4" />
           </button>
@@ -92,13 +92,13 @@ export function ClassHomeroomModal(props: {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 px-5 py-5 sm:px-6">
           <div className="rounded-xl border border-border-control bg-surface-container-low px-3 py-2.5 text-xs">
             <span className="text-text-muted">Wali kelas saat ini: </span>
-            <span className="text-text-primary font-semibold">
+            <span className="font-semibold text-text-primary">
               {props.classRecord.homeroom_teacher_name?.trim() ?? 'Belum ditugaskan'}
             </span>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="homeroom-teacher" className="text-text-primary text-xs font-semibold">
+            <label htmlFor="homeroom-teacher" className="text-xs font-semibold text-text-primary">
               Guru Aktif <span className="text-rose-600">*</span>
             </label>
             <select
@@ -108,7 +108,7 @@ export function ClassHomeroomModal(props: {
                 setTeacherId(event.target.value);
               }}
               required
-              className="bg-surface-card text-text-primary h-10 w-full cursor-pointer rounded-xl border border-border-control px-3 text-sm focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+              className="h-10 w-full cursor-pointer rounded-xl border border-border-control bg-surface-card px-3 text-sm text-text-primary focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
             >
               <option value="">
                 {teachersQuery.isLoading ? 'Memuat guru…' : 'Pilih guru aktif'}
@@ -126,8 +126,8 @@ export function ClassHomeroomModal(props: {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="homeroom-start" className="text-text-primary text-xs font-semibold">
-              Tanggal Mulai <span className="text-text-muted font-normal">(opsional)</span>
+            <label htmlFor="homeroom-start" className="text-xs font-semibold text-text-primary">
+              Tanggal Mulai <span className="font-normal text-text-muted">(opsional)</span>
             </label>
             <input
               id="homeroom-start"
@@ -136,9 +136,9 @@ export function ClassHomeroomModal(props: {
               onChange={(event) => {
                 setStartDate(event.target.value);
               }}
-              className="bg-surface-card text-text-primary h-10 w-full rounded-xl border border-border-control px-3 text-sm focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+              className="h-10 w-full rounded-xl border border-border-control bg-surface-card px-3 text-sm text-text-primary focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
             />
-            <span className="text-text-muted text-[11px]">
+            <span className="text-[11px] text-text-muted">
               Kosongkan untuk memakai tanggal mulai tahun ajaran.
             </span>
           </div>
@@ -156,7 +156,7 @@ export function ClassHomeroomModal(props: {
             <button
               type="button"
               onClick={props.onClose}
-              className="text-text-primary bg-surface-card cursor-pointer rounded-xl border border-border-control px-4 py-2 text-sm font-semibold transition-colors hover:bg-surface-container-low"
+              className="cursor-pointer rounded-xl border border-border-control bg-surface-card px-4 py-2 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-container-low"
             >
               Batal
             </button>

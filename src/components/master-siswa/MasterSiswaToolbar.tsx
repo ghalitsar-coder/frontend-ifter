@@ -39,7 +39,7 @@ export function MasterSiswaToolbar(props: {
     <div className="flex flex-col gap-3">
       {/* Search Bar */}
       <div className="relative w-full">
-        <Search className="text-text-muted pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+        <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-text-muted" />
         <input
           type="text"
           value={props.searchQuery}
@@ -47,7 +47,7 @@ export function MasterSiswaToolbar(props: {
             props.onSearchChange(e.target.value);
           }}
           placeholder={t('search_placeholder')}
-          className="bg-surface-card text-text-primary placeholder:text-text-muted h-11 w-full rounded-xl border border-border-control pr-10 pl-10 text-sm shadow-xs transition-all focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+          className="h-11 w-full rounded-xl border border-border-control bg-surface-card pr-10 pl-10 text-sm text-text-primary shadow-xs transition-all placeholder:text-text-muted focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
         />
         {props.searchQuery && (
           <button
@@ -55,7 +55,7 @@ export function MasterSiswaToolbar(props: {
             onClick={() => {
               props.onSearchChange('');
             }}
-            className="text-text-muted hover:text-text-primary absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer p-1"
+            className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer p-1 text-text-muted hover:text-text-primary"
             aria-label={t('btn_clear_search')}
           >
             <X className="size-4" />
@@ -73,14 +73,14 @@ export function MasterSiswaToolbar(props: {
               // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
               props.onGradeChange(e.target.value as GradeFilter);
             }}
-            className="bg-surface-card text-text-primary h-9 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+            className="h-9 cursor-pointer appearance-none rounded-xl border border-border-control bg-surface-card pr-8 pl-3.5 text-xs font-medium text-text-primary shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           >
             <option value="all">{t('filter_grade_all')}</option>
             <option value="VII">{t('filter_grade_vii')}</option>
             <option value="VIII">{t('filter_grade_viii')}</option>
             <option value="IX">{t('filter_grade_ix')}</option>
           </select>
-          <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-text-muted" />
         </div>
 
         {/* Class Rombel filter (real class ids from GET /classes) */}
@@ -90,7 +90,7 @@ export function MasterSiswaToolbar(props: {
             onChange={(e) => {
               props.onClassChange(e.target.value);
             }}
-            className="bg-surface-card text-text-primary h-9 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+            className="h-9 cursor-pointer appearance-none rounded-xl border border-border-control bg-surface-card pr-8 pl-3.5 text-xs font-medium text-text-primary shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           >
             <option value="all">{t('filter_class_all')}</option>
             {props.availableClasses.map((cls) => (
@@ -99,7 +99,7 @@ export function MasterSiswaToolbar(props: {
               </option>
             ))}
           </select>
-          <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-text-muted" />
         </div>
 
         {/* Status filter */}
@@ -110,14 +110,14 @@ export function MasterSiswaToolbar(props: {
               // oxlint-disable-next-line typescript/no-unsafe-type-assertion -- value comes from the controlled <option> list below
               props.onStatusChange(e.target.value as StatusFilter);
             }}
-            className="bg-surface-card text-text-primary h-9 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+            className="h-9 cursor-pointer appearance-none rounded-xl border border-border-control bg-surface-card pr-8 pl-3.5 text-xs font-medium text-text-primary shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           >
             <option value="all">{t('filter_status_all')}</option>
             <option value="active">{t('filter_status_active')}</option>
             <option value="mutation">{t('filter_status_mutation')}</option>
             <option value="alumni">{t('filter_status_alumni')}</option>
           </select>
-          <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-text-muted" />
         </div>
 
         {/* Year filter (real academic years from GET /academic-years) */}
@@ -127,7 +127,7 @@ export function MasterSiswaToolbar(props: {
             onChange={(e) => {
               props.onYearChange(e.target.value);
             }}
-            className="bg-surface-card text-text-primary h-9 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+            className="h-9 cursor-pointer appearance-none rounded-xl border border-border-control bg-surface-card pr-8 pl-3.5 text-xs font-medium text-text-primary shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           >
             {props.yearOptions.length === 0 && <option value="">—</option>}
             {props.yearOptions.map((year) => (
@@ -136,7 +136,7 @@ export function MasterSiswaToolbar(props: {
               </option>
             ))}
           </select>
-          <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-text-muted" />
         </div>
 
         {/* Sort selector (GET /students sort=name|nis) */}
@@ -148,12 +148,12 @@ export function MasterSiswaToolbar(props: {
               props.onSortChange(e.target.value as 'name' | 'nis');
             }}
             aria-label={t('th_name_nisn')}
-            className="bg-surface-card text-text-primary h-9 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+            className="h-9 cursor-pointer appearance-none rounded-xl border border-border-control bg-surface-card pr-8 pl-3.5 text-xs font-medium text-text-primary shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           >
             <option value="name">Urut: Nama</option>
             <option value="nis">Urut: NIS</option>
           </select>
-          <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-text-muted" />
         </div>
 
         {/* Reset button if filter active */}

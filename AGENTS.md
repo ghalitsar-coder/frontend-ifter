@@ -23,6 +23,7 @@ Only these `bun run` scripts: `build-local`, `lint`, `check:types`, `check:deps`
 - **Branch Prefix**: Every feature, enhancement, or custom version initiated for the user MUST use the prefix `ghal/`.
 - **Branch Naming**: `ghal/<feature-slug>` or `ghal/<type>-<feature-slug>` (e.g. `ghal/feat-presensi`, `ghal/feat-kedisiplinan`, `ghal/fix-auth-token`).
 - **Isolation Rule**: NEVER commit directly to `main` for new feature requests unless explicitly instructed. Always create and switch to a `ghal/*` branch first.
+- **Main Merge Prohibition**: NEVER merge any `ghal/*` branch—especially `ghal/feat-wave3-prd-gaps`—into `main`. Do not merge PRs targeting `main`, enable auto-merge, push to `main`, or force-push `main`. Only the repository owner updates `main` manually; agents must leave PRs open for human review.
 - **Workflow Steps**:
   1. Sync base: `git checkout main && git pull origin main`
   2. Create branch: `git checkout -b ghal/<feature-name>`

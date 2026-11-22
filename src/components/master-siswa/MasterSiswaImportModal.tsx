@@ -56,8 +56,8 @@ function ImportUploadStep(props: UploadStepProps) {
   return (
     <>
       {/* File picker */}
-      <div className="bg-surface-card space-y-3 rounded-2xl border border-border-control p-5 shadow-xs">
-        <span className="text-text-primary block text-sm font-bold">Berkas Excel</span>
+      <div className="space-y-3 rounded-2xl border border-border-control bg-surface-card p-5 shadow-xs">
+        <span className="block text-sm font-bold text-text-primary">Berkas Excel</span>
         <input
           type="file"
           accept=".xlsx"
@@ -65,10 +65,10 @@ function ImportUploadStep(props: UploadStepProps) {
           onChange={(e) => {
             props.onFilePicked(e.target.files?.[0] ?? null);
           }}
-          className="text-text-muted block w-full text-xs file:mr-3 file:cursor-pointer file:rounded-xl file:border-0 file:bg-pine-light file:px-4 file:py-2 file:text-xs file:font-bold file:text-pine-deep"
+          className="block w-full text-xs text-text-muted file:mr-3 file:cursor-pointer file:rounded-xl file:border-0 file:bg-pine-light file:px-4 file:py-2 file:text-xs file:font-bold file:text-pine-deep"
         />
         {props.file !== null && (
-          <p className="text-text-muted text-xs">
+          <p className="text-xs text-text-muted">
             Terpilih:{' '}
             <span className="font-mono font-semibold text-pine-deep">{props.file.name}</span>
           </p>
@@ -88,7 +88,7 @@ function ImportUploadStep(props: UploadStepProps) {
             type="button"
             onClick={props.onDownloadTemplate}
             disabled={props.templateBusy}
-            className="bg-surface-card text-text-primary hover:bg-surface-container flex cursor-pointer items-center gap-1.5 rounded-xl border border-border-control px-3.5 py-2 text-xs font-semibold transition-colors disabled:opacity-50"
+            className="flex cursor-pointer items-center gap-1.5 rounded-xl border border-border-control bg-surface-card px-3.5 py-2 text-xs font-semibold text-text-primary transition-colors hover:bg-surface-container disabled:opacity-50"
           >
             {props.templateBusy ? (
               <Loader2 className="size-4 animate-spin" />
@@ -101,8 +101,8 @@ function ImportUploadStep(props: UploadStepProps) {
       </div>
 
       {/* Mode selection */}
-      <div className="bg-surface-card space-y-3 rounded-2xl border border-border-control p-5 shadow-xs">
-        <span className="text-text-primary block text-sm font-bold">Mode Import</span>
+      <div className="space-y-3 rounded-2xl border border-border-control bg-surface-card p-5 shadow-xs">
+        <span className="block text-sm font-bold text-text-primary">Mode Import</span>
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           <button
             type="button"
@@ -113,12 +113,12 @@ function ImportUploadStep(props: UploadStepProps) {
             className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 text-left transition-colors ${
               props.mode === 'create_only'
                 ? 'border-amber-gold bg-amber-surface/70 ring-1 ring-amber-gold'
-                : 'bg-surface-card border-border-control hover:bg-pine-light/30'
+                : 'border-border-control bg-surface-card hover:bg-pine-light/30'
             }`}
           >
             <div>
               <span className="block text-xs font-bold text-pine-deep sm:text-sm">Create Only</span>
-              <span className="text-text-muted mt-0.5 block text-[11px] leading-relaxed">
+              <span className="mt-0.5 block text-[11px] leading-relaxed text-text-muted">
                 Menolak baris yang NISN / NIS-nya sudah terdaftar untuk menghindari timpa data.
               </span>
             </div>
@@ -132,14 +132,14 @@ function ImportUploadStep(props: UploadStepProps) {
             className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 text-left transition-colors ${
               props.mode === 'upsert'
                 ? 'border-amber-gold bg-amber-surface/70 ring-1 ring-amber-gold'
-                : 'bg-surface-card border-border-control hover:bg-pine-light/30'
+                : 'border-border-control bg-surface-card hover:bg-pine-light/30'
             }`}
           >
             <div>
               <span className="block text-xs font-bold text-pine-deep sm:text-sm">
                 Upsert (Perbarui)
               </span>
-              <span className="text-text-muted mt-0.5 block text-[11px] leading-relaxed">
+              <span className="mt-0.5 block text-[11px] leading-relaxed text-text-muted">
                 Memperbarui data siswa lama yang NISN / NIS-nya sudah tercatat di sistem.
               </span>
             </div>
@@ -184,26 +184,26 @@ function ImportReviewStep(props: ReviewStepProps) {
   return (
     <>
       {/* Validation summary */}
-      <div className="bg-surface-card grid grid-cols-2 gap-3 rounded-2xl border border-border-control p-5 shadow-xs sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 rounded-2xl border border-border-control bg-surface-card p-5 shadow-xs sm:grid-cols-4">
         <div className="flex flex-col gap-1">
-          <span className="text-text-muted text-[11px] font-semibold uppercase">Total Baris</span>
+          <span className="text-[11px] font-semibold text-text-muted uppercase">Total Baris</span>
           <span className="text-lg font-black text-pine-deep">{job?.total_rows ?? 0}</span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-text-muted text-[11px] font-semibold uppercase">Valid</span>
+          <span className="text-[11px] font-semibold text-text-muted uppercase">Valid</span>
           <span className="text-lg font-black text-emerald-700">{job?.valid_rows ?? 0}</span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-text-muted text-[11px] font-semibold uppercase">Duplikat</span>
+          <span className="text-[11px] font-semibold text-text-muted uppercase">Duplikat</span>
           <span className="text-lg font-black text-amber-700">{job?.duplicate_rows ?? 0}</span>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-text-muted text-[11px] font-semibold uppercase">Invalid</span>
+          <span className="text-[11px] font-semibold text-text-muted uppercase">Invalid</span>
           <span className="text-lg font-black text-rose-700">{job?.invalid_rows ?? 0}</span>
         </div>
       </div>
 
-      <p className="text-text-muted text-xs">
+      <p className="text-xs text-text-muted">
         Berkas{' '}
         <span className="font-mono font-semibold text-pine-deep">{job?.original_filename}</span> —
         status job: <span className="font-semibold text-pine-deep">{job?.status}</span>
@@ -211,7 +211,7 @@ function ImportReviewStep(props: ReviewStepProps) {
 
       {/* Per-row errors */}
       {props.errors.length > 0 && (
-        <div className="bg-surface-card overflow-hidden rounded-2xl border border-rose-200 shadow-xs">
+        <div className="overflow-hidden rounded-2xl border border-rose-200 bg-surface-card shadow-xs">
           <div className="border-b border-rose-100 bg-rose-50 px-4 py-2.5 text-xs font-bold text-rose-800">
             Baris Bermasalah ({props.errors.length})
           </div>
@@ -224,10 +224,10 @@ function ImportReviewStep(props: ReviewStepProps) {
                 <span className="w-14 shrink-0 font-mono font-semibold text-rose-700">
                   Baris #{rowErr.row_number}
                 </span>
-                <span className="text-text-muted w-24 shrink-0 font-semibold">
+                <span className="w-24 shrink-0 font-semibold text-text-muted">
                   {rowErr.column ?? '-'}
                 </span>
-                <span className="text-text-primary flex-1">{rowErr.message}</span>
+                <span className="flex-1 text-text-primary">{rowErr.message}</span>
               </div>
             ))}
           </div>
@@ -235,14 +235,14 @@ function ImportReviewStep(props: ReviewStepProps) {
       )}
 
       {/* Preview */}
-      <div className="bg-surface-card overflow-hidden rounded-2xl border border-border-control shadow-xs">
+      <div className="overflow-hidden rounded-2xl border border-border-control bg-surface-card shadow-xs">
         <div className="border-b border-border-control bg-pine-light/60 px-4 py-2.5 text-xs font-bold text-pine-deep">
           Pratinjau Baris Terbaca ({props.preview.length})
         </div>
-        <div className="max-h-64 overflow-y-auto">
+        <div className="max-h-64 overflow-auto">
           <table className="w-full text-left text-xs">
             <thead>
-              <tr className="text-text-muted border-b border-border-control bg-surface-container-low/70 text-[10px] font-bold uppercase">
+              <tr className="border-b border-border-control bg-surface-container-low/70 text-[10px] font-bold text-text-muted uppercase">
                 <th scope="col" className="px-4 py-2">
                   Baris
                 </th>
@@ -263,7 +263,7 @@ function ImportReviewStep(props: ReviewStepProps) {
             <tbody className="divide-y divide-border-subtle">
               {props.preview.map((row) => (
                 <tr key={row.row_number}>
-                  <td className="text-text-muted px-4 py-2 font-mono">#{row.row_number}</td>
+                  <td className="px-4 py-2 font-mono text-text-muted">#{row.row_number}</td>
                   <td className="px-4 py-2">
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${actionBadgeClass(row.action)}`}
@@ -273,7 +273,7 @@ function ImportReviewStep(props: ReviewStepProps) {
                   </td>
                   <td className="px-4 py-2 font-mono">{row.key}</td>
                   <td className="px-4 py-2 font-semibold text-pine-deep">{row.name}</td>
-                  <td className="text-text-muted px-4 py-2">{row.class_name ?? '-'}</td>
+                  <td className="px-4 py-2 text-text-muted">{row.class_name ?? '-'}</td>
                 </tr>
               ))}
             </tbody>
@@ -365,11 +365,11 @@ export function MasterSiswaImportModal(props: {
       aria-labelledby="modal-import-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-pine-deep/50 p-3 backdrop-blur-sm sm:p-6"
     >
-      <div className="bg-surface-card relative flex max-h-[92vh] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl shadow-2xl duration-200 zoom-in-95 fade-in">
+      <div className="relative flex max-h-[92vh] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl bg-surface-card shadow-2xl duration-200 zoom-in-95 fade-in">
         <div className="h-1.5 w-full bg-gradient-to-r from-pine-deep via-pine-hover to-amber-gold" />
 
         {/* Header */}
-        <div className="bg-surface-card flex items-start justify-between border-b border-border-control px-6 py-5 sm:px-8">
+        <div className="flex items-start justify-between border-b border-border-control bg-surface-card px-6 py-5 sm:px-8">
           <div className="flex items-start gap-4">
             <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-pine-light text-pine-deep shadow-xs">
               <FileSpreadsheet className="size-6" />
@@ -381,7 +381,7 @@ export function MasterSiswaImportModal(props: {
               >
                 Import Data Siswa (Excel .xlsx)
               </h2>
-              <p className="text-text-muted mt-0.5 text-xs sm:text-sm">
+              <p className="mt-0.5 text-xs text-text-muted sm:text-sm">
                 Langkah 1: unggah berkas • Langkah 2: tinjau validasi baris • Langkah 3: konfirmasi
                 ke database.
               </p>
@@ -391,14 +391,14 @@ export function MasterSiswaImportModal(props: {
             type="button"
             onClick={handleClose}
             aria-label="Tutup jendela import"
-            className="hover:bg-surface-container text-text-muted hover:text-text-primary flex size-9 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low transition-colors"
+            className="flex size-9 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary"
           >
             <X className="size-4" />
           </button>
         </div>
 
         {/* Body */}
-        <div className="bg-canvas-base flex-1 space-y-5 overflow-y-auto px-6 py-5 sm:px-8">
+        <div className="flex-1 space-y-5 overflow-y-auto bg-canvas-base px-6 py-5 sm:px-8">
           {upload === undefined ? (
             <ImportUploadStep
               file={file}
@@ -427,17 +427,17 @@ export function MasterSiswaImportModal(props: {
         </div>
 
         {/* Footer */}
-        <div className="bg-surface-card flex shrink-0 flex-col items-center justify-between gap-3 border-t border-border-control px-6 py-4 sm:flex-row sm:px-8">
+        <div className="flex shrink-0 flex-col items-center justify-between gap-3 border-t border-border-control bg-surface-card px-6 py-4 sm:flex-row sm:px-8">
           <button
             type="button"
             onClick={handleClose}
-            className="hover:bg-surface-container text-text-muted hover:text-text-primary h-10 w-full cursor-pointer rounded-xl bg-surface-container-low px-4 text-xs font-semibold transition-colors sm:w-auto sm:text-sm"
+            className="h-10 w-full cursor-pointer rounded-xl bg-surface-container-low px-4 text-xs font-semibold text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary sm:w-auto sm:text-sm"
           >
             Tutup
           </button>
 
           {upload === undefined ? (
-            <span className="text-text-muted text-[11px]">
+            <span className="text-[11px] text-text-muted">
               Format .xlsx sesuai template Dapodik sekolah.
             </span>
           ) : (

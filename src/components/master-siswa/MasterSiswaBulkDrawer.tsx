@@ -79,7 +79,7 @@ export function MasterSiswaBulkDrawer(props: {
             type="button"
             onClick={props.onChangeStatus}
             disabled={props.isStatusPending === true}
-            className="hover:bg-amber-hover flex cursor-pointer items-center gap-1.5 rounded-xl bg-amber-gold px-3 py-2 text-xs font-bold text-pine-deep transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex cursor-pointer items-center gap-1.5 rounded-xl bg-amber-gold px-3 py-2 text-xs font-bold text-pine-deep transition-colors hover:bg-amber-hover disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Edit3 className="size-3.5" />
             {/* shortcut: no busy locale key; hard-coded Indonesian action feedback */}

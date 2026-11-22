@@ -272,7 +272,7 @@ export function MasterGuruManager() {
 
       {/* Query status banners */}
       {teachersQuery.isPending && (
-        <div className="bg-surface-card text-text-muted mb-4 rounded-xl border border-border-control px-4 py-3 text-xs font-semibold">
+        <div className="mb-4 rounded-xl border border-border-control bg-surface-card px-4 py-3 text-xs font-semibold text-text-muted">
           Memuat data guru dari server…
         </div>
       )}

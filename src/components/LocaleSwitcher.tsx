@@ -24,9 +24,9 @@ export const LocaleSwitcher = () => {
 
   return (
     <select
-      defaultValue={locale}
+      value={locale}
       onChange={handleChange}
-      className="border border-gray-300 font-medium focus:outline-hidden focus-visible:ring-3"
+      className="cursor-pointer rounded-xl border border-[#D4DAD7] bg-white px-2 py-1.5 text-xs font-semibold text-[#173F36] outline-none focus-visible:ring-2 focus-visible:ring-[#173F36]"
       aria-label={t('change_language')}
     >
       {routing.locales.map((elt) => (

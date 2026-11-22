@@ -38,16 +38,16 @@ export function PiketActiveCompensation(props: {
   const activeCount = props.compensations.filter((c) => !c.isCompleted).length;
 
   return (
-    <div className="bg-surface-card rounded-2xl p-6 shadow-xs">
+    <div className="rounded-2xl bg-surface-card p-6 shadow-xs">
       <div className="flex items-center justify-between pb-4">
         <div className="space-y-0.5">
           <div className="flex items-center gap-2">
             <span className="size-2 rounded-full bg-amber-dark" />
-            <h2 className="text-text-primary text-lg font-bold">{t('comp_title')}</h2>
+            <h2 className="text-lg font-bold text-text-primary">{t('comp_title')}</h2>
           </div>
-          <p className="font-caption text-text-muted text-xs">{t('comp_subtitle')}</p>
+          <p className="font-caption text-xs text-text-muted">{t('comp_subtitle')}</p>
         </div>
-        <span className="font-caption rounded-full bg-amber-surface px-2.5 py-1 text-xs font-bold text-amber-dark">
+        <span className="rounded-full bg-amber-surface px-2.5 py-1 font-caption text-xs font-bold text-amber-dark">
           {t('comp_active_badge', { count: activeCount })}
         </span>
       </div>
@@ -56,17 +56,17 @@ export function PiketActiveCompensation(props: {
         {props.compensations.map((item) => (
           <div
             key={item.id}
-            className="bg-canvas-base flex items-center justify-between gap-3 rounded-xl p-3.5 transition-colors hover:bg-pine-light/20"
+            className="flex items-center justify-between gap-3 rounded-xl bg-canvas-base p-3.5 transition-colors hover:bg-pine-light/20"
           >
             <div className="flex items-center gap-3">
-              <div className="text-on-primary flex size-9 shrink-0 items-center justify-center rounded-full bg-pine-deep text-xs font-bold">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-pine-deep text-xs font-bold text-on-primary">
                 {item.initials}
               </div>
               <div className="space-y-0.5">
-                <p className="text-text-primary text-xs leading-tight font-bold">
+                <p className="text-xs leading-tight font-bold text-text-primary">
                   {item.studentName} ({item.className.replace('Kelas ', '')})
                 </p>
-                <p className="font-caption text-text-muted flex items-center gap-1 text-[11px]">
+                <p className="flex items-center gap-1 font-caption text-[11px] text-text-muted">
                   {renderIcon(item.areaIcon)}
                   <span>Area: {item.area}</span>
                 </p>
@@ -76,11 +76,11 @@ export function PiketActiveCompensation(props: {
             <div className="flex shrink-0 items-center gap-2">
               {item.isCompleted ? (
                 <>
-                  <span className="font-caption rounded-md bg-amber-surface px-2 py-1 text-xs font-semibold text-amber-dark">
+                  <span className="rounded-md bg-amber-surface px-2 py-1 font-caption text-xs font-semibold text-amber-dark">
                     {t('comp_done_badge')}
                   </span>
                   <button
-                    className="hover:bg-amber-hover flex size-8 items-center justify-center rounded-lg bg-amber-gold text-pine-deep shadow-xs transition-colors"
+                    className="flex size-8 items-center justify-center rounded-lg bg-amber-gold text-pine-deep shadow-xs transition-colors hover:bg-amber-hover"
                     title={t('btn_print_permit')}
                     type="button"
                     onClick={() => {
@@ -92,11 +92,11 @@ export function PiketActiveCompensation(props: {
                 </>
               ) : (
                 <>
-                  <span className="font-caption rounded-md bg-pine-light px-2 py-1 text-xs font-semibold text-pine-deep">
+                  <span className="rounded-md bg-pine-light px-2 py-1 font-caption text-xs font-semibold text-pine-deep">
                     {t('comp_remaining_min', { count: item.remainingMinutes })}
                   </span>
                   <button
-                    className="text-on-primary flex size-8 items-center justify-center rounded-lg bg-pine-deep shadow-xs transition-colors hover:bg-pine-hover"
+                    className="flex size-8 items-center justify-center rounded-lg bg-pine-deep text-on-primary shadow-xs transition-colors hover:bg-pine-hover"
                     title={t('btn_mark_complete')}
                     type="button"
                     onClick={() => {
@@ -112,7 +112,7 @@ export function PiketActiveCompensation(props: {
         ))}
       </div>
 
-      <div className="font-caption text-text-muted mt-4 flex items-center justify-between border-t border-border-subtle pt-3 text-xs">
+      <div className="mt-4 flex items-center justify-between border-t border-border-subtle pt-3 font-caption text-xs text-text-muted">
         <span className="flex items-center gap-1 font-medium text-pine-deep">
           <History className="size-3.5" />
           {t('comp_cutoff')}

@@ -99,7 +99,7 @@ export function MasterGuruAddModal(props: {
       aria-labelledby="modal-add-guru-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/60 p-3 backdrop-blur-xs sm:p-4"
     >
-      <div className="bg-surface-card relative my-6 w-full max-w-3xl overflow-hidden rounded-2xl border border-border-control shadow-2xl">
+      <div className="relative my-6 w-full max-w-3xl overflow-hidden rounded-2xl border border-border-control bg-surface-card shadow-2xl">
         {/* Modal Header */}
         <div className="flex items-center justify-between bg-pine-deep px-6 py-4.5 text-white">
           <div className="flex items-center gap-3">
@@ -142,7 +142,7 @@ export function MasterGuruAddModal(props: {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div className="sm:col-span-2">
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_full_name_degree_label')} *
                 </label>
                 <input
@@ -153,12 +153,12 @@ export function MasterGuruAddModal(props: {
                     setName(e.target.value);
                   }}
                   placeholder="Contoh: Drs. Agus Subagyo, M.Pd."
-                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                  className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_nip_label')}
                 </label>
                 <input
@@ -168,12 +168,12 @@ export function MasterGuruAddModal(props: {
                     setNip(e.target.value);
                   }}
                   placeholder="19780412 200501 1 003"
-                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                  className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_nuptk_label')}
                 </label>
                 <input
@@ -183,12 +183,12 @@ export function MasterGuruAddModal(props: {
                     setNuptk(e.target.value);
                   }}
                   placeholder="16 digit NUPTK resmi"
-                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                  className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_nik_ktp_label')}
                 </label>
                 <input
@@ -198,12 +198,12 @@ export function MasterGuruAddModal(props: {
                     setNik(e.target.value);
                   }}
                   placeholder="320101XXXXXXXXXX"
-                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                  className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_gender_label')}
                 </label>
                 <div className="flex h-10 items-center gap-4">
@@ -235,7 +235,7 @@ export function MasterGuruAddModal(props: {
               </div>
 
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_email_workspace_label')} *
                 </label>
                 <input
@@ -246,12 +246,12 @@ export function MasterGuruAddModal(props: {
                     setEmail(e.target.value);
                   }}
                   placeholder="nama.guru@sekolah.sch.id"
-                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                  className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_phone_whatsapp_label')} *
                 </label>
                 <input
@@ -262,7 +262,7 @@ export function MasterGuruAddModal(props: {
                     setPhone(e.target.value);
                   }}
                   placeholder="+62 812-XXXX-XXXX"
-                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                  className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
             </div>
@@ -281,7 +281,7 @@ export function MasterGuruAddModal(props: {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_employment_status_label')}
                 </label>
                 <select
@@ -290,7 +290,7 @@ export function MasterGuruAddModal(props: {
                   onChange={(e) => {
                     setEmploymentTypeId(e.target.value);
                   }}
-                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                  className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 >
                   <option value="">Belum ditentukan</option>
                   {props.employmentTypes
@@ -304,7 +304,7 @@ export function MasterGuruAddModal(props: {
               </div>
 
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_main_subject_label')} *
                 </label>
                 <input
@@ -314,12 +314,12 @@ export function MasterGuruAddModal(props: {
                     setSubject(e.target.value);
                   }}
                   placeholder="Contoh: Matematika / IPA"
-                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                  className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
 
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_teaching_hours_label')}
                 </label>
                 <input
@@ -330,7 +330,7 @@ export function MasterGuruAddModal(props: {
                   onChange={(e) => {
                     setTeachingHours(Number(e.target.value));
                   }}
-                  className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                  className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                 />
               </div>
             </div>
@@ -347,7 +347,7 @@ export function MasterGuruAddModal(props: {
 
             <div className="space-y-3">
               {/* Homeroom Assignment Toggle */}
-              <div className="bg-canvas-base flex flex-col justify-between gap-3 rounded-xl border border-border-control p-3.5 sm:flex-row sm:items-center">
+              <div className="flex flex-col justify-between gap-3 rounded-xl border border-border-control bg-canvas-base p-3.5 sm:flex-row sm:items-center">
                 <div className="flex items-start gap-3">
                   <input
                     type="checkbox"
@@ -365,13 +365,13 @@ export function MasterGuruAddModal(props: {
                     >
                       {t('role_homeroom_toggle_title')}
                     </label>
-                    <p className="text-text-muted text-[11px]">{t('role_homeroom_toggle_desc')}</p>
+                    <p className="text-[11px] text-text-muted">{t('role_homeroom_toggle_desc')}</p>
                   </div>
                 </div>
 
                 {isHomeroom && (
                   <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-text-muted text-xs font-semibold">
+                    <span className="text-xs font-semibold text-text-muted">
                       {t('label_target_rombel')}:
                     </span>
                     <select
@@ -395,7 +395,7 @@ export function MasterGuruAddModal(props: {
               </div>
 
               {/* Picket Duty Toggle */}
-              <div className="bg-canvas-base flex flex-col justify-between gap-3 rounded-xl border border-border-control p-3.5 sm:flex-row sm:items-center">
+              <div className="flex flex-col justify-between gap-3 rounded-xl border border-border-control bg-canvas-base p-3.5 sm:flex-row sm:items-center">
                 <div className="flex items-start gap-3">
                   <input
                     type="checkbox"
@@ -413,13 +413,13 @@ export function MasterGuruAddModal(props: {
                     >
                       {t('role_piket_toggle_title')}
                     </label>
-                    <p className="text-text-muted text-[11px]">{t('role_piket_toggle_desc')}</p>
+                    <p className="text-[11px] text-text-muted">{t('role_piket_toggle_desc')}</p>
                   </div>
                 </div>
 
                 {isPicket && (
                   <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-text-muted text-xs font-semibold">
+                    <span className="text-xs font-semibold text-text-muted">
                       {t('label_duty_day')}:
                     </span>
                     <select
@@ -451,7 +451,7 @@ export function MasterGuruAddModal(props: {
 
               {/* Access Level Selector */}
               <div>
-                <label className="text-text-primary mb-2 block text-xs font-semibold">
+                <label className="mb-2 block text-xs font-semibold text-text-primary">
                   {t('label_access_level_title')}
                 </label>
                 <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
@@ -463,14 +463,14 @@ export function MasterGuruAddModal(props: {
                     className={`cursor-pointer rounded-xl border p-3 text-left transition-all ${
                       accessLevel === 'teacher'
                         ? 'border-pine-deep bg-pine-light ring-2 ring-pine-deep/10'
-                        : 'bg-canvas-base border-border-control hover:bg-slate-100'
+                        : 'border-border-control bg-canvas-base hover:bg-slate-100'
                     }`}
                   >
                     <UserCheck className="mb-1 size-4 text-pine-deep" />
                     <span className="block text-xs font-bold text-pine-deep">
                       {t('access_level_teacher')}
                     </span>
-                    <span className="text-text-muted block text-[10px]">
+                    <span className="block text-[10px] text-text-muted">
                       {t('access_level_teacher_desc')}
                     </span>
                   </button>
@@ -483,14 +483,14 @@ export function MasterGuruAddModal(props: {
                     className={`cursor-pointer rounded-xl border p-3 text-left transition-all ${
                       accessLevel === 'homeroom'
                         ? 'border-pine-deep bg-pine-light ring-2 ring-pine-deep/10'
-                        : 'bg-canvas-base border-border-control hover:bg-slate-100'
+                        : 'border-border-control bg-canvas-base hover:bg-slate-100'
                     }`}
                   >
                     <GraduationCap className="mb-1 size-4 text-pine-deep" />
                     <span className="block text-xs font-bold text-pine-deep">
                       {t('access_level_homeroom')}
                     </span>
-                    <span className="text-text-muted block text-[10px]">
+                    <span className="block text-[10px] text-text-muted">
                       {t('access_level_homeroom_desc')}
                     </span>
                   </button>
@@ -503,14 +503,14 @@ export function MasterGuruAddModal(props: {
                     className={`cursor-pointer rounded-xl border p-3 text-left transition-all ${
                       accessLevel === 'admin'
                         ? 'border-pine-deep bg-pine-light ring-2 ring-pine-deep/10'
-                        : 'bg-canvas-base border-border-control hover:bg-slate-100'
+                        : 'border-border-control bg-canvas-base hover:bg-slate-100'
                     }`}
                   >
                     <Shield className="mb-1 size-4 text-pine-deep" />
                     <span className="block text-xs font-bold text-pine-deep">
                       {t('access_level_admin')}
                     </span>
-                    <span className="text-text-muted block text-[10px]">
+                    <span className="block text-[10px] text-text-muted">
                       {t('access_level_admin_desc')}
                     </span>
                   </button>
@@ -532,11 +532,11 @@ export function MasterGuruAddModal(props: {
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
-                <label className="text-text-primary mb-1 block text-xs font-semibold">
+                <label className="mb-1 block text-xs font-semibold text-text-primary">
                   {t('field_rfid_card_uid_label')}
                 </label>
                 <div className="relative">
-                  <CreditCard className="text-text-muted absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                  <CreditCard className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-text-muted" />
                   <input
                     type="text"
                     value={rfidUid}
@@ -544,7 +544,7 @@ export function MasterGuruAddModal(props: {
                       setRfidUid(e.target.value);
                     }}
                     placeholder="Contoh: A4:9F:32:8B"
-                    className="bg-canvas-base h-10 w-full rounded-xl border border-border-control pr-3 pl-9 font-mono text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                    className="h-10 w-full rounded-xl border border-border-control bg-canvas-base pr-3 pl-9 font-mono text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
                   />
                 </div>
               </div>
@@ -559,7 +559,7 @@ export function MasterGuruAddModal(props: {
                     }}
                     className="mt-0.5 size-4 rounded-md text-pine-deep"
                   />
-                  <span className="text-text-muted text-xs leading-relaxed">
+                  <span className="text-xs leading-relaxed text-text-muted">
                     {t('label_notify_whatsapp_credentials')}
                   </span>
                 </label>
@@ -572,7 +572,7 @@ export function MasterGuruAddModal(props: {
             <button
               type="button"
               onClick={props.onClose}
-              className="text-text-muted cursor-pointer rounded-xl border border-border-control px-4 py-2.5 text-xs font-semibold transition-colors hover:bg-slate-100 sm:text-sm"
+              className="cursor-pointer rounded-xl border border-border-control px-4 py-2.5 text-xs font-semibold text-text-muted transition-colors hover:bg-slate-100 sm:text-sm"
             >
               {t('btn_cancel')}
             </button>

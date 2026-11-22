@@ -21,7 +21,7 @@ export function MasterGuruPiketDrawer(props: {
   }
 
   return (
-    <div className="bg-surface-card mb-8 animate-in rounded-2xl border border-pine-deep/20 p-5 shadow-sm transition-all fade-in slide-in-from-top-2 sm:p-6">
+    <div className="mb-8 animate-in rounded-2xl border border-pine-deep/20 bg-surface-card p-5 shadow-sm transition-all fade-in slide-in-from-top-2 sm:p-6">
       {/* Drawer Header */}
       <div className="flex flex-col justify-between gap-3 border-b border-border-subtle pb-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
@@ -32,7 +32,7 @@ export function MasterGuruPiketDrawer(props: {
             <h2 className="text-base font-bold text-pine-deep sm:text-lg">
               {t('piket_drawer_title')}
             </h2>
-            <div className="text-text-muted mt-0.5 flex flex-wrap items-center gap-2 text-xs">
+            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs text-text-muted">
               <span className="flex items-center gap-1 font-medium">
                 <Clock className="size-3.5 text-amber-600" />
                 {t('piket_operational_time')}
@@ -57,7 +57,7 @@ export function MasterGuruPiketDrawer(props: {
           <button
             type="button"
             onClick={props.onClose}
-            className="text-text-muted hover:text-text-primary cursor-pointer rounded-lg p-1.5 transition-colors hover:bg-slate-100"
+            className="cursor-pointer rounded-lg p-1.5 text-text-muted transition-colors hover:bg-slate-100 hover:text-text-primary"
             aria-label={t('btn_close')}
           >
             <X className="size-5" />
@@ -70,7 +70,7 @@ export function MasterGuruPiketDrawer(props: {
         {props.posts.map((post) => (
           <div
             key={post.id}
-            className="bg-canvas-base/80 flex flex-col justify-between rounded-xl border border-border-control p-4 transition-all hover:border-pine-deep/30"
+            className="flex flex-col justify-between rounded-xl border border-border-control bg-canvas-base/80 p-4 transition-all hover:border-pine-deep/30"
           >
             <div>
               <div className="mb-2 flex items-center justify-between gap-2">
@@ -84,8 +84,8 @@ export function MasterGuruPiketDrawer(props: {
               </div>
 
               <h3 className="text-sm leading-snug font-bold text-pine-deep">{post.name}</h3>
-              <div className="text-text-muted mt-1 flex items-center gap-1 text-xs">
-                <MapPin className="text-text-muted size-3 shrink-0" />
+              <div className="mt-1 flex items-center gap-1 text-xs text-text-muted">
+                <MapPin className="size-3 shrink-0 text-text-muted" />
                 <span>{post.location}</span>
               </div>
             </div>
@@ -96,10 +96,10 @@ export function MasterGuruPiketDrawer(props: {
                   {post.officerInitial}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-text-primary text-xs leading-tight font-semibold">
+                  <span className="text-xs leading-tight font-semibold text-text-primary">
                     {post.officerName}
                   </span>
-                  <span className="text-text-muted flex items-center gap-1 text-[10px]">
+                  <span className="flex items-center gap-1 text-[10px] text-text-muted">
                     <Shield className="size-2.5 text-amber-600" />
                     {post.dutyRole}
                   </span>

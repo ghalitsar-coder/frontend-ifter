@@ -76,14 +76,14 @@ export function MasterGuruAccountStatusModal(props: {
       aria-labelledby="modal-account-status-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-pine-deep/40 p-3 backdrop-blur-md sm:p-6"
     >
-      <div className="bg-surface-card relative my-auto flex max-h-[92vh] w-full max-w-[480px] animate-in flex-col overflow-hidden rounded-3xl border border-border-control shadow-2xl duration-200 zoom-in-95 fade-in">
+      <div className="relative my-auto flex max-h-[92vh] w-full max-w-[480px] animate-in flex-col overflow-hidden rounded-3xl border border-border-control bg-surface-card shadow-2xl duration-200 zoom-in-95 fade-in">
         <div className="h-1.5 w-full bg-gradient-to-r from-pine-deep via-amber-gold to-pine-deep" />
         <div className="px-6 pt-6 pb-6 sm:px-8">
           <button
             type="button"
             onClick={props.onClose}
             aria-label="Tutup"
-            className="hover:bg-surface-container text-text-muted absolute top-5 right-5 flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-container-low transition-colors hover:text-pine-deep"
+            className="absolute top-5 right-5 flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-pine-deep"
           >
             <X className="size-4" />
           </button>
@@ -100,16 +100,16 @@ export function MasterGuruAccountStatusModal(props: {
             )}
           </div>
 
-          <h2 id="modal-account-status-title" className="text-text-primary text-lg font-bold">
+          <h2 id="modal-account-status-title" className="text-lg font-bold text-text-primary">
             {isDeactivating ? 'Nonaktifkan akun login' : 'Aktifkan akun login'}
           </h2>
-          <p className="text-text-muted mt-0.5 text-xs">
+          <p className="mt-0.5 text-xs text-text-muted">
             {props.teacherName} · @{props.username} · saat ini{' '}
             {accountStatusLabel(props.currentStatus)}
           </p>
 
           <div className="mt-4 flex flex-col gap-3">
-            <p className="text-text-muted text-xs">
+            <p className="text-xs text-text-muted">
               {isDeactivating
                 ? 'Akun tidak dapat masuk lagi dan seluruh sesi/refresh token dicabut. Data guru, kelas wali, dan jadwal piket tetap utuh.'
                 : 'Akun dapat masuk kembali memakai kredensial yang ada. Tidak ada token baru yang dibuat.'}
@@ -123,7 +123,7 @@ export function MasterGuruAccountStatusModal(props: {
               <button
                 type="button"
                 onClick={props.onClose}
-                className="text-text-muted cursor-pointer rounded-lg border border-border-control px-3 py-2 text-xs font-semibold transition-colors hover:bg-surface-container-low hover:text-pine-deep"
+                className="cursor-pointer rounded-lg border border-border-control px-3 py-2 text-xs font-semibold text-text-muted transition-colors hover:bg-surface-container-low hover:text-pine-deep"
               >
                 Batal
               </button>

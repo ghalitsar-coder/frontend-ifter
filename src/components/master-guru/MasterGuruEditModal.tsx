@@ -65,7 +65,7 @@ export function MasterGuruEditModal(props: {
       aria-labelledby="modal-edit-guru-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-slate-900/60 p-3 backdrop-blur-xs sm:p-4"
     >
-      <div className="bg-surface-card relative my-6 w-full max-w-xl overflow-hidden rounded-2xl border border-border-control shadow-2xl">
+      <div className="relative my-6 w-full max-w-xl overflow-hidden rounded-2xl border border-border-control bg-surface-card shadow-2xl">
         {/* Modal Header */}
         <div className="flex items-center justify-between bg-pine-deep px-6 py-4.5 text-white">
           <div className="flex items-center gap-3">
@@ -100,7 +100,7 @@ export function MasterGuruEditModal(props: {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="text-text-primary mb-1 block text-xs font-semibold">
+              <label className="mb-1 block text-xs font-semibold text-text-primary">
                 {t('field_full_name_degree_label')} *
               </label>
               <input
@@ -111,12 +111,12 @@ export function MasterGuruEditModal(props: {
                   setName(e.target.value);
                 }}
                 placeholder="Contoh: Drs. Agus Subagyo, M.Pd."
-                className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
               />
             </div>
 
             <div>
-              <label className="text-text-primary mb-1 block text-xs font-semibold">
+              <label className="mb-1 block text-xs font-semibold text-text-primary">
                 {t('field_nip_label')}
               </label>
               <input
@@ -126,14 +126,14 @@ export function MasterGuruEditModal(props: {
                   setNip(e.target.value);
                 }}
                 placeholder="19780412 200501 1 003"
-                className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
               />
             </div>
 
             <div>
               <label
                 htmlFor="edit-employment-type"
-                className="text-text-primary mb-1 block text-xs font-semibold"
+                className="mb-1 block text-xs font-semibold text-text-primary"
               >
                 Jenis Kepegawaian
               </label>
@@ -143,7 +143,7 @@ export function MasterGuruEditModal(props: {
                 onChange={(e) => {
                   setEmploymentTypeId(e.target.value);
                 }}
-                className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
               >
                 <option value="">Belum ditentukan</option>
                 {props.employmentTypes
@@ -157,7 +157,7 @@ export function MasterGuruEditModal(props: {
             </div>
 
             <div>
-              <label className="text-text-primary mb-1 block text-xs font-semibold">
+              <label className="mb-1 block text-xs font-semibold text-text-primary">
                 {t('field_email_workspace_label')} *
               </label>
               <input
@@ -168,12 +168,12 @@ export function MasterGuruEditModal(props: {
                   setEmail(e.target.value);
                 }}
                 placeholder="nama.guru@sekolah.sch.id"
-                className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
               />
             </div>
 
             <div>
-              <label className="text-text-primary mb-1 block text-xs font-semibold">
+              <label className="mb-1 block text-xs font-semibold text-text-primary">
                 {t('field_phone_whatsapp_label')} *
               </label>
               <input
@@ -184,7 +184,7 @@ export function MasterGuruEditModal(props: {
                   setPhone(e.target.value);
                 }}
                 placeholder="+62 812-XXXX-XXXX"
-                className="bg-canvas-base h-10 w-full rounded-xl border border-border-control px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+                className="h-10 w-full rounded-xl border border-border-control bg-canvas-base px-3 text-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
               />
             </div>
           </div>
@@ -194,7 +194,7 @@ export function MasterGuruEditModal(props: {
             <button
               type="button"
               onClick={props.onClose}
-              className="text-text-muted cursor-pointer rounded-xl border border-border-control px-4 py-2.5 text-xs font-semibold transition-colors hover:bg-slate-100 sm:text-sm"
+              className="cursor-pointer rounded-xl border border-border-control px-4 py-2.5 text-xs font-semibold text-text-muted transition-colors hover:bg-slate-100 sm:text-sm"
             >
               {t('btn_cancel')}
             </button>

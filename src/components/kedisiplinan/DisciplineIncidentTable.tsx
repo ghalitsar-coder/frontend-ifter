@@ -106,7 +106,7 @@ function StatusBadge(props: { status: IncidentDisplayStatus }) {
   }
 
   return (
-    <span className="bg-surface-container inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
+    <span className="inline-flex items-center gap-1 rounded-full bg-surface-container px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
       <CheckCircle className="size-3 text-pine-deep" />
       Selesai
     </span>
@@ -243,7 +243,7 @@ export function DisciplineIncidentTable(props: {
                     {/* Pencatat */}
                     <td className="px-4 py-3.5 whitespace-nowrap">
                       <div className="font-medium">{incident.recorderName}</div>
-                      <span className="bg-surface-container rounded px-1.5 py-0.5 text-[10px] text-muted-foreground">
+                      <span className="rounded bg-surface-container px-1.5 py-0.5 text-[10px] text-muted-foreground">
                         {incident.recorderRole}
                       </span>
                     </td>
@@ -262,7 +262,7 @@ export function DisciplineIncidentTable(props: {
                           <span>{incident.studentTotalPoints} / 100</span>
                           <span>{incident.studentPointStatus}</span>
                         </div>
-                        <div className="bg-surface-container h-1.5 w-full overflow-hidden rounded-full">
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container">
                           <div
                             className={`h-1.5 rounded-full ${barColor}`}
                             style={{

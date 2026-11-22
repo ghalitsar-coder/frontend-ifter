@@ -39,15 +39,15 @@ export function MasterGuruHeader(props: {
             <span className="text-[11px] font-bold tracking-wider text-amber-700 uppercase">
               {t('academic_cycle_badge')}
             </span>
-            <span className="text-text-muted text-xs">/</span>
-            <span className="text-text-muted text-[11px] font-semibold tracking-wider uppercase">
+            <span className="text-xs text-text-muted">/</span>
+            <span className="text-[11px] font-semibold tracking-wider text-text-muted uppercase">
               {t('module_code_badge')}
             </span>
           </div>
           <h1 className="text-2xl font-extrabold tracking-tight text-pine-deep sm:text-3xl lg:text-4xl">
             {t('page_title')}
           </h1>
-          <p className="text-text-muted text-sm leading-relaxed">
+          <p className="text-sm leading-relaxed text-text-muted">
             {t('page_subtitle', { total: props.totalCount })}
           </p>
         </div>
@@ -60,7 +60,7 @@ export function MasterGuruHeader(props: {
             className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition-all sm:text-sm ${
               props.isPiketDrawerOpen
                 ? 'border-pine-deep bg-pine-deep text-white shadow-sm'
-                : 'bg-surface-card border-border-control text-pine-deep hover:bg-pine-light'
+                : 'border-border-control bg-surface-card text-pine-deep hover:bg-pine-light'
             }`}
           >
             <CalendarDays className="size-4" />
@@ -70,7 +70,7 @@ export function MasterGuruHeader(props: {
           <button
             type="button"
             onClick={props.onOpenImportModal}
-            className="bg-surface-card inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2.5 text-xs font-semibold text-pine-deep shadow-xs transition-all hover:bg-pine-light sm:text-sm"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border-control bg-surface-card px-3.5 py-2.5 text-xs font-semibold text-pine-deep shadow-xs transition-all hover:bg-pine-light sm:text-sm"
           >
             <Upload className="size-4 text-pine-deep" />
             <span>{t('btn_import_excel')}</span>
@@ -79,7 +79,7 @@ export function MasterGuruHeader(props: {
           <button
             type="button"
             onClick={props.onExport}
-            className="bg-surface-card inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2.5 text-xs font-semibold text-pine-deep shadow-xs transition-all hover:bg-pine-light sm:text-sm"
+            className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border-control bg-surface-card px-3.5 py-2.5 text-xs font-semibold text-pine-deep shadow-xs transition-all hover:bg-pine-light sm:text-sm"
           >
             <Download className="size-4" />
             <span>{t('btn_export_excel')}</span>
@@ -127,10 +127,10 @@ export function MasterGuruHeader(props: {
         </div>
 
         {/* Bento 2: Homeroom Class Distribution */}
-        <div className="bg-surface-card flex flex-col justify-between rounded-2xl border border-border-control p-5 shadow-xs md:col-span-4">
+        <div className="flex flex-col justify-between rounded-2xl border border-border-control bg-surface-card p-5 shadow-xs md:col-span-4">
           <div>
             <div className="mb-3 flex items-center justify-between">
-              <span className="text-text-muted text-[11px] font-bold tracking-wider uppercase">
+              <span className="text-[11px] font-bold tracking-wider text-text-muted uppercase">
                 {t('metric_homeroom_distribution_title')}
               </span>
               <div className="flex size-7 items-center justify-center rounded-lg bg-pine-light text-pine-deep">
@@ -141,9 +141,9 @@ export function MasterGuruHeader(props: {
               <span className="text-3xl font-extrabold tracking-tight text-pine-deep sm:text-4xl">
                 {props.homeroomCount} / {props.totalRombels}
               </span>
-              <span className="text-text-muted text-sm font-medium">{t('unit_rombel')}</span>
+              <span className="text-sm font-medium text-text-muted">{t('unit_rombel')}</span>
             </div>
-            <p className="text-text-muted text-xs leading-relaxed">
+            <p className="text-xs leading-relaxed text-text-muted">
               {t('metric_homeroom_distribution_desc')}
             </p>
           </div>

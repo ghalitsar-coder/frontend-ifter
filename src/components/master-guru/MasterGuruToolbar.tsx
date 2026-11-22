@@ -39,7 +39,7 @@ export function MasterGuruToolbar(props: {
           className={`cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all sm:text-sm ${
             props.selectedRole === 'all'
               ? 'bg-pine-deep text-white shadow-xs'
-              : 'bg-surface-card text-text-muted hover:text-text-primary border border-border-control hover:bg-slate-100'
+              : 'border border-border-control bg-surface-card text-text-muted hover:bg-slate-100 hover:text-text-primary'
           }`}
         >
           {t('role_tab_all', { count: props.totalTeachers })}
@@ -53,7 +53,7 @@ export function MasterGuruToolbar(props: {
           className={`cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all sm:text-sm ${
             props.selectedRole === 'homeroom'
               ? 'bg-pine-deep text-white shadow-xs'
-              : 'bg-surface-card text-text-muted hover:text-text-primary border border-border-control hover:bg-slate-100'
+              : 'border border-border-control bg-surface-card text-text-muted hover:bg-slate-100 hover:text-text-primary'
           }`}
         >
           {t('role_tab_homeroom', { count: props.homeroomCount })}
@@ -67,7 +67,7 @@ export function MasterGuruToolbar(props: {
           className={`cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all sm:text-sm ${
             props.selectedRole === 'picket'
               ? 'bg-pine-deep text-white shadow-xs'
-              : 'bg-surface-card text-text-muted hover:text-text-primary border border-border-control hover:bg-slate-100'
+              : 'border border-border-control bg-surface-card text-text-muted hover:bg-slate-100 hover:text-text-primary'
           }`}
         >
           {t('role_tab_picket', { count: props.picketCount })}
@@ -81,7 +81,7 @@ export function MasterGuruToolbar(props: {
           className={`cursor-pointer rounded-xl px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all sm:text-sm ${
             props.selectedRole === 'admin'
               ? 'bg-pine-deep text-white shadow-xs'
-              : 'bg-surface-card text-text-muted hover:text-text-primary border border-border-control hover:bg-slate-100'
+              : 'border border-border-control bg-surface-card text-text-muted hover:bg-slate-100 hover:text-text-primary'
           }`}
         >
           {t('role_tab_admin', { count: props.adminCount })}
@@ -92,7 +92,7 @@ export function MasterGuruToolbar(props: {
       <div className="flex flex-wrap items-center gap-3">
         {/* Search Input */}
         <div className="relative flex-1 sm:w-72 lg:w-80">
-          <Search className="text-text-muted pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2" />
+          <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-text-muted" />
           <input
             type="text"
             value={props.searchQuery}
@@ -100,7 +100,7 @@ export function MasterGuruToolbar(props: {
               props.onSearchChange(e.target.value);
             }}
             placeholder={t('search_placeholder')}
-            className="bg-surface-card text-text-primary placeholder:text-text-muted h-10 w-full rounded-xl border border-border-control pr-10 pl-10 text-xs shadow-xs transition-all focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+            className="h-10 w-full rounded-xl border border-border-control bg-surface-card pr-10 pl-10 text-xs text-text-primary shadow-xs transition-all placeholder:text-text-muted focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           />
           {props.searchQuery && (
             <button
@@ -108,7 +108,7 @@ export function MasterGuruToolbar(props: {
               onClick={() => {
                 props.onSearchChange('');
               }}
-              className="text-text-muted hover:text-text-primary absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer p-1"
+              className="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer p-1 text-text-muted hover:text-text-primary"
               aria-label={t('btn_clear_search')}
             >
               <X className="size-4" />
@@ -124,7 +124,7 @@ export function MasterGuruToolbar(props: {
             onChange={(e) => {
               props.onEmploymentTypeIdChange(e.target.value);
             }}
-            className="bg-surface-card text-text-primary h-10 cursor-pointer appearance-none rounded-xl border border-border-control pr-8 pl-3.5 text-xs font-medium shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
+            className="h-10 cursor-pointer appearance-none rounded-xl border border-border-control bg-surface-card pr-8 pl-3.5 text-xs font-medium text-text-primary shadow-xs focus:ring-2 focus:ring-pine-deep/20 focus:outline-none sm:text-sm"
           >
             <option value="">{t('status_filter_all')}</option>
             {props.employmentTypes
@@ -135,7 +135,7 @@ export function MasterGuruToolbar(props: {
                 </option>
               ))}
           </select>
-          <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
+          <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-text-muted" />
         </div>
 
         {/* Reset filter button */}

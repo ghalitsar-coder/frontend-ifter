@@ -111,12 +111,12 @@ export function MasterSiswaMutationModal(props: {
       aria-labelledby="modal-mutation-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-pine-deep/60 p-3 backdrop-blur-md sm:p-6"
     >
-      <div className="bg-surface-card relative flex max-h-[92vh] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl shadow-2xl duration-200 zoom-in-95 fade-in">
+      <div className="relative flex max-h-[92vh] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-3xl bg-surface-card shadow-2xl duration-200 zoom-in-95 fade-in">
         {/* Top Accent Gradient */}
         <div className="h-1.5 w-full bg-gradient-to-r from-pine-deep via-amber-gold to-pine-deep" />
 
         {/* Modal Header */}
-        <div className="bg-surface-card border-b border-border-control px-6 pt-6 pb-4 sm:px-8">
+        <div className="border-b border-border-control bg-surface-card px-6 pt-6 pb-4 sm:px-8">
           <div className="flex items-start justify-between gap-4">
             <div className="flex flex-col gap-1.5">
               <span className="inline-flex items-center gap-1.5 self-start rounded-full bg-amber-surface px-3 py-0.5 text-xs font-semibold text-amber-dark">
@@ -129,7 +129,7 @@ export function MasterSiswaMutationModal(props: {
               >
                 {t('mutation_modal_title')}
               </h2>
-              <p className="text-text-muted max-w-2xl text-xs leading-relaxed sm:text-sm">
+              <p className="max-w-2xl text-xs leading-relaxed text-text-muted sm:text-sm">
                 {t('mutation_modal_desc')}
               </p>
             </div>
@@ -137,7 +137,7 @@ export function MasterSiswaMutationModal(props: {
               type="button"
               onClick={props.onClose}
               aria-label={t('btn_close')}
-              className="hover:bg-surface-container text-text-muted hover:text-text-primary flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low transition-colors"
+              className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary"
             >
               <X className="size-4" />
             </button>
@@ -145,7 +145,7 @@ export function MasterSiswaMutationModal(props: {
         </div>
 
         {/* Scrollable Body */}
-        <div className="bg-canvas-base max-h-[calc(90vh-180px)] space-y-6 overflow-y-auto px-6 py-6 sm:px-8">
+        <div className="max-h-[calc(90vh-180px)] space-y-6 overflow-y-auto bg-canvas-base px-6 py-6 sm:px-8">
           {/* Section 1: Selected Students Review */}
           <section className="space-y-3 rounded-2xl border border-pine-deep/10 bg-pine-light/40 p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -157,7 +157,7 @@ export function MasterSiswaMutationModal(props: {
                   {t('mutation_selected_students_title', { count: selectedCount })}
                 </h3>
               </div>
-              <span className="bg-surface-card rounded-lg border border-border-control px-2.5 py-1 text-xs font-semibold text-pine-deep">
+              <span className="rounded-lg border border-border-control bg-surface-card px-2.5 py-1 text-xs font-semibold text-pine-deep">
                 {t('mutation_source_rombel_label', { name: sourceClassName })}
               </span>
             </div>
@@ -166,7 +166,7 @@ export function MasterSiswaMutationModal(props: {
               {props.selectedStudents.map((std) => (
                 <div
                   key={std.id}
-                  className="bg-surface-card flex items-center gap-2.5 rounded-xl border border-border-control p-3 shadow-xs"
+                  className="flex items-center gap-2.5 rounded-xl border border-border-control bg-surface-card p-3 shadow-xs"
                 >
                   <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-pine-deep/10 text-xs font-bold text-pine-deep">
                     {std.name
@@ -176,10 +176,10 @@ export function MasterSiswaMutationModal(props: {
                       .join('')}
                   </div>
                   <div className="flex min-w-0 flex-col">
-                    <span className="text-text-primary truncate text-xs font-bold sm:text-sm">
+                    <span className="truncate text-xs font-bold text-text-primary sm:text-sm">
                       {std.name}
                     </span>
-                    <span className="text-text-muted font-mono text-[11px]">NIS: {std.nis}</span>
+                    <span className="font-mono text-[11px] text-text-muted">NIS: {std.nis}</span>
                     <span className="text-[10px] font-semibold text-amber-dark">
                       {std.className} • Absen #{std.absentNumber}
                     </span>
@@ -196,25 +196,25 @@ export function MasterSiswaMutationModal(props: {
                 <span className="flex size-6 items-center justify-center rounded-full bg-pine-deep text-xs font-bold text-white">
                   1
                 </span>
-                <h4 className="text-text-primary text-sm font-bold">
+                <h4 className="text-sm font-bold text-text-primary">
                   {t('mutation_step_1_title')}
                 </h4>
               </div>
-              <span className="text-text-muted text-xs">{t('mutation_step_1_capacity_info')}</span>
+              <span className="text-xs text-text-muted">{t('mutation_step_1_capacity_info')}</span>
             </div>
 
             {/* Capacity Visualizer */}
             <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-border-control bg-surface-container-low p-4 md:flex-row">
               <div className="flex items-center gap-3">
-                <div className="bg-surface-card flex items-center gap-2.5 rounded-xl border border-border-control p-2">
-                  <span className="text-text-muted flex size-8 items-center justify-center rounded-lg bg-surface-container-high text-xs font-bold">
+                <div className="flex items-center gap-2.5 rounded-xl border border-border-control bg-surface-card p-2">
+                  <span className="flex size-8 items-center justify-center rounded-lg bg-surface-container-high text-xs font-bold text-text-muted">
                     {sourceGrade.slice(0, 2)}
                   </span>
                   <div>
-                    <span className="text-text-muted block text-[10px] font-bold uppercase">
+                    <span className="block text-[10px] font-bold text-text-muted uppercase">
                       {t('mutation_source_label')}
                     </span>
-                    <span className="text-text-primary text-xs font-bold sm:text-sm">
+                    <span className="text-xs font-bold text-text-primary sm:text-sm">
                       {sourceClassName}
                     </span>
                   </div>
@@ -223,14 +223,14 @@ export function MasterSiswaMutationModal(props: {
                   <span className="text-text-muted">{t('mutation_running_capacity')}</span>
                   <div className="flex items-center gap-1 font-bold text-pine-deep">
                     <span>{sourceCount}</span>
-                    <ArrowRight className="text-text-muted size-3" />
+                    <ArrowRight className="size-3 text-text-muted" />
                     <span>{Math.max(0, sourceCount - selectedCount)} Siswa</span>
                     <span className="text-[11px] text-amber-700">(-{selectedCount})</span>
                   </div>
                 </div>
               </div>
 
-              <div className="text-text-muted bg-surface-card flex items-center gap-1 rounded-xl border border-border-control px-3 py-1.5 text-xs">
+              <div className="flex items-center gap-1 rounded-xl border border-border-control bg-surface-card px-3 py-1.5 text-xs text-text-muted">
                 <HelpCircle className="size-3.5 text-amber-dark" />
                 <span>{t('mutation_quota_requirement', { count: selectedCount })}</span>
               </div>
@@ -252,16 +252,16 @@ export function MasterSiswaMutationModal(props: {
                         className="flex cursor-not-allowed flex-col justify-between rounded-2xl border border-border-control bg-surface-container-low p-4 opacity-60"
                       >
                         <div className="mb-2 flex items-start justify-between">
-                          <span className="text-text-muted text-xs font-bold">{rombel.name}</span>
+                          <span className="text-xs font-bold text-text-muted">{rombel.name}</span>
                           <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-800">
                             Sisa {remainingQuota}
                           </span>
                         </div>
-                        <p className="text-text-muted text-[11px]">
+                        <p className="text-[11px] text-text-muted">
                           Wali: {rombel.homeroomTeacher}
                         </p>
                         <div className="mt-3">
-                          <div className="bg-surface-container h-1.5 w-full overflow-hidden rounded-full">
+                          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container">
                             <div className="h-full w-[96%] bg-rose-500" />
                           </div>
                           <span className="mt-1 block text-right text-[10px] font-semibold text-rose-700">
@@ -282,7 +282,7 @@ export function MasterSiswaMutationModal(props: {
                       className={`flex cursor-pointer flex-col justify-between rounded-2xl border p-4 text-left transition-all ${
                         isSelected
                           ? 'border-amber-gold bg-amber-surface/70 shadow-xs ring-2 ring-amber-gold'
-                          : 'bg-surface-card border-border-control hover:bg-pine-light/30'
+                          : 'border-border-control bg-surface-card hover:bg-pine-light/30'
                       }`}
                     >
                       <div className="mb-2 flex items-start justify-between">
@@ -295,7 +295,7 @@ export function MasterSiswaMutationModal(props: {
                           </span>
                         )}
                       </div>
-                      <p className="text-text-muted mb-2 text-[11px]">
+                      <p className="mb-2 text-[11px] text-text-muted">
                         Wali: {rombel.homeroomTeacher}
                       </p>
                       <div className="mt-auto">
@@ -305,7 +305,7 @@ export function MasterSiswaMutationModal(props: {
                           </span>
                           <span className="text-pine-deep">Sisa {remainingQuota} Kuota</span>
                         </div>
-                        <div className="bg-surface-container h-1.5 w-full overflow-hidden rounded-full">
+                        <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface-container">
                           <div
                             className="h-full rounded-full bg-pine-deep"
                             style={{
@@ -326,7 +326,7 @@ export function MasterSiswaMutationModal(props: {
               <span className="flex size-6 items-center justify-center rounded-full bg-pine-deep text-xs font-bold text-white">
                 2
               </span>
-              <h4 className="text-text-primary text-sm font-bold">{t('mutation_step_2_title')}</h4>
+              <h4 className="text-sm font-bold text-text-primary">{t('mutation_step_2_title')}</h4>
             </div>
 
             <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
@@ -361,7 +361,7 @@ export function MasterSiswaMutationModal(props: {
                   className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 text-left transition-colors ${
                     reason === item.id
                       ? 'border-amber-gold bg-amber-surface/70 ring-1 ring-amber-gold'
-                      : 'bg-surface-card border-border-control hover:bg-pine-light/30'
+                      : 'border-border-control bg-surface-card hover:bg-pine-light/30'
                   }`}
                 >
                   <span
@@ -377,7 +377,7 @@ export function MasterSiswaMutationModal(props: {
                     <span className="block text-xs font-bold text-pine-deep sm:text-sm">
                       {item.title}
                     </span>
-                    <span className="text-text-muted mt-0.5 block text-[11px] leading-relaxed">
+                    <span className="mt-0.5 block text-[11px] leading-relaxed text-text-muted">
                       {item.desc}
                     </span>
                   </div>
@@ -386,10 +386,10 @@ export function MasterSiswaMutationModal(props: {
             </div>
 
             {/* SK Number input */}
-            <div className="bg-surface-card flex flex-col gap-3 rounded-xl border border-border-control p-3 sm:flex-row sm:items-center">
+            <div className="flex flex-col gap-3 rounded-xl border border-border-control bg-surface-card p-3 sm:flex-row sm:items-center">
               <label
                 htmlFor="sk-input"
-                className="text-text-primary text-xs font-semibold whitespace-nowrap"
+                className="text-xs font-semibold whitespace-nowrap text-text-primary"
               >
                 {t('mutation_sk_number_label')}
               </label>
@@ -412,12 +412,12 @@ export function MasterSiswaMutationModal(props: {
               <span className="flex size-6 items-center justify-center rounded-full bg-pine-deep text-xs font-bold text-white">
                 3
               </span>
-              <h4 className="text-text-primary text-sm font-bold">
+              <h4 className="text-sm font-bold text-text-primary">
                 {t('mutation_step_3_title', { target: targetRombel?.name ?? '-' })}
               </h4>
             </div>
 
-            <div className="bg-surface-card overflow-hidden rounded-2xl border border-border-control shadow-xs">
+            <div className="overflow-hidden rounded-2xl border border-border-control bg-surface-card shadow-xs">
               <div className="flex items-center bg-pine-light/60 px-4 py-2.5 text-xs font-bold tracking-wider text-pine-deep uppercase">
                 <span className="w-24">NIS</span>
                 <span className="flex-1">Nama Siswa</span>
@@ -434,11 +434,11 @@ export function MasterSiswaMutationModal(props: {
                       key={std.id}
                       className="flex items-center px-4 py-3 text-xs font-medium sm:text-sm"
                     >
-                      <span className="text-text-muted w-24 font-mono text-xs">{std.nis}</span>
-                      <span className="text-text-primary flex-1 truncate font-bold">
+                      <span className="w-24 font-mono text-xs text-text-muted">{std.nis}</span>
+                      <span className="flex-1 truncate font-bold text-text-primary">
                         {std.name}
                       </span>
-                      <span className="text-text-muted w-28 text-center font-mono text-xs">
+                      <span className="w-28 text-center font-mono text-xs text-text-muted">
                         #{std.absentNumber} ({sourceClassName})
                       </span>
                       <span className="w-8 text-center text-amber-dark">
@@ -480,7 +480,7 @@ export function MasterSiswaMutationModal(props: {
         </div>
 
         {/* Footer Actions */}
-        <div className="bg-surface-card flex shrink-0 flex-col items-center justify-between gap-3 border-t border-border-control px-6 py-4 sm:flex-row sm:px-8">
+        <div className="flex shrink-0 flex-col items-center justify-between gap-3 border-t border-border-control bg-surface-card px-6 py-4 sm:flex-row sm:px-8">
           <label className="flex cursor-pointer items-center gap-2 select-none">
             <input
               type="checkbox"
@@ -490,7 +490,7 @@ export function MasterSiswaMutationModal(props: {
               }}
               className="size-4 cursor-pointer rounded border-border-control accent-pine-deep"
             />
-            <span className="text-text-primary text-xs font-semibold">
+            <span className="text-xs font-semibold text-text-primary">
               {t('mutation_notify_whatsapp_label')}
             </span>
           </label>
@@ -499,7 +499,7 @@ export function MasterSiswaMutationModal(props: {
             <button
               type="button"
               onClick={props.onClose}
-              className="hover:bg-surface-container text-text-muted hover:text-text-primary h-10 cursor-pointer rounded-xl bg-surface-container-low px-4 text-xs font-semibold transition-colors sm:text-sm"
+              className="h-10 cursor-pointer rounded-xl bg-surface-container-low px-4 text-xs font-semibold text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary sm:text-sm"
             >
               {t('btn_cancel')}
             </button>

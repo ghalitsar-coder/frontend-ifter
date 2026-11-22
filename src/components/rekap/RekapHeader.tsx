@@ -23,19 +23,19 @@ export function RekapHeader(props: {
   const t = useTranslations('RekapPage');
 
   return (
-    <section className="bg-surface-card flex flex-col items-start justify-between gap-6 rounded-2xl p-6 shadow-xs xl:flex-row xl:items-center">
+    <section className="flex flex-col items-start justify-between gap-6 rounded-2xl bg-surface-card p-6 shadow-xs xl:flex-row xl:items-center">
       <div className="max-w-2xl space-y-1.5">
         <div className="flex items-center gap-2">
-          <span className="font-caption inline-flex items-center gap-1.5 rounded-full bg-pine-light px-3 py-0.5 text-xs font-semibold text-pine-deep">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-pine-light px-3 py-0.5 font-caption text-xs font-semibold text-pine-deep">
             <Calendar className="size-3.5 text-pine-deep" />
             {t('badge_module')}
           </span>
-          <span className="font-caption text-text-muted text-xs">{t('badge_sync')}</span>
+          <span className="font-caption text-xs text-text-muted">{t('badge_sync')}</span>
         </div>
-        <h1 className="text-text-primary text-xl font-bold tracking-tight sm:text-2xl">
+        <h1 className="text-xl font-bold tracking-tight text-text-primary sm:text-2xl">
           {t('title')}
         </h1>
-        <p className="font-body-md text-text-muted text-xs leading-relaxed sm:text-sm">
+        <p className="font-body-md text-xs leading-relaxed text-text-muted sm:text-sm">
           {t('subtitle')}
         </p>
       </div>
@@ -44,13 +44,13 @@ export function RekapHeader(props: {
         {/* Dropdown Kelas */}
         <div className="relative min-w-[240px] flex-1 sm:flex-initial">
           <label
-            className="font-caption text-text-muted mb-1 block text-[11px] font-semibold tracking-wider uppercase"
+            className="mb-1 block font-caption text-[11px] font-semibold tracking-wider text-text-muted uppercase"
             htmlFor="select-rekap-class"
           >
             {t('select_class_label')}
           </label>
           <select
-            className="bg-canvas-base text-text-primary focus:bg-surface-card h-11 w-full cursor-pointer appearance-none rounded-xl px-3.5 pr-8 text-xs font-medium shadow-inner transition-all focus:ring-2 focus:ring-pine-deep/15 focus:outline-none"
+            className="h-11 w-full cursor-pointer appearance-none rounded-xl bg-canvas-base px-3.5 pr-8 text-xs font-medium text-text-primary shadow-inner transition-all focus:bg-surface-card focus:ring-2 focus:ring-pine-deep/15 focus:outline-none"
             id="select-rekap-class"
             value={props.selectedClassId}
             onChange={(e) => {
@@ -70,13 +70,13 @@ export function RekapHeader(props: {
         {/* Dropdown Periode */}
         <div className="relative min-w-[200px] flex-1 sm:flex-initial">
           <label
-            className="font-caption text-text-muted mb-1 block text-[11px] font-semibold tracking-wider uppercase"
+            className="mb-1 block font-caption text-[11px] font-semibold tracking-wider text-text-muted uppercase"
             htmlFor="select-rekap-period"
           >
             {t('select_period_label')}
           </label>
           <select
-            className="bg-canvas-base text-text-primary focus:bg-surface-card h-11 w-full cursor-pointer appearance-none rounded-xl px-3.5 pr-8 text-xs font-medium shadow-inner transition-all focus:ring-2 focus:ring-pine-deep/15 focus:outline-none"
+            className="h-11 w-full cursor-pointer appearance-none rounded-xl bg-canvas-base px-3.5 pr-8 text-xs font-medium text-text-primary shadow-inner transition-all focus:bg-surface-card focus:ring-2 focus:ring-pine-deep/15 focus:outline-none"
             id="select-rekap-period"
             value={props.selectedPeriod}
             onChange={(e) => {
@@ -94,7 +94,7 @@ export function RekapHeader(props: {
         {/* Action Buttons */}
         <div className="flex w-full items-center gap-2 pt-2 sm:w-auto sm:pt-4">
           <button
-            className="bg-canvas-base inline-flex h-11 items-center gap-2 rounded-xl px-4 text-xs font-semibold text-pine-deep shadow-xs transition-all hover:bg-pine-light active:scale-95"
+            className="inline-flex h-11 items-center gap-2 rounded-xl bg-canvas-base px-4 text-xs font-semibold text-pine-deep shadow-xs transition-all hover:bg-pine-light active:scale-95"
             id="btn-export-excel"
             title="Download rekap per siswa (XLSX)"
             type="button"
@@ -108,7 +108,7 @@ export function RekapHeader(props: {
 
           <button
             aria-label="Unduh laporan absensi terkelompok"
-            className="bg-canvas-base inline-flex h-11 w-11 items-center justify-center rounded-xl text-pine-deep shadow-xs transition-all hover:bg-pine-light active:scale-95"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-canvas-base text-pine-deep shadow-xs transition-all hover:bg-pine-light active:scale-95"
             id="btn-export-report"
             title="Unduh laporan absensi terkelompok (XLSX)"
             type="button"
@@ -120,7 +120,7 @@ export function RekapHeader(props: {
           </button>
 
           <button
-            className="text-on-primary inline-flex h-11 items-center gap-2 rounded-xl bg-pine-deep px-4 text-xs font-semibold shadow-sm transition-all hover:bg-pine-hover active:scale-95"
+            className="inline-flex h-11 items-center gap-2 rounded-xl bg-pine-deep px-4 text-xs font-semibold text-on-primary shadow-sm transition-all hover:bg-pine-hover active:scale-95"
             id="btn-send-whatsapp"
             title="Send automated attendance WhatsApp broadcast"
             type="button"
@@ -130,7 +130,7 @@ export function RekapHeader(props: {
           >
             <Send className="size-4 text-amber-gold" />
             <span className="whitespace-nowrap">{t('btn_send_whatsapp')}</span>
-            <span className="font-caption rounded-full bg-amber-gold px-1.5 py-0.5 text-[10px] font-bold text-pine-deep">
+            <span className="rounded-full bg-amber-gold px-1.5 py-0.5 font-caption text-[10px] font-bold text-pine-deep">
               {t('badge_auto')}
             </span>
           </button>

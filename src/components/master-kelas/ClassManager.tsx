@@ -140,7 +140,7 @@ export function ClassManager() {
           <h1 className="text-2xl font-black tracking-tight text-pine-deep sm:text-3xl">
             Manajemen Kelas
           </h1>
-          <p className="text-text-muted text-sm">
+          <p className="text-sm text-text-muted">
             Kelola rombel, tingkat, tahun ajaran, dan penugasan wali kelas.
           </p>
         </div>
@@ -180,7 +180,7 @@ export function ClassManager() {
         onReset={resetFilters}
       />
 
-      <div className="bg-surface-card flex flex-col gap-3 rounded-2xl border border-border-control p-4 shadow-xs sm:p-5">
+      <div className="flex flex-col gap-3 rounded-2xl border border-border-control bg-surface-card p-4 shadow-xs sm:p-5">
         <ClassTable
           entries={entries}
           isLoading={listQuery.isLoading}
@@ -195,7 +195,7 @@ export function ClassManager() {
         />
 
         {total > entries.length && (
-          <span className="text-text-muted text-[11px]">
+          <span className="text-[11px] text-text-muted">
             Hanya 100 kelas pertama yang dimuat. Persempit filter tahun ajaran atau tingkat.
           </span>
         )}

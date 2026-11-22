@@ -34,7 +34,7 @@ export function MasterSiswaHeader(props: {
           <h1 className="text-2xl font-black tracking-tight text-pine-deep sm:text-3xl">
             {t('page_title')}
           </h1>
-          <p className="text-text-muted text-sm">
+          <p className="text-sm text-text-muted">
             {t('page_subtitle', { total: props.totalCount })}
           </p>
         </div>
@@ -45,9 +45,9 @@ export function MasterSiswaHeader(props: {
             <button
               type="button"
               onClick={props.onOpenImportExcel}
-              className="bg-surface-card text-text-primary flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2 text-xs font-semibold shadow-xs transition-colors hover:bg-surface-container-low sm:text-sm"
+              className="flex cursor-pointer items-center gap-2 rounded-xl border border-border-control bg-surface-card px-3.5 py-2 text-xs font-semibold text-text-primary shadow-xs transition-colors hover:bg-surface-container-low sm:text-sm"
             >
-              <Upload className="text-text-muted size-4" />
+              <Upload className="size-4 text-text-muted" />
               {/* shortcut: no locale key for import button in MasterSiswaPage namespace; domain label hard-coded */}
               <span>Import Excel</span>
             </button>
@@ -57,10 +57,10 @@ export function MasterSiswaHeader(props: {
             type="button"
             onClick={props.onExportExcel}
             disabled={props.isExporting === true}
-            className="bg-surface-card text-text-primary flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2 text-xs font-semibold shadow-xs transition-colors hover:bg-surface-container-low disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
+            className="flex cursor-pointer items-center gap-2 rounded-xl border border-border-control bg-surface-card px-3.5 py-2 text-xs font-semibold text-text-primary shadow-xs transition-colors hover:bg-surface-container-low disabled:cursor-not-allowed disabled:opacity-50 sm:text-sm"
           >
             <Download
-              className={`size-4 ${props.isExporting === true ? 'text-text-muted animate-pulse' : 'text-text-muted'}`}
+              className={`size-4 ${props.isExporting === true ? 'animate-pulse text-text-muted' : 'text-text-muted'}`}
             />
             <span>{t('btn_export_excel')}</span>
           </button>
@@ -69,7 +69,7 @@ export function MasterSiswaHeader(props: {
             <button
               type="button"
               onClick={props.onToggleBulkMode}
-              className="bg-surface-card text-text-primary flex cursor-pointer items-center gap-2 rounded-xl border border-border-control px-3.5 py-2 text-xs font-semibold shadow-xs transition-colors hover:bg-surface-container-low sm:text-sm"
+              className="flex cursor-pointer items-center gap-2 rounded-xl border border-border-control bg-surface-card px-3.5 py-2 text-xs font-semibold text-text-primary shadow-xs transition-colors hover:bg-surface-container-low sm:text-sm"
             >
               <Users className="size-4 text-pine-deep" />
               <span>{t('btn_bulk_action')}</span>
@@ -89,19 +89,19 @@ export function MasterSiswaHeader(props: {
 
       {/* 4 Metric Bento Cards */}
       <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-        <div className="bg-surface-card flex flex-col gap-1.5 rounded-2xl border border-border-control p-4 shadow-xs sm:p-5">
-          <div className="text-text-muted flex items-center justify-between text-xs font-medium">
+        <div className="flex flex-col gap-1.5 rounded-2xl border border-border-control bg-surface-card p-4 shadow-xs sm:p-5">
+          <div className="flex items-center justify-between text-xs font-medium text-text-muted">
             <span>{t('metric_total_students')}</span>
             <Users className="size-4 text-pine-deep" />
           </div>
           <p className="text-xl font-black tracking-tight text-pine-deep sm:text-2xl">
             {props.totalCount} {t('unit_student')}
           </p>
-          <span className="text-text-muted text-[11px]">{t('metric_total_students_hint')}</span>
+          <span className="text-[11px] text-text-muted">{t('metric_total_students_hint')}</span>
         </div>
 
-        <div className="bg-surface-card flex flex-col gap-1.5 rounded-2xl border border-border-control p-4 shadow-xs sm:p-5">
-          <div className="text-text-muted flex items-center justify-between text-xs font-medium">
+        <div className="flex flex-col gap-1.5 rounded-2xl border border-border-control bg-surface-card p-4 shadow-xs sm:p-5">
+          <div className="flex items-center justify-between text-xs font-medium text-text-muted">
             <span>{t('metric_male_students')}</span>
             <span className="rounded bg-pine-light px-1.5 py-0.5 text-xs font-bold text-pine-deep">
               L
@@ -110,14 +110,14 @@ export function MasterSiswaHeader(props: {
           <p className="text-xl font-black tracking-tight text-pine-deep sm:text-2xl">
             {props.maleCount} {t('unit_student')}
           </p>
-          <span className="text-text-muted text-[11px]">
+          <span className="text-[11px] text-text-muted">
             {Math.round((props.maleCount / (props.totalCount || 1)) * 100)}%{' '}
             {t('metric_ratio_label')}
           </span>
         </div>
 
-        <div className="bg-surface-card flex flex-col gap-1.5 rounded-2xl border border-border-control p-4 shadow-xs sm:p-5">
-          <div className="text-text-muted flex items-center justify-between text-xs font-medium">
+        <div className="flex flex-col gap-1.5 rounded-2xl border border-border-control bg-surface-card p-4 shadow-xs sm:p-5">
+          <div className="flex items-center justify-between text-xs font-medium text-text-muted">
             <span>{t('metric_female_students')}</span>
             <span className="rounded bg-amber-surface px-1.5 py-0.5 text-xs font-bold text-amber-dark">
               P
@@ -126,14 +126,14 @@ export function MasterSiswaHeader(props: {
           <p className="text-xl font-black tracking-tight text-pine-deep sm:text-2xl">
             {props.femaleCount} {t('unit_student')}
           </p>
-          <span className="text-text-muted text-[11px]">
+          <span className="text-[11px] text-text-muted">
             {Math.round((props.femaleCount / (props.totalCount || 1)) * 100)}%{' '}
             {t('metric_ratio_label')}
           </span>
         </div>
 
-        <div className="bg-surface-card flex flex-col gap-1.5 rounded-2xl border border-border-control p-4 shadow-xs sm:p-5">
-          <div className="text-text-muted flex items-center justify-between text-xs font-medium">
+        <div className="flex flex-col gap-1.5 rounded-2xl border border-border-control bg-surface-card p-4 shadow-xs sm:p-5">
+          <div className="flex items-center justify-between text-xs font-medium text-text-muted">
             <span>{t('metric_rombel_fill')}</span>
             <UserX className="size-4 text-amber-dark" />
           </div>

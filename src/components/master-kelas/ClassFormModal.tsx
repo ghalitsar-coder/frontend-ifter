@@ -112,7 +112,7 @@ export function ClassFormModal(props: {
       aria-labelledby="class-form-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-pine-deep/60 p-3 backdrop-blur-md sm:p-6"
     >
-      <div className="bg-surface-card flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl shadow-2xl">
+      <div className="flex max-h-[92vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl bg-surface-card shadow-2xl">
         <div className="h-1.5 w-full bg-gradient-to-r from-pine-deep via-amber-gold to-pine-deep" />
         <div className="flex items-start justify-between gap-4 border-b border-border-control px-5 py-4 sm:px-6">
           <div className="flex items-start gap-3">
@@ -123,7 +123,7 @@ export function ClassFormModal(props: {
               <h2 id="class-form-title" className="text-lg font-bold text-pine-deep">
                 {isEdit ? 'Edit Kelas' : 'Tambah Kelas'}
               </h2>
-              <p className="text-text-muted text-xs">
+              <p className="text-xs text-text-muted">
                 {isEdit
                   ? 'Perbarui nama, tingkat, dan jurusan kelas.'
                   : 'Buat rombel baru untuk tahun ajaran berjalan.'}
@@ -134,7 +134,7 @@ export function ClassFormModal(props: {
             type="button"
             onClick={props.onClose}
             aria-label="Tutup"
-            className="text-text-muted hover:bg-surface-container hover:text-text-primary flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low transition-colors"
+            className="flex size-9 shrink-0 cursor-pointer items-center justify-center rounded-xl bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-text-primary"
           >
             <X className="size-4" />
           </button>
@@ -145,7 +145,7 @@ export function ClassFormModal(props: {
           className="flex flex-col gap-4 overflow-y-auto px-5 py-5 sm:px-6"
         >
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="class-name" className="text-text-primary text-xs font-semibold">
+            <label htmlFor="class-name" className="text-xs font-semibold text-text-primary">
               Nama Kelas <span className="text-rose-600">*</span>
             </label>
             <input
@@ -158,13 +158,13 @@ export function ClassFormModal(props: {
               maxLength={100}
               placeholder="Contoh: 7A"
               required
-              className="bg-surface-card text-text-primary placeholder:text-text-muted h-10 w-full rounded-xl border border-border-control px-3 text-sm focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+              className="h-10 w-full rounded-xl border border-border-control bg-surface-card px-3 text-sm text-text-primary placeholder:text-text-muted focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
             />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="class-grade" className="text-text-primary text-xs font-semibold">
+              <label htmlFor="class-grade" className="text-xs font-semibold text-text-primary">
                 Tingkat <span className="text-rose-600">*</span>
               </label>
               <select
@@ -173,7 +173,7 @@ export function ClassFormModal(props: {
                 onChange={(event) => {
                   setGradeLevel(Number(event.target.value));
                 }}
-                className="bg-surface-card text-text-primary h-10 w-full cursor-pointer rounded-xl border border-border-control px-3 text-sm focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+                className="h-10 w-full cursor-pointer rounded-xl border border-border-control bg-surface-card px-3 text-sm text-text-primary focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
               >
                 {GRADE_OPTIONS.map((grade) => (
                   <option key={grade} value={grade}>
@@ -184,7 +184,7 @@ export function ClassFormModal(props: {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="class-year" className="text-text-primary text-xs font-semibold">
+              <label htmlFor="class-year" className="text-xs font-semibold text-text-primary">
                 Tahun Ajaran <span className="text-rose-600">*</span>
               </label>
               <select
@@ -194,7 +194,7 @@ export function ClassFormModal(props: {
                   setAcademicYearId(event.target.value);
                 }}
                 disabled={isEdit}
-                className="bg-surface-card text-text-primary h-10 w-full cursor-pointer rounded-xl border border-border-control px-3 text-sm focus:ring-2 focus:ring-pine-deep/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+                className="h-10 w-full cursor-pointer rounded-xl border border-border-control bg-surface-card px-3 text-sm text-text-primary focus:ring-2 focus:ring-pine-deep/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {props.academicYears.length === 0 && !isEdit && (
                   <option value="">Memuat tahun ajaran…</option>
@@ -212,7 +212,7 @@ export function ClassFormModal(props: {
                 ))}
               </select>
               {isEdit && (
-                <span className="text-text-muted text-[11px]">
+                <span className="text-[11px] text-text-muted">
                   Tahun ajaran tidak dapat diubah setelah kelas dibuat.
                 </span>
               )}
@@ -220,8 +220,8 @@ export function ClassFormModal(props: {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="class-major" className="text-text-primary text-xs font-semibold">
-              Jurusan <span className="text-text-muted font-normal">(opsional)</span>
+            <label htmlFor="class-major" className="text-xs font-semibold text-text-primary">
+              Jurusan <span className="font-normal text-text-muted">(opsional)</span>
             </label>
             <input
               id="class-major"
@@ -232,7 +232,7 @@ export function ClassFormModal(props: {
               }}
               maxLength={100}
               placeholder="Contoh: IPA / IPS"
-              className="bg-surface-card text-text-primary placeholder:text-text-muted h-10 w-full rounded-xl border border-border-control px-3 text-sm focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
+              className="h-10 w-full rounded-xl border border-border-control bg-surface-card px-3 text-sm text-text-primary placeholder:text-text-muted focus:ring-2 focus:ring-pine-deep/20 focus:outline-none"
             />
           </div>
 
@@ -249,7 +249,7 @@ export function ClassFormModal(props: {
             <button
               type="button"
               onClick={props.onClose}
-              className="text-text-primary bg-surface-card cursor-pointer rounded-xl border border-border-control px-4 py-2 text-sm font-semibold transition-colors hover:bg-surface-container-low"
+              className="cursor-pointer rounded-xl border border-border-control bg-surface-card px-4 py-2 text-sm font-semibold text-text-primary transition-colors hover:bg-surface-container-low"
             >
               Batal
             </button>

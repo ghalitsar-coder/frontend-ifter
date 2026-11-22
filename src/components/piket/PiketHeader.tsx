@@ -16,33 +16,33 @@ export function PiketHeader(props: {
   const t = useTranslations('PiketPage');
 
   return (
-    <div className="text-on-primary relative overflow-hidden rounded-2xl bg-pine-deep p-6 shadow-xl">
+    <div className="relative overflow-hidden rounded-2xl bg-pine-deep p-6 text-on-primary shadow-xl">
       <div className="pointer-events-none absolute -top-16 -right-16 size-64 rounded-full bg-pine-hover/40 blur-3xl" />
       <div className="pointer-events-none absolute right-1/4 -bottom-20 size-48 rounded-full bg-amber-gold/10 blur-2xl" />
 
       <div className="relative z-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
         <div className="max-w-3xl space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="font-caption inline-flex items-center gap-1.5 rounded-full bg-amber-gold px-3 py-1 text-xs font-bold tracking-wide text-pine-deep uppercase">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-gold px-3 py-1 font-caption text-xs font-bold tracking-wide text-pine-deep uppercase">
               <span className="size-2 animate-ping rounded-full bg-pine-deep" />
               {t('shift_active')}
             </span>
             <span className="text-tertiary-fixed-dim">•</span>
-            <span className="font-caption text-tertiary-fixed-dim inline-flex items-center gap-1 text-xs">
+            <span className="inline-flex items-center gap-1 font-caption text-xs text-tertiary-fixed-dim">
               <ShieldCheck className="size-4" />
               {t('on_duty_officers')}
             </span>
             <span className="text-tertiary-fixed-dim">•</span>
-            <span className="font-caption text-tertiary-fixed-dim inline-flex items-center gap-1 text-xs">
+            <span className="inline-flex items-center gap-1 font-caption text-xs text-tertiary-fixed-dim">
               <DoorOpen className="size-4" />
               {t('gate_name')}
             </span>
           </div>
 
-          <h1 className="text-on-primary text-2xl font-bold tracking-tight sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight text-on-primary sm:text-3xl">
             {t('page_title')}
           </h1>
-          <p className="text-tertiary-fixed-dim max-w-2xl text-sm leading-relaxed">
+          <p className="max-w-2xl text-sm leading-relaxed text-tertiary-fixed-dim">
             {t('page_subtitle')}
           </p>
         </div>
@@ -61,7 +61,7 @@ export function PiketHeader(props: {
           <button
             className={`flex h-11 items-center gap-2 rounded-xl px-5 text-sm font-semibold shadow-xs transition-all duration-150 ${
               props.shiftInfo.isGateOpen
-                ? 'bg-surface-card hover:bg-canvas-base text-pine-deep'
+                ? 'bg-surface-card text-pine-deep hover:bg-canvas-base'
                 : 'bg-red-600 text-white hover:bg-red-700'
             }`}
             id="btn-gate-toggle"
@@ -70,7 +70,7 @@ export function PiketHeader(props: {
           >
             {props.shiftInfo.isGateOpen ? (
               <>
-                <DoorClosed className="text-error size-5" />
+                <DoorClosed className="size-5 text-error" />
                 <span>{t('btn_close_gate')}</span>
               </>
             ) : (
@@ -82,7 +82,7 @@ export function PiketHeader(props: {
           </button>
 
           <button
-            className="hover:bg-amber-hover flex h-11 items-center gap-2 rounded-xl bg-amber-gold px-5 text-sm font-bold text-pine-deep shadow-md transition-all duration-150"
+            className="flex h-11 items-center gap-2 rounded-xl bg-amber-gold px-5 text-sm font-bold text-pine-deep shadow-md transition-all duration-150 hover:bg-amber-hover"
             id="btn-alert-bell"
             type="button"
             onClick={props.onRingBell}

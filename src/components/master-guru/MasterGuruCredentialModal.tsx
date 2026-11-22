@@ -50,22 +50,22 @@ export function MasterGuruCredentialModal(props: {
       aria-labelledby="modal-credential-reset-title"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-pine-deep/40 p-3 backdrop-blur-md sm:p-6"
     >
-      <div className="bg-surface-card relative my-auto flex max-h-[92vh] w-full max-w-[460px] animate-in flex-col overflow-hidden rounded-3xl border border-border-control shadow-2xl duration-200 zoom-in-95 fade-in">
+      <div className="relative my-auto flex max-h-[92vh] w-full max-w-[460px] animate-in flex-col overflow-hidden rounded-3xl border border-border-control bg-surface-card shadow-2xl duration-200 zoom-in-95 fade-in">
         <div className="h-1.5 w-full bg-gradient-to-r from-pine-deep via-amber-gold to-pine-deep" />
         <div className="px-6 pt-6 pb-6 sm:px-8">
           <button
             type="button"
             onClick={props.onClose}
             aria-label="Tutup"
-            className="hover:bg-surface-container text-text-muted absolute top-5 right-5 flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-container-low transition-colors hover:text-pine-deep"
+            className="absolute top-5 right-5 flex size-8 cursor-pointer items-center justify-center rounded-full bg-surface-container-low text-text-muted transition-colors hover:bg-surface-container hover:text-pine-deep"
           >
             <X className="size-4" />
           </button>
 
-          <h2 id="modal-credential-reset-title" className="text-text-primary text-lg font-bold">
+          <h2 id="modal-credential-reset-title" className="text-lg font-bold text-text-primary">
             Reset password — {props.teacherName}
           </h2>
-          <p className="text-text-muted mt-0.5 text-xs">
+          <p className="mt-0.5 text-xs text-text-muted">
             Akun @{props.username} · hanya admin yang dapat membuat token ini
           </p>
 
@@ -77,7 +77,7 @@ export function MasterGuruCredentialModal(props: {
                 handleIssue();
               }}
             >
-              <p className="text-text-muted text-xs">
+              <p className="text-xs text-text-muted">
                 Token ini menggantikan token reset sebelumnya. Bagikan ke yang bersangkutan untuk
                 dipakai di halaman Aktivasi Akun (password minimal 12 karakter).
               </p>
@@ -92,9 +92,9 @@ export function MasterGuruCredentialModal(props: {
             </form>
           ) : (
             <div className="mt-4 rounded-2xl border border-amber-gold/50 bg-amber-gold/10 p-4">
-              <p className="text-text-primary text-sm font-semibold">Token reset (satu kali)</p>
+              <p className="text-sm font-semibold text-text-primary">Token reset (satu kali)</p>
               {expiresAt !== null && (
-                <p className="text-text-muted mt-1 text-xs">Berlaku sampai {expiresAt}</p>
+                <p className="mt-1 text-xs text-text-muted">Berlaku sampai {expiresAt}</p>
               )}
               <div className="mt-2 flex items-center gap-2">
                 <input

@@ -40,7 +40,7 @@ function FilterSelect(props: {
       >
         {props.children}
       </select>
-      <ChevronDown className="text-text-muted pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2" />
+      <ChevronDown className="pointer-events-none absolute top-1/2 right-2.5 size-3.5 -translate-y-1/2 text-text-muted" />
     </div>
   );
 }
@@ -76,7 +76,7 @@ export function ClassToolbar(props: {
   onReset: () => void;
 }) {
   return (
-    <div className="bg-surface-card flex flex-col gap-3 rounded-2xl border border-border-control p-4 shadow-xs sm:p-5">
+    <div className="flex flex-col gap-3 rounded-2xl border border-border-control bg-surface-card p-4 shadow-xs sm:p-5">
       <div className="flex flex-wrap items-center gap-2.5">
         <FilterSelect
           value={props.yearFilter}
@@ -121,14 +121,14 @@ export function ClassToolbar(props: {
           <button
             type="button"
             onClick={props.onReset}
-            className="text-text-muted hover:text-text-primary flex cursor-pointer items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold transition-colors"
+            className="flex cursor-pointer items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-text-muted transition-colors hover:text-text-primary"
           >
             <RefreshCw className="size-3.5" />
             Reset filter
           </button>
         )}
 
-        <span className="text-text-muted ml-auto text-xs">
+        <span className="ml-auto text-xs text-text-muted">
           Menampilkan {props.shownCount} dari {props.total} kelas
         </span>
       </div>

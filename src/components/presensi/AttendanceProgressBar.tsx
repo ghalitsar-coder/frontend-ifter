@@ -35,7 +35,7 @@ export function AttendanceProgressBar(props: {
             </span>
           </div>
           <span className="text-sm font-bold text-foreground">
-            {verifiedRate}% {t('verified_percentage').replace(/^\d+(\.\d+)?%\s*/u, '')}
+            {t('verified_percentage', { rate: verifiedRate })}
           </span>
         </div>
 
@@ -64,8 +64,7 @@ export function AttendanceProgressBar(props: {
         </div>
 
         <span className="text-xs text-muted-foreground">
-          {validCount} dari {props.total}{' '}
-          {t('verified_caption').replace(/^\d+\s*dari\s*\d+\s*/iu, '')}
+          {t('verified_caption', { valid: validCount, total: props.total })}
         </span>
       </div>
 
