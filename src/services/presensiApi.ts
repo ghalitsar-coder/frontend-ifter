@@ -278,6 +278,15 @@ export async function recordAttendances(
 }
 
 /**
+ * Load the school's active or next scheduled staff QR session.
+ *
+ * @returns The open session, or null when every session has ended.
+ */
+export async function getActiveStaffQrSession(): Promise<StaffQrSession | null> {
+  return requireData(await requestEnvelope<StaffQrSession | null>('v1/staff/qr-sessions/active'));
+}
+
+/**
  * Create a TU managed QR session for staff check-in or check-out.
  *
  * @param input - Attendance date, session type and time window.

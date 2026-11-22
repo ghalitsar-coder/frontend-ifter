@@ -1,10 +1,18 @@
 import './src/libs/Env';
+import { networkInterfaces } from 'node:os';
 import { withSentryConfig } from '@sentry/nextjs';
 import type { NextConfig } from 'next';
 import createNextIntlPlugin from 'next-intl/plugin';
 
 // Define the base Next.js configuration
 const baseConfig: NextConfig = {
+  // Allow this computer's LAN addresses so mobile browsers can load the dev runtime.
+  allowedDevOrigins: Object.values(networkInterfaces()).flatMap(
+    (addresses) =>
+      addresses
+        ?.filter((address) => address.family === 'IPv4' && !address.internal)
+        .map((address) => address.address) ?? [],
+  ),
   devIndicators: {
     position: 'bottom-right',
   },

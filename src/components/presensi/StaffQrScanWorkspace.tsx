@@ -4,6 +4,8 @@ import type { IScannerControls } from '@zxing/browser';
 import { useTranslations } from 'next-intl';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { MaterialIcon } from '@/components/landing/MaterialIcon';
+import { Button } from '@/components/ui/button';
+import { Link } from '@/libs/I18nNavigation';
 import { PresensiApiError, scanStaffQr } from '@/services/presensiApi';
 import type { StaffQrScanResult } from '@/services/presensiApi';
 
@@ -71,16 +73,21 @@ function cameraErrorKey(error: unknown): CameraErrorKey {
 }
 
 function formatScanTime(value: string): string {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat('id-ID', {
     dateStyle: 'medium',
     timeStyle: 'short',
+    timeZone: 'Asia/Jakarta',
   }).format(new Date(value));
 }
 
-/** Scan a TU-issued staff attendance QR and display the backend result. */
+/**
+ * Scan a TU-issued staff attendance QR and display the backend result.
+ * @returns Camera and image scanner with attendance confirmation.
+ */
 export function StaffQrScanWorkspace() {
   const t = useTranslations('StaffQrScanPage');
   const videoRef = useRef<HTMLVideoElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
   const scanHandledRef = useRef(false);
   const [scanning, setScanning] = useState(false);
@@ -89,20 +96,40 @@ export function StaffQrScanWorkspace() {
   const [scanError, setScanError] = useState('');
   const [result, setResult] = useState<StaffQrScanResult | null>(null);
 
-  const submitScanPayload = useEffectEvent((payload: string) => {
+  const submitPayload = async (payload: string) => {
     setSubmitting(true);
     setScanError('');
-    void scanStaffQr(payload)
+    setResult(null);
+    await scanStaffQr(payload)
       .then(setResult)
-      .catch((error: unknown) => setScanError(t(scanErrorKey(error))))
-      .finally(() => setSubmitting(false));
-  });
+      .catch((error: unknown) => {
+        const messages = {
+          error_already_scanned: t('error_already_scanned'),
+          error_check_in_required: t('error_check_in_required'),
+          error_forbidden: t('error_forbidden'),
+          error_generic: t('error_generic'),
+          error_invalid_qr: t('error_invalid_qr'),
+          error_not_found: t('error_not_found'),
+          error_outside_window: t('error_outside_window'),
+          error_session_closed: t('error_session_closed'),
+          error_unauthorized: t('error_unauthorized'),
+        };
+        setScanError(messages[scanErrorKey(error)]);
+      })
+      .finally(() => {
+        setSubmitting(false);
+      });
+  };
+
+  const submitScanPayload = useEffectEvent(submitPayload);
 
   useEffect(() => {
     const preview = videoRef.current;
 
     if (!scanning || preview === null) {
-      return undefined;
+      return () => {
+        controlsRef.current?.stop();
+      };
     }
 
     let disposed = false;
@@ -112,13 +139,13 @@ export function StaffQrScanWorkspace() {
       try {
         const { BrowserQRCodeReader } = await import('@zxing/browser');
 
-        if (disposed || videoRef.current === null) {
+        if (disposed || preview === null) {
           return;
         }
 
         const reader = new BrowserQRCodeReader();
-        const activeControls = await reader.decodeFromVideoDevice(
-          undefined,
+        const activeControls = await reader.decodeFromConstraints(
+          { audio: false, video: { facingMode: { ideal: 'environment' } } },
           preview,
           (decoded, _error, callbackControls) => {
             if (decoded === undefined || scanHandledRef.current) {
@@ -129,7 +156,7 @@ export function StaffQrScanWorkspace() {
             callbackControls.stop();
             controlsRef.current = null;
             setScanning(false);
-            submitScanPayload(decoded.getText());
+            void submitScanPayload(decoded.getText());
           },
         );
 
@@ -141,7 +168,12 @@ export function StaffQrScanWorkspace() {
         controlsRef.current = controls;
       } catch (error) {
         if (!disposed) {
-          setCameraError(t(cameraErrorKey(error)));
+          const messages = {
+            camera_denied: t('camera_denied'),
+            camera_missing: t('camera_missing'),
+            camera_unavailable: t('camera_unavailable'),
+          };
+          setCameraError(messages[cameraErrorKey(error)]);
           setScanning(false);
         }
       }
@@ -171,20 +203,39 @@ export function StaffQrScanWorkspace() {
     setScanning(false);
   };
 
-  const resultStatus =
-    result === null
-      ? null
-      : result.status === 'hadir'
-        ? t('status_present')
-        : result.status === 'terlambat'
-          ? t('status_late')
-          : t('status_checkout');
-  const resultType =
-    result === null
-      ? null
-      : (result.tipe_sesi === 'masuk'
-        ? t('type_check_in')
-        : t('type_check_out'));
+  const scanImage = async (file: File) => {
+    stopScan();
+    setResult(null);
+    setCameraError('');
+    setScanError('');
+    if (!file.type.startsWith('image/') || file.size > 10 * 1024 * 1024) {
+      setScanError(t('image_invalid'));
+      return;
+    }
+    setSubmitting(true);
+    const imageUrl = URL.createObjectURL(file);
+    try {
+      const { BrowserQRCodeReader } = await import('@zxing/browser');
+      const decoded = await new BrowserQRCodeReader().decodeFromImageUrl(imageUrl);
+      await submitPayload(decoded.getText());
+    } catch {
+      setScanError(t('image_unreadable'));
+    } finally {
+      URL.revokeObjectURL(imageUrl);
+      setSubmitting(false);
+    }
+  };
+
+  const statusLabels = {
+    hadir: t('status_present'),
+    terlambat: t('status_late'),
+    pulang: t('status_checkout'),
+  };
+  const sessionLabels = { masuk: t('type_check_in'), pulang: t('type_check_out') };
+  let scanLabel = result === null ? t('start_camera') : t('scan_again');
+  if (submitting) {
+    scanLabel = t('sending');
+  }
 
   return (
     <section className="mx-auto w-full max-w-5xl space-y-6">
@@ -197,7 +248,10 @@ export function StaffQrScanWorkspace() {
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(300px,0.9fr)]">
-        <div className="rounded-2xl border border-border-subtle bg-surface-card p-5 shadow-sm sm:p-6">
+        <div
+          aria-busy={submitting}
+          className="rounded-2xl border border-border-subtle bg-surface-card p-5 shadow-sm sm:p-6"
+        >
           <div className="mb-4 flex items-start justify-between gap-4">
             <div>
               <h2 className="font-headline-sm text-xl font-bold text-text-primary">
@@ -253,11 +307,19 @@ export function StaffQrScanWorkspace() {
               {scanError}
             </p>
           ) : null}
+          {scanError === t('error_unauthorized') ? (
+            <Link
+              className="mt-3 inline-block text-sm font-semibold text-pine-deep underline"
+              href="/sign-in"
+            >
+              {t('sign_in')}
+            </Link>
+          ) : null}
 
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             {scanning ? (
               <button
-                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-border-control px-4 text-sm font-semibold text-text-primary hover:bg-pine-light"
+                className="flex h-12 items-center justify-center gap-2 rounded-xl border border-border-control px-4 text-sm font-semibold text-text-primary hover:bg-pine-light sm:flex-1"
                 onClick={stopScan}
                 type="button"
               >
@@ -265,16 +327,42 @@ export function StaffQrScanWorkspace() {
               </button>
             ) : (
               <button
-                className="flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-pine-deep px-4 text-sm font-bold text-on-primary transition-colors hover:bg-pine-hover disabled:opacity-60"
+                className="flex h-12 items-center justify-center gap-2 rounded-xl bg-pine-deep px-4 text-sm font-bold text-on-primary transition-colors hover:bg-pine-hover disabled:opacity-60 sm:flex-1"
                 disabled={submitting}
                 onClick={startScan}
                 type="button"
               >
-                <MaterialIcon name="qr_code_scanner" />{' '}
-                {submitting ? t('sending') : (result ? t('scan_again') : t('start_camera'))}
+                <MaterialIcon name="qr_code_scanner" /> {scanLabel}
               </button>
             )}
           </div>
+          <input
+            accept="image/*"
+            aria-label={t('upload_image')}
+            disabled={submitting || scanning}
+            hidden
+            id="attendance-qr-image"
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+              if (file !== undefined) {
+                void scanImage(file);
+              }
+            }}
+            ref={imageInputRef}
+            type="file"
+          />
+          <Button
+            className="mt-3 h-12 w-full border-border-control text-pine-deep"
+            disabled={submitting || scanning}
+            onClick={() => {
+              imageInputRef.current?.click();
+            }}
+            variant="outline"
+          >
+            <MaterialIcon name="upload_file" /> {t('upload_image')}
+          </Button>
+          <p className="mt-3 text-xs text-text-muted">{t('image_hint')}</p>
           <p className="mt-3 text-xs text-text-muted">{t('secure_context_hint')}</p>
         </div>
 
@@ -287,13 +375,15 @@ export function StaffQrScanWorkspace() {
                 </span>
                 <div>
                   <p className="font-label-md text-sm font-bold">{t('success_title')}</p>
-                  <p className="text-sm">{resultStatus}</p>
+                  <p className="text-sm">{statusLabels[result.status]}</p>
                 </div>
               </div>
               <dl className="space-y-3 text-sm">
                 <div className="flex justify-between gap-4 border-b border-border-subtle pb-3">
                   <dt className="text-text-muted">{t('session_type')}</dt>
-                  <dd className="font-semibold text-text-primary">{resultType}</dd>
+                  <dd className="font-semibold text-text-primary">
+                    {sessionLabels[result.tipe_sesi]}
+                  </dd>
                 </div>
                 <div className="flex justify-between gap-4 border-b border-border-subtle pb-3">
                   <dt className="text-text-muted">{t('attendance_date')}</dt>

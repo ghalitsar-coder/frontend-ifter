@@ -15,6 +15,7 @@ export type NavBadgeTone =
 export type NavItem = {
   icon: string;
   label: string;
+  labelKey?: 'nav_teacher_attendance';
   href?: string;
 
   badge?: { label: string; tone: NavBadgeTone; box?: boolean };
@@ -140,11 +141,11 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
       {
         title: 'Presensi Pribadi',
         items: [
-          { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
           {
-            icon: 'fingerprint',
-            label: 'Presensi Mandiri Guru',
-            badge: { label: '06:48 WIB', tone: 'present', box: true },
+            icon: 'qr_code_scanner',
+            label: '',
+            labelKey: 'nav_teacher_attendance',
+            href: '/dashboard/absen',
           },
         ],
       },
@@ -222,7 +223,7 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
         title: 'Layanan Administrasi',
         items: [
           { icon: 'receipt_long', label: 'Dashboard Layanan TU', href: '/dashboard?role=tu' },
-          { icon: 'summarize', label: 'Rekap Bulanan & Verifikasi', href: '/dashboard/rekap?role=tu' },
+          { icon: 'summarize', label: 'Rekap Absensi Siswa', href: '/dashboard/rekap' },
           { icon: 'qr_code_2', label: 'Presensi Guru dengan QR', href: '/dashboard/qr' },
           { icon: 'qr_code_scanner', label: 'Scan QR Kehadiran', href: '/dashboard/scan-qr' },
           {

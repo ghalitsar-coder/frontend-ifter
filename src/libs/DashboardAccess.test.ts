@@ -29,6 +29,14 @@ describe(decodeBackendToken, () => {
     expect(decodeBackendToken('not-a-jwt')).toBeNull();
   });
 
+  it('rejects primitive JWT claims', () => {
+    for (const claims of [null, true, 12, 'guru']) {
+      expect(
+        decodeBackendToken(`${encodeSegment({ alg: 'HS256' })}.${encodeSegment(claims)}.signature`),
+      ).toBeNull();
+    }
+  });
+
   it('drops non-string role entries', () => {
     const token = makeToken({ roles: ['guru', 7, null] });
 
@@ -37,6 +45,18 @@ describe(decodeBackendToken, () => {
 });
 
 describe(isAllowedPage, () => {
+  it('admits teachers and administrators to personal attendance', () => {
+    expect(isAllowedPage(['guru'], 'absen')).toBeTruthy();
+    expect(isAllowedPage(['admin'], 'absen')).toBeTruthy();
+    expect(isAllowedPage(['school_admin'], 'absen')).toBeTruthy();
+  });
+
+  it('denies other roles access to teacher attendance', () => {
+    for (const roles of [[], ['tu'], ['kesiswaan'], ['kepala_sekolah']]) {
+      expect(isAllowedPage(roles, 'absen')).toBeFalsy();
+    }
+  });
+
   it('allows kesiswaan only on kedisiplinan and guru on presensi', () => {
     expect(isAllowedPage(['guru'], 'presensi')).toBeTruthy();
     expect(isAllowedPage(['kesiswaan'], 'kedisiplinan')).toBeTruthy();

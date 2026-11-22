@@ -13,9 +13,15 @@ import { AUTH_QUERY_KEY, signIn } from '@/services/presensiApi';
 
 const TAB_CLASSES = {
   active:
-    'flex flex-1 cursor-pointer items-center justify-center gap-space-xs rounded-lg bg-surface-card px-space-md py-2.5 font-label-md text-label-md font-semibold text-pine-deep shadow-sm transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/40',
-  idle: 'flex flex-1 cursor-pointer items-center justify-center gap-space-xs rounded-lg px-space-md py-2.5 font-label-md text-label-md font-medium text-text-muted transition-all duration-200 hover:text-text-primary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/40',
+    'flex min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg bg-surface-card px-2 py-2.5 font-label-md text-label-md font-semibold text-pine-deep shadow-sm transition-all duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/40 sm:flex-row sm:gap-space-xs sm:px-space-md',
+  idle: 'flex min-w-0 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg px-2 py-2.5 font-label-md text-label-md font-medium text-text-muted transition-all duration-200 hover:text-text-primary active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/40 sm:flex-row sm:gap-space-xs sm:px-space-md',
 } as const;
+
+const ROLE_ICONS: Record<PresensiLoginRole, string> = {
+  teacher: 'school',
+  kesiswaan: 'gavel',
+  admin: 'shield',
+};
 
 /**
  * Scandinavian credential form of the login screen: the role switcher decides which identity the
@@ -36,6 +42,11 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
   const [pending, setPending] = useState(false);
   const [errorKey, setErrorKey] = useState<PresensiErrorKey | null>(null);
   const field = LOGIN_ROLE_FIELDS[role];
+  const roleLabels = {
+    teacher: t('login_role_teacher'),
+    kesiswaan: t('login_role_kesiswaan'),
+    admin: t('login_role_admin'),
+  };
 
   async function handleSubmit(event: React.SyntheticEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -74,7 +85,7 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
 
         <div
           aria-label={t('login_role_group')}
-          className="mb-space-lg flex items-center gap-1 rounded-xl bg-surface-container p-1"
+          className="mb-space-lg grid grid-cols-3 items-stretch gap-1 rounded-xl bg-surface-container p-1"
           role="tablist"
         >
           {(['teacher', 'kesiswaan', 'admin'] as const).map((tab) => (
@@ -89,15 +100,15 @@ export function PresensiLoginForm(props: { onRfidTap: () => void }) {
               role="tab"
               type="button"
             >
-              <span className="material-symbols-outlined text-[18px]">
-                {tab === 'teacher' ? 'school' : tab === 'kesiswaan' ? 'gavel' : 'shield'}
+              <span aria-hidden className="material-symbols-outlined text-[18px]">
+                {ROLE_ICONS[tab]}
               </span>
-                <span>{tab === 'teacher' ? t('login_role_teacher') : tab === 'kesiswaan' ? t('login_role_kesiswaan') : t('login_role_admin')}</span>
+              <span>{roleLabels[tab]}</span>
             </button>
           ))}
         </div>
 
-        <form className="space-y-space-md" id="login-form" onSubmit={handleSubmit}>
+        <form className="space-y-space-md" id="login-form" method="post" onSubmit={handleSubmit}>
           <div>
             <label
               className="mb-1.5 block font-label-md text-label-md font-medium text-text-primary"
