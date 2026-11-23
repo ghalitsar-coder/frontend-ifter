@@ -76,31 +76,39 @@ export function isAllowedPage(roles: string[], page: string): boolean {
 }
 
 /**
- * Choose the first dashboard destination that matches the signed-in staff role.
+ * Selects the workspace used by the sidebar and the sign-in redirect.
  *
- * @param roles - Roles from the signed-in backend account.
- * @returns The role-specific dashboard URL.
+ * @param roles - Roles from the signed-in account.
+ * @returns The preferred workspace, or undefined for an unrecognized role.
  */
-export function dashboardHrefForRoles(roles: string[]): string {
-  if (roles.includes('kesiswaan')) {
-    return '/dashboard/kedisiplinan?role=kesiswaan';
-  }
-
-  if (roles.includes('tu')) {
-    return '/dashboard/qr?role=tu';
-  }
-
-  if (roles.includes('guru')) {
-    return '/dashboard/presensi?role=guru';
+export function dashboardRoleForRoles(roles: string[]) {
+  for (const role of ['kesiswaan', 'tu', 'guru'] as const) {
+    if (roles.includes(role)) {
+      return role;
+    }
   }
 
   if (roles.some((role) => role.includes('admin'))) {
-    return '/dashboard/presensi';
+    return 'admin';
   }
 
-  if (roles.includes('kepala_sekolah')) {
-    return '/dashboard?role=kepsek';
-  }
+  return roles.includes('kepala_sekolah') || roles.includes('kepsek') ? 'kepsek' : undefined;
+}
 
-  return '/dashboard';
+/**
+ * Selects the landing page for the signed-in account.
+ *
+ * @param roles - Roles from the signed-in account.
+ * @returns The role-specific dashboard URL.
+ */
+export function dashboardHrefForRoles(roles: string[]): string {
+  const role = dashboardRoleForRoles(roles);
+  const destinations = {
+    admin: '/dashboard/presensi',
+    guru: '/dashboard/presensi?role=guru',
+    kepsek: '/dashboard?role=kepsek',
+    kesiswaan: '/dashboard/kedisiplinan?role=kesiswaan',
+    tu: '/dashboard/qr?role=tu',
+  };
+  return role === undefined ? '/dashboard' : destinations[role];
 }

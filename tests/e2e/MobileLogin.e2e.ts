@@ -38,6 +38,7 @@ test.describe('Mobile login over the local network', () => {
       roles: ['guru'],
       destination: '/dashboard/presensi',
       queryRole: 'guru',
+      sidebarLink: 'Dashboard Guru',
     },
     {
       name: 'counseling staff',
@@ -45,6 +46,7 @@ test.describe('Mobile login over the local network', () => {
       roles: ['kesiswaan'],
       destination: '/dashboard/kedisiplinan',
       queryRole: 'kesiswaan',
+      sidebarLink: 'Dashboard Kedisiplinan',
     },
     {
       name: 'school operator',
@@ -52,6 +54,7 @@ test.describe('Mobile login over the local network', () => {
       roles: ['tu'],
       destination: '/dashboard/qr',
       queryRole: 'tu',
+      sidebarLink: 'Dashboard Layanan TU',
     },
     {
       name: 'administrator',
@@ -59,6 +62,7 @@ test.describe('Mobile login over the local network', () => {
       roles: ['admin'],
       destination: '/dashboard/presensi',
       queryRole: null,
+      sidebarLink: 'Dashboard Utama',
     },
   ] as const;
 
@@ -114,6 +118,21 @@ test.describe('Mobile login over the local network', () => {
       const cookie = cookies.find((entry) => entry.name === 'ifter_token');
       expect(cookie?.httpOnly).toBeTruthy();
       expect(new URL(page.url()).searchParams.has('password')).toBeFalsy();
+
+      await page.goto(new URL(account.destination, page.url()).href);
+      await page.getByRole('button', { name: 'Buka navigasi' }).tap();
+      const dashboardLink = page.locator('#app-sidebar').getByRole('link', {
+        name: account.sidebarLink,
+        exact: true,
+      });
+      await expect(dashboardLink).toBeInViewport();
+      if (account.queryRole === 'guru') {
+        await dashboardLink.tap();
+        await expect(page).toHaveURL(/\/dashboard\/presensi\?role=guru$/u);
+        await page.getByRole('button', { name: 'Buka navigasi' }).tap();
+        await expect(dashboardLink).toBeInViewport();
+        await expect(page.locator('#app-sidebar')).not.toContainText('Dashboard Utama');
+      }
     });
   }
 

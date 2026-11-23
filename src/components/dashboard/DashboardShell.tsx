@@ -7,7 +7,7 @@ import { MaterialIcon } from '@/components/landing/MaterialIcon';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link, usePathname } from '@/libs/I18nNavigation';
-import { dashboardRoles, roleConfigs } from './navigation';
+import { roleConfigs } from './navigation';
 import type { DashboardRole, NavBadgeTone, NavItem, RoleCallout } from './navigation';
 import { ProfileMenu } from './ProfileMenu';
 
@@ -21,9 +21,6 @@ const badgeToneClassName: Record<NavBadgeTone, string> = {
   surface: 'bg-amber-surface text-amber-dark',
   present: 'bg-status-present text-pine-deep',
 };
-
-const resolveRole = (value: string | null): DashboardRole =>
-  dashboardRoles.find((role) => role === value) ?? 'admin';
 
 const NavItemRow = (props: {
   item: NavItem;
@@ -150,10 +147,9 @@ const Callout = (props: { callout: RoleCallout }) => {
   );
 };
 
-export const DashboardShell = (props: { children: React.ReactNode }) => {
+export const DashboardShell = (props: { children: React.ReactNode; role: DashboardRole }) => {
   const searchParams = useSearchParams();
-  const role = resolveRole(searchParams.get('role'));
-  const config = roleConfigs[role];
+  const config = roleConfigs[props.role];
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -161,11 +157,10 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
   const effectiveCollapsed = !isMobile && collapsed;
   const pathname = usePathname();
 
-  // The shell rebuilds its nav from ?role=, so every navigation has to carry it.
   const withRole = (href: string) =>
-    role === 'admin' || href.includes('role=')
+    props.role === 'admin' || href.includes('role=')
       ? href
-      : `${href}${href.includes('?') ? '&' : '?'}role=${role}`;
+      : `${href}${href.includes('?') ? '&' : '?'}role=${props.role}`;
   const navHref = (item: NavItem) =>
     withRole(item.href ?? `/dashboard/segera?item=${encodeURIComponent(item.label)}`);
   const isActive = (item: NavItem) =>
@@ -258,7 +253,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
         <ProfileMenu
           align="start"
           config={config}
-          role={role}
+          role={props.role}
           side="top"
           triggerClassName={`flex w-full cursor-pointer items-center gap-2.5 bg-tertiary-container/40 p-3 transition-colors hover:bg-tertiary-container/70 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-gold/60 ${
             effectiveCollapsed ? 'justify-center px-0' : 'justify-start px-3'
@@ -361,7 +356,7 @@ export const DashboardShell = (props: { children: React.ReactNode }) => {
             <ProfileMenu
               align="end"
               config={config}
-              role={role}
+              role={props.role}
               side="bottom"
               triggerClassName="flex cursor-pointer items-center gap-3 rounded-xl py-1 pl-3 transition-colors hover:bg-canvas-base active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/30"
             >

@@ -1,6 +1,4 @@
-export const dashboardRoles = ['admin', 'guru', 'kepsek', 'tu', 'kesiswaan'] as const;
-
-export type DashboardRole = (typeof dashboardRoles)[number];
+export type DashboardRole = 'admin' | 'guru' | 'kepsek' | 'tu' | 'kesiswaan';
 
 export type NavBadgeTone =
   | 'amber'
