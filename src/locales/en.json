@@ -141,7 +141,7 @@
     "date": "Attendance date",
     "opens": "Opens at",
     "closes": "Closes at",
-    "timezone_hint": "Session date and times use Jakarta time (WIB).",
+    "timezone_hint": "Use 24-hour time (HH:mm), for example 06:30 or 15:00. Session date and times use Jakarta time (WIB).",
     "late_after": "Late after",
     "late_hint": "Staff checking in after this time are marked late.",
     "create": "Create QR session",

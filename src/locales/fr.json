@@ -141,7 +141,7 @@
     "date": "Date de présence",
     "opens": "Ouverture",
     "closes": "Fermeture",
-    "timezone_hint": "La date et les heures utilisent l’heure de Jakarta (WIB).",
+    "timezone_hint": "Utilisez le format 24 heures (HH:mm), par exemple 06:30 ou 15:00. La date et les heures utilisent l’heure de Jakarta (WIB).",
     "late_after": "Retard après",
     "late_hint": "Le personnel qui arrive après cette heure sera marqué en retard.",
     "create": "Créer une session QR",

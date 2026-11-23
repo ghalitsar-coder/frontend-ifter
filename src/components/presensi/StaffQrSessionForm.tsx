@@ -88,7 +88,9 @@ export function StaffQrSessionForm(props: {
               setOpenAt(event.target.value);
             }}
             required
-            type="time"
+            pattern="([01][0-9]|2[0-3]):[0-5][0-9]"
+            placeholder="00:00"
+            type="text"
             value={props.session?.jam_buka.slice(0, 5) ?? openAt}
           />
         </label>
@@ -101,7 +103,9 @@ export function StaffQrSessionForm(props: {
               setCloseAt(event.target.value);
             }}
             required
-            type="time"
+            pattern="([01][0-9]|2[0-3]):[0-5][0-9]"
+            placeholder="00:00"
+            type="text"
             value={props.session?.jam_tutup.slice(0, 5) ?? closeAt}
           />
         </label>
@@ -116,7 +120,9 @@ export function StaffQrSessionForm(props: {
             onChange={(event) => {
               setLateAfter(event.target.value);
             }}
-            type="time"
+            pattern="([01][0-9]|2[0-3]):[0-5][0-9]"
+            placeholder="00:00"
+            type="text"
             value={
               props.session === null
                 ? lateAfter

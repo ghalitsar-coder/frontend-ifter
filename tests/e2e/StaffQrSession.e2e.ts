@@ -18,6 +18,7 @@ const session: StaffQrSession = {
 };
 
 test.describe('Staff QR session', () => {
+  test.use({ locale: 'en-US' });
   test.beforeEach(async ({ context, baseURL }) => {
     const header = Buffer.from(JSON.stringify({ alg: 'HS256' })).toString('base64url');
     const claims = Buffer.from(
@@ -31,6 +32,49 @@ test.describe('Staff QR session', () => {
         url: baseURL ?? 'http://localhost:3008',
       },
     ]);
+  });
+
+  test('accepts only 24-hour times when creating a session', async ({ page }) => {
+    await page.route(activePath, async (route) => {
+      await route.fulfill({ json: { data: null } });
+    });
+    let submitted: unknown;
+    await page.route('**/api/backend/v1/staff/qr-sessions', async (route) => {
+      submitted = route.request().postDataJSON();
+      await route.fulfill({ status: 201, json: { data: session } });
+    });
+    await page.route(codePath, async (route) => {
+      await route.fulfill({ status: 409, json: { error: { code: 'outside_window' } } });
+    });
+    await page.goto('/dashboard/qr?role=tu');
+    const opens = page.getByLabel('Opens at', { exact: true });
+    const closes = page.getByLabel('Closes at', { exact: true });
+    const late = page.getByLabel('Late after', { exact: false });
+    await Promise.all(
+      [opens, closes, late].map(async (field) => {
+        await expect(field).toHaveAttribute('type', 'text');
+      }),
+    );
+    await opens.fill('24:00');
+    await page.getByRole('button', { name: 'Create QR session', exact: true }).click();
+    expect(submitted).toBeUndefined();
+    await opens.fill('12:60');
+    await page.getByRole('button', { name: 'Create QR session', exact: true }).click();
+    expect(submitted).toBeUndefined();
+    await opens.fill('07:00 PM');
+    await page.getByRole('button', { name: 'Create QR session', exact: true }).click();
+    expect(submitted).toBeUndefined();
+    await opens.fill('00:00');
+    await closes.fill('23:59');
+    await late.fill('13:05');
+    await page.getByRole('button', { name: 'Create QR session', exact: true }).click();
+    await expect
+      .poll(() => submitted)
+      .toMatchObject({
+        jam_buka: '00:00',
+        jam_tutup: '23:59',
+        batas_terlambat: '13:05',
+      });
   });
 
   for (const width of [390, 1440]) {
@@ -89,8 +133,8 @@ test.describe('Staff QR session', () => {
         'true',
       );
       await expect(page.locator('input[type="date"]')).toHaveValue('2026-11-19');
-      await expect(page.locator('input[type="time"]').nth(0)).toHaveValue('10:15');
-      await expect(page.locator('input[type="time"]').nth(1)).toHaveValue('23:59');
+      await expect(page.getByLabel('Opens at', { exact: true })).toHaveValue('10:15');
+      await expect(page.getByLabel('Closes at', { exact: true })).toHaveValue('23:59');
       await expect(
         page.getByRole('button', { name: 'Create QR session', exact: true }),
       ).toBeDisabled();
