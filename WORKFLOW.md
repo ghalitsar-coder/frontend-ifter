@@ -1,37 +1,37 @@
 # Team & Personal Feature Branching Workflow Guide
 
-Dokumen ini adalah panduan standar alur kerja (*workflow*) Git dan branching untuk pengembang **ghal** (`ghalitsar`) serta panduan bagi **AI Assistant** (Antigravity, Claude Code, Cursor, dll.) dalam mengembangkan fitur di repositori **Frontend** (`frontend-ifter`) maupun **Backend**.
+Dokumen ini adalah panduan alur kerja Git dan branching untuk pengembang dan AI Assistant di repositori frontend dan backend Ifter.
 
 ---
 
 ## 1. Latar Belakang & Tujuan
 - Proyek ini dikerjakan secara kolaboratif oleh tim.
-- Pengembang **ghal** ingin bereksperimen, membangun versi rancangan khusus, atau menyelesaikan fitur prioritas sesuai preferensi terlebih dahulu tanpa mengganggu kestabilan branch tim (`main` / `dev`).
-- Branch khusus dengan prefiks `ghal/` menjamin isolasi penuh dari branch utama tim, sekaligus menjaga riwayat commit tetap rapi dan siap di-*merge* via Pull Request (PR) kapan pun dibutuhkan.
+- Pengembang dapat bereksperimen, membangun versi rancangan khusus, atau menyelesaikan fitur prioritas sesuai preferensi tanpa mengganggu kestabilan branch tim (`main` / `dev`).
+- Branch khusus dengan prefiks `vin/` menjaga riwayat commit tetap rapi dan siap di-*merge* via Pull Request (PR).
 
 ---
 
 ## 2. Aturan Branching (Wajib Dipatuhi AI & Developer)
 
-Setiap pembuatan fitur, perbaikan bug, atau implementasi baru yang diinisiasi oleh user **ghal** **HARUS** dibuat dalam branch baru dengan format berikut:
+Setiap pembuatan fitur, perbaikan bug, atau implementasi baru **HARUS** dibuat dalam branch baru dengan format berikut:
 
 ### Format Penamaan Branch
 ```
-ghal/<type>-<nama-fitur>
+vin/<type>-<nama-fitur>
 ```
 atau
 ```
-ghal/<nama-fitur>
+vin/<nama-fitur>
 ```
 
 ### Prefix & Contoh Penamaan
 | Tipe Tugas | Contoh Branch Frontend | Contoh Branch Backend |
 | :--- | :--- | :--- |
-| **Fitur Baru** | `ghal/feat-presensi-kelas` | `ghal/feat-presensi-api` |
-| **Modul Khusus** | `ghal/feat-kedisiplinan-siswa` | `ghal/feat-student-points` |
-| **Perbaikan Bug** | `ghal/fix-auth-redirect` | `ghal/fix-jwt-middleware` |
-| **Refactoring** | `ghal/refactor-ui-components` | `ghal/refactor-attendance-service` |
-| **Eksperimen / UI** | `ghal/ui-stitch-redesign` | `ghal/poc-websockets` |
+| **Fitur Baru** | `vin/feat-presensi-kelas` | `vin/feat-presensi-api` |
+| **Modul Khusus** | `vin/feat-kedisiplinan-siswa` | `vin/feat-student-points` |
+| **Perbaikan Bug** | `vin/fix-auth-redirect` | `vin/fix-jwt-middleware` |
+| **Refactoring** | `vin/refactor-ui-components` | `vin/refactor-attendance-service` |
+| **Eksperimen / UI** | `vin/ui-stitch-redesign` | `vin/poc-websockets` |
 
 > ⚠️ **Aturan Isolasi AI**: AI **DILARANG** melakukan commit langsung ke branch `main` atau `dev` tim saat mengerjakan fitur baru, kecuali jika user secara eksplisit meminta push ke `main`.
 
@@ -78,7 +78,7 @@ git pull origin main
 
 ### Langkah 2: Buat & Pindah ke Branch Fitur Pribadi
 ```bash
-git checkout -b ghal/<nama-fitur>
+git checkout -b vin/<nama-fitur>
 ```
 
 ### Langkah 3: Implementasi Kode & Test
@@ -107,7 +107,7 @@ git commit -m "feat: <deskripsi perubahan>"
 
 ### Langkah 6: Push ke Remote
 ```bash
-git push -u origin ghal/<nama-fitur>
+git push -u origin vin/<nama-fitur>
 ```
 
 ---
@@ -115,8 +115,8 @@ git push -u origin ghal/<nama-fitur>
 ## 5. Koordinasi Frontend & Backend (2 Repositori)
 
 Karena backend dan frontend dipisah ke 2 repositori berbeda:
-1. Salin file `WORKFLOW.md` ini ke root repositori backend.
+1. Terapkan aturan branch yang sama pada `AGENTS.md` di repositori backend.
 2. Gunakan nama slug fitur yang selaras di kedua repositori:
-   - Frontend: `ghal/feat-presensi`
-   - Backend: `ghal/feat-presensi`
-3. Dengan demikian, ketika ingin menguji integrasi end-to-end, Anda cukup meng-checkout branch `ghal/<fitur>` di kedua folder proyek.
+   - Frontend: `vin/feat-presensi`
+   - Backend: `vin/feat-presensi`
+3. Dengan demikian, ketika ingin menguji integrasi end-to-end, Anda cukup meng-checkout branch `vin/<fitur>` di kedua folder proyek.
