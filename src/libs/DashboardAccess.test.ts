@@ -51,8 +51,12 @@ describe(isAllowedPage, () => {
     expect(isAllowedPage(['school_admin'], 'absen')).toBeTruthy();
   });
 
+  it('admits kesiswaan to personal attendance', () => {
+    expect(isAllowedPage(['kesiswaan'], 'absen')).toBeTruthy();
+  });
+
   it('denies other roles access to teacher attendance', () => {
-    for (const roles of [[], ['tu'], ['kesiswaan'], ['kepala_sekolah']]) {
+    for (const roles of [[], ['tu'], ['kepala_sekolah']]) {
       expect(isAllowedPage(roles, 'absen')).toBeFalsy();
     }
   });

@@ -38,6 +38,63 @@ test.describe('Teacher attendance', () => {
     await expect(page).toHaveURL(/\/dashboard$/u);
   });
 
+  test.describe('Signed-in kesiswaan', () => {
+    test.beforeEach(async ({ context }) => {
+      await context.addCookies([
+        {
+          httpOnly: true,
+          name: 'ifter_token',
+          url: test.info().project.use.baseURL ?? 'http://localhost:3008',
+          value: sessionToken(['kesiswaan']),
+        },
+      ]);
+    });
+
+    for (const width of [390, 1440]) {
+      test(`opens attendance from the sidebar and records a scan at ${width}px`, async ({
+        page,
+      }) => {
+        await page.setViewportSize({ width, height: 900 });
+        let scans = 0;
+        await page.route(scanPath, async (route) => {
+          scans += 1;
+          expect(route.request().postDataJSON()).toStrictEqual({
+            payload: 'ifter-attendance-test-payload',
+          });
+          await route.fulfill({
+            json: {
+              data: {
+                staff_id: 2,
+                status: 'hadir',
+                tanggal: '2026-11-23',
+                tipe_sesi: 'masuk',
+                waktu_scan: '2026-11-23T06:50:00+07:00',
+              },
+            },
+          });
+        });
+        await page.goto('/dashboard/segera?item=Profil');
+        if (width === 390) {
+          await page.getByRole('button', { name: 'Buka navigasi' }).click();
+        }
+        const sidebar = page.locator('#app-sidebar');
+        await expect(
+          sidebar.getByRole('link', { name: 'Dashboard Kedisiplinan', exact: true }),
+        ).toBeInViewport();
+        await sidebar.getByRole('link', { name: 'Absensi QR', exact: true }).click();
+        await expect(page).toHaveURL(/\/dashboard\/absen\?role=kesiswaan$/u);
+        await expect(page.getByRole('heading', { name: 'Scan QR code absensi' })).toBeVisible();
+        await expect(page.getByRole('button', { name: 'Aktifkan kamera' })).toBeEnabled();
+        await page.locator('#attendance-qr-image').setInputFiles(fixture);
+        await expect(page.getByText('Kehadiran berhasil dicatat')).toBeVisible();
+        expect(scans).toBe(1);
+        await page.reload();
+        await expect(page.getByRole('heading', { name: 'Scan QR code absensi' })).toBeVisible();
+        await expect(sidebar).toContainText('Dashboard Kedisiplinan');
+      });
+    }
+  });
+
   test.describe('Signed-in teacher', () => {
     test.beforeEach(async ({ context }) => {
       await context.addCookies([

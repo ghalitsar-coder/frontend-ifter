@@ -32,7 +32,11 @@ const NavItemRow = (props: {
   onNavigate?: () => void;
 }) => {
   const t = useTranslations('StaffQrScanPage');
-  const label = props.item.labelKey === undefined ? props.item.label : t('nav_teacher_attendance');
+  const labels = {
+    nav_teacher_attendance: t('nav_teacher_attendance'),
+    nav_staff_attendance: t('nav_staff_attendance'),
+  };
+  const label = props.item.labelKey === undefined ? props.item.label : labels[props.item.labelKey];
   const rowClassName = `flex items-center rounded-xl py-2 font-label-md text-label-md transition-colors active:scale-[0.99] focus-visible:ring-2 focus-visible:ring-amber-gold/60 focus-visible:outline-none ${
     props.collapsed ? 'justify-center px-0' : 'justify-between px-3'
   } ${

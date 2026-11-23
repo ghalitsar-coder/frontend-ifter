@@ -13,7 +13,7 @@ export type NavBadgeTone =
 export type NavItem = {
   icon: string;
   label: string;
-  labelKey?: 'nav_teacher_attendance';
+  labelKey?: 'nav_teacher_attendance' | 'nav_staff_attendance';
   href?: string;
 
   badge?: { label: string; tone: NavBadgeTone; box?: boolean };
@@ -274,6 +274,12 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
             label: 'Dashboard Kedisiplinan',
             href: '/dashboard/kedisiplinan',
             dot: 'amber',
+          },
+          {
+            icon: 'qr_code_scanner',
+            label: '',
+            labelKey: 'nav_staff_attendance',
+            href: '/dashboard/absen',
           },
           {
             icon: 'checklist_rtl',

@@ -218,7 +218,8 @@
     "image_invalid": "Pilih gambar berukuran maksimal 10 MB.",
     "image_unreadable": "QR belum terbaca. Dekatkan kamera sampai kode terlihat jelas dan keempat sudutnya masuk dalam foto.",
     "sign_in": "Masuk kembali",
-    "nav_teacher_attendance": "Absensi guru"
+    "nav_teacher_attendance": "Absensi guru",
+    "nav_staff_attendance": "Absensi QR"
   },
   "PresensiPage": {
     "meta_title": "Presensi Harian — Kelas VIII A",
