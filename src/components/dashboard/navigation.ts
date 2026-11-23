@@ -299,9 +299,9 @@ export const roleConfigs: Record<DashboardRole, RoleConfig> = {
         items: [
           {
             icon: 'warning',
-            label: 'Siswa Waspada & SP',
+            label: 'Pembinaan & SP',
             href: '/dashboard/kedisiplinan/waspada',
-            badge: { label: '3 Kasus', tone: 'error' },
+            badge: { label: 'Pantau', tone: 'error' },
           },
           {
             icon: 'mark_email_read',

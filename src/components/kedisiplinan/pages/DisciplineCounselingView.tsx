@@ -6,138 +6,64 @@ import {
   Clock,
   HeartHandshake,
   MessageSquare,
+  Pencil,
   PlusCircle,
   Search,
+  Trash2,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from '@/libs/I18nNavigation';
+import {
+  createCounselingRecord,
+  deleteCounselingRecord,
+  DisciplineApiError,
+  fetchCounselingRecords,
+  fetchSchoolStudents,
+  updateCounselingRecord,
+} from '@/services/disciplineApi';
+import type {
+  CounselingRecord,
+  CounselingStatus,
+  SchoolStudentRecord,
+} from '@/services/disciplineApi';
 
-type CounselingRecord = {
-  id: string;
-  date: string;
-  studentName: string;
-  studentClass: string;
-  studentNis: string;
-  counselorName: string;
-  topic: string;
-  category: 'disiplin' | 'sosial' | 'akademik';
-  approach: string;
-  studentCommitment: string;
-  status: 'monitoring' | 'resolved';
-  followupDate: string;
-};
-
-const categoryBadges = {
-  disiplin: {
-    label: 'Kedisiplinan',
+const statusMeta: Record<CounselingStatus, { label: string; className: string }> = {
+  scheduled: {
+    label: 'Terjadwal',
+    className: 'border border-blue-200 bg-blue-100 text-blue-900',
+  },
+  ongoing: {
+    label: 'Dalam Pendampingan',
     className: 'border border-amber-gold/40 bg-amber-surface text-amber-dark',
   },
-  sosial: { label: 'Mediasi Sosial', className: 'bg-purple-100 text-purple-800' },
-  akademik: { label: 'Akademik', className: 'bg-blue-100 text-blue-800' },
+  completed: {
+    label: 'Selesai',
+    className: 'bg-emerald-100 text-emerald-900',
+  },
 };
 
-const initialCounselingRecords: CounselingRecord[] = [
-  {
-    id: 'c-1',
-    date: '05 Okt 2026',
-    studentName: 'Rizky Pratama',
-    studentClass: 'Kelas IX A',
-    studentNis: '00829103',
-    counselorName: 'Dra. Nurhasanah (Guru BK)',
-    topic: 'Klarifikasi & Mediasi Konflik Fisik di Area Kantin',
-    category: 'sosial',
-    approach: 'Restitusi Tiga Segitiga & Mediasi Empati Teman Sebaya',
-    studentCommitment:
-      'Menyadari kesalahan, meminta maaf secara terbuka kepada pihak terkait, serta bersedia membantu piket kebersihan perpustakaan selama 3 hari sebagai wujud tanggung jawab.',
-    status: 'monitoring',
-    followupDate: '12 Okt 2026',
-  },
-  {
-    id: 'c-2',
-    date: '04 Okt 2026',
-    studentName: 'Aldo Firmansyah',
-    studentClass: 'Kelas VIII B',
-    studentNis: '00829440',
-    counselorName: 'Dra. Nurhasanah (Guru BK)',
-    topic: 'Bimbingan Kelengkapan Atribut & Kebiasaan Disiplin Diri',
-    category: 'disiplin',
-    approach: 'Konseling Individual & Pembuatan Lembar Kontrak Diri',
-    studentCommitment:
-      'Berkomitmen menyiapkan kelengkapan seragam (dasi & sabuk) di malam hari sebelum tidur, dengan paraf kontrol harian dari orang tua pada buku penghubung.',
-    status: 'resolved',
-    followupDate: 'Selesai',
-  },
-  {
-    id: 'c-3',
-    date: '02 Okt 2026',
-    studentName: 'Fajar Maulana',
-    studentClass: 'Kelas VIII A',
-    studentNis: '00829311',
-    counselorName: 'Sarah Rahma, S.Pd. & Guru BK',
-    topic: 'Kecanduan Game Online & Penggunaan Smartphone Saat Belajar',
-    category: 'akademik',
-    approach: 'Restrukturisasi Kognitif & Manajemen Waktu Layar',
-    studentCommitment:
-      'Smartphone dititipkan pada loker piket setiap pagi sebelum jam 07.00 WIB selama 2 pekan ke depan.',
-    status: 'monitoring',
-    followupDate: '09 Okt 2026',
-  },
-  {
-    id: 'c-4',
-    date: '28 Sep 2026',
-    studentName: 'Dimas Saputra',
-    studentClass: 'Kelas VIII A',
-    studentNis: '00829103',
-    counselorName: 'Dra. Nurhasanah (Guru BK)',
-    topic: 'Motivasi Kesiapan Bangun Pagi & Manajemen Rute Bersekolah',
-    category: 'disiplin',
-    approach: 'Bimbingan Afektif & Solusi Kendaraan Bersama Orang Tua',
-    studentCommitment: 'Bangun lebih awal pukul 05.00 WIB dan berangkat pukul 06.15 WIB.',
-    status: 'resolved',
-    followupDate: 'Selesai',
-  },
-];
-
 /**
- * Page view for Guidance and Counseling (BK) student tracking and journal.
+ * Full-CRUD Counseling (Bimbingan BK) journal view connected to backend APIs.
  *
- * @returns Rendered counseling screen.
+ * @returns Rendered counseling journal page.
  */
 export function DisciplineCounselingView() {
-  const [records, setRecords] = useState<CounselingRecord[]>(initialCounselingRecords);
-  const [filterCategory, setFilterCategory] = useState<'all' | 'disiplin' | 'sosial' | 'akademik'>(
-    'all',
-  );
-  const [searchQuery, setSearchQuery] = useState('');
+  const [records, setRecords] = useState<CounselingRecord[]>([]);
+  const [students, setStudents] = useState<SchoolStudentRecord[]>([]);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | CounselingStatus>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<CounselingRecord | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // New Record State
-  const [newStudent, setNewStudent] = useState('Bagus Pamungkas');
-  const [newClass, setNewClass] = useState('Kelas VIII A');
-  const [newTopic, setNewTopic] = useState(
-    'Meninggalkan kelas tanpa izin dan evaluasi kejenuhan belajar',
-  );
-  const [newApproach, setNewApproach] = useState('Konseling Individual & Kontrak Perilaku');
-  const [newCommitment, setNewCommitment] = useState(
-    'Siswa berjanji melapor ke wali kelas sebelum keluar kelas.',
-  );
-
-  const filtered = records.filter((r) => {
-    if (filterCategory !== 'all' && r.category !== filterCategory) {
-      return false;
-    }
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase().trim();
-      return (
-        r.studentName.toLowerCase().includes(q) ||
-        r.topic.toLowerCase().includes(q) ||
-        r.studentCommitment.toLowerCase().includes(q)
-      );
-    }
-    return true;
-  });
+  // Form state
+  const [selectedStudentId, setSelectedStudentId] = useState<number>(1);
+  const [tanggal, setTanggal] = useState(() => new Date().toISOString().slice(0, 10));
+  const [topik, setTopik] = useState('');
+  const [catatan, setCatatan] = useState('');
+  const [tindakLanjut, setTindakLanjut] = useState('');
+  const [status, setStatus] = useState<CounselingStatus>('scheduled');
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -146,376 +72,437 @@ export function DisciplineCounselingView() {
     }, 3500);
   };
 
-  const handleCreateRecord = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const newEntry: CounselingRecord = {
-      id: `c-${Date.now()}`,
-      date: '05 Okt 2026',
-      studentName: newStudent,
-      studentClass: newClass,
-      studentNis: '00829562',
-      counselorName: 'Dra. Nurhasanah (Guru BK)',
-      topic: newTopic,
-      category: 'disiplin',
-      approach: newApproach,
-      studentCommitment: newCommitment,
-      status: 'monitoring',
-      followupDate: '12 Okt 2026',
-    };
-    setRecords([newEntry, ...records]);
-    setIsModalOpen(false);
-    showToast(`Jurnal sesi konseling untuk ${newStudent} berhasil disimpan.`);
+  const loadData = async () => {
+    try {
+      const [counselings, studentList] = await Promise.all([
+        fetchCounselingRecords(),
+        fetchSchoolStudents(),
+      ]);
+      setRecords(counselings);
+      setStudents(studentList);
+      if (studentList[0] && selectedStudentId === 1) {
+        setSelectedStudentId(studentList[0].id);
+      }
+    } catch {
+      // Keep current state when offline.
+    }
   };
+
+  useEffect(() => {
+    void loadData();
+  }, []);
+
+  const filtered = records.filter((rec) => {
+    if (statusFilter !== 'all' && rec.status !== statusFilter) {
+      return false;
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      return (
+        rec.student_name.toLowerCase().includes(q) ||
+        rec.topik.toLowerCase().includes(q) ||
+        (rec.nama_kelas ?? '').toLowerCase().includes(q) ||
+        (rec.nis ?? '').includes(q)
+      );
+    }
+    return true;
+  });
+
+  const openCreateModal = () => {
+    setEditingRecord(null);
+    setSelectedStudentId(students[0]?.id ?? 1);
+    setTanggal(new Date().toISOString().slice(0, 10));
+    setTopik('');
+    setCatatan('');
+    setTindakLanjut('');
+    setStatus('scheduled');
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (rec: CounselingRecord) => {
+    setEditingRecord(rec);
+    setSelectedStudentId(rec.student_id);
+    setTanggal(rec.tanggal);
+    setTopik(rec.topik);
+    setCatatan(rec.catatan ?? '');
+    setTindakLanjut(rec.tindak_lanjut ?? '');
+    setStatus(rec.status);
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!topik.trim()) {
+      showToast('Topik pembinaan wajib diisi.');
+      return;
+    }
+    try {
+      if (editingRecord) {
+        await updateCounselingRecord(editingRecord.id, {
+          tanggal,
+          topik: topik.trim(),
+          catatan: catatan.trim() || undefined,
+          tindak_lanjut: tindakLanjut.trim() || undefined,
+          status,
+        });
+        showToast('Catatan bimbingan BK berhasil diperbarui.');
+      } else {
+        await createCounselingRecord({
+          student_id: selectedStudentId,
+          tanggal,
+          topik: topik.trim(),
+          catatan: catatan.trim() || undefined,
+          tindak_lanjut: tindakLanjut.trim() || undefined,
+          status,
+        });
+        showToast('Daftar bimbingan BK baru berhasil disimpan.');
+      }
+      setIsModalOpen(false);
+      setEditingRecord(null);
+      await loadData();
+    } catch (error) {
+      if (error instanceof DisciplineApiError) {
+        showToast(error.message);
+      }
+    }
+  };
+
+  const handleDelete = async (rec: CounselingRecord) => {
+    try {
+      await deleteCounselingRecord(rec.id);
+      showToast(`Catatan bimbingan ${rec.student_name} berhasil dihapus.`);
+      setRecords((prev) => prev.filter((item) => item.id !== rec.id));
+    } catch (error) {
+      if (error instanceof DisciplineApiError) {
+        showToast(error.message);
+      }
+    }
+  };
+
+  const ongoingCount = records.filter((r) => r.status !== 'completed').length;
+  const completedCount = records.filter((r) => r.status === 'completed').length;
 
   return (
     <div className="space-y-6">
-      {/* Toast Alert */}
       {toastMessage && (
         <div className="fixed top-6 right-6 z-50 flex animate-in items-center gap-2 rounded-xl bg-pine-deep px-4 py-3 text-sm font-semibold text-white shadow-xl duration-200 slide-in-from-top-4">
-          <CheckCircle2 className="size-4 text-amber-gold" />
+          <CheckCircle2 className="size-4.5 text-amber-gold" />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Header and Actions */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      {/* Header */}
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
           <Link
-            className="flex size-9 items-center justify-center rounded-xl border border-border bg-card text-on-surface shadow-xs transition-colors hover:bg-surface-card"
-            href="/dashboard/kedisiplinan?role=kesiswaan"
+            href="/dashboard/kedisiplinan"
+            className="flex size-10 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted"
           >
-            <ArrowLeft className="size-4" />
+            <ArrowLeft className="size-4.5" />
           </Link>
           <div>
-            <div className="flex items-center gap-2 text-xs font-semibold text-pine-deep">
-              <span>Tata Tertib Kesiswaan</span>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Link href="/dashboard/kedisiplinan" className="hover:text-pine-deep">
+                Tata Tertib Kesiswaan
+              </Link>
               <span>/</span>
-              <span className="text-muted-foreground">Jurnal Bimbingan Konseling</span>
+              <span>Rekam Bimbingan BK</span>
             </div>
-            <h1 className="font-heading text-xl font-bold tracking-tight text-on-surface md:text-2xl">
-              Rekam Jejak Bimbingan & Konseling (BK)
+            <h1 className="text-xl font-black tracking-tight text-foreground sm:text-2xl">
+              Jurnal Rekam Bimbingan & Konseling (BK)
             </h1>
           </div>
         </div>
 
         <button
-          className="inline-flex items-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-95"
-          onClick={() => {
-            setIsModalOpen(true);
-          }}
           type="button"
+          onClick={openCreateModal}
+          className="inline-flex items-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2 text-xs font-bold text-white shadow-xs transition-colors hover:bg-pine-hover"
         >
-          <PlusCircle className="size-3.5 text-amber-gold" />+ Catat Sesi Konseling Baru
+          <PlusCircle className="size-4 text-amber-gold" />
+          <span>+ Tambah Sesi Bimbingan</span>
         </button>
       </div>
 
-      {/* KPI Bento Cards */}
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Total Sesi Bulan Ini</span>
-            <MessageSquare className="size-4 text-pine-deep" />
-          </div>
-          <p className="mt-2 font-heading text-2xl font-bold text-on-surface">
-            {records.length} Sesi
-          </p>
-          <span className="text-[11px] text-muted-foreground">
-            Terdokumentasi lengkap di portal BK
-          </span>
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-xs">
+          <span className="text-xs font-medium text-muted-foreground">Total Sesi Bimbingan</span>
+          <p className="mt-1 text-2xl font-black text-foreground">{records.length} Sesi</p>
         </div>
-
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-emerald-900">Restitusi Tuntas & Positif</span>
-            <HeartHandshake className="size-4 text-emerald-700" />
-          </div>
-          <p className="mt-2 font-heading text-2xl font-bold text-emerald-900">
-            {records.filter((r) => r.status === 'resolved').length} Kasus
-          </p>
-          <span className="text-[11px] font-medium text-emerald-700">
-            Perilaku kembali sesuai tata tertib
-          </span>
+        <div className="rounded-2xl border border-amber-gold/40 bg-amber-surface/40 p-5 shadow-xs">
+          <span className="text-xs font-medium text-amber-900">Terjadwal / Pendampingan</span>
+          <p className="mt-1 text-2xl font-black text-amber-dark">{ongoingCount} Siswa</p>
         </div>
-
-        <div className="rounded-2xl border border-amber-gold/40 bg-amber-surface/60 p-4 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-amber-900">Dalam Monitoring Lanjutan</span>
-            <Clock className="size-4 text-amber-dark" />
-          </div>
-          <p className="mt-2 font-heading text-2xl font-bold text-amber-900">
-            {records.filter((r) => r.status === 'monitoring').length} Siswa
-          </p>
-          <span className="text-[11px] font-medium text-amber-800">Evaluasi berkala 7–14 hari</span>
+        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/40 p-5 shadow-xs">
+          <span className="text-xs font-medium text-emerald-900">Selesai Pembinaan</span>
+          <p className="mt-1 text-2xl font-black text-emerald-900">{completedCount} Kasus</p>
         </div>
       </div>
 
-      {/* Search and Category Filter */}
-      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-xs md:flex-row md:items-center md:justify-between">
-        <div className="relative flex-1">
-          <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
+      {/* Filters */}
+      <div className="flex flex-col justify-between gap-3 rounded-2xl border border-border bg-card p-4 shadow-xs sm:flex-row sm:items-center">
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            { id: 'all' as const, label: `Semua (${records.length})` },
+            {
+              id: 'scheduled' as const,
+              label: `Terjadwal (${records.filter((r) => r.status === 'scheduled').length})`,
+            },
+            {
+              id: 'ongoing' as const,
+              label: `Pendampingan (${records.filter((r) => r.status === 'ongoing').length})`,
+            },
+            { id: 'completed' as const, label: `Selesai (${completedCount})` },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => {
+                setStatusFilter(tab.id);
+              }}
+              className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-colors ${
+                statusFilter === tab.id
+                  ? 'bg-pine-deep text-white'
+                  : 'border border-border bg-surface-container-low text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <label className="flex h-9 w-full items-center rounded-xl border border-border bg-surface-container-low px-3 sm:w-72">
+          <Search className="mr-2 size-4 text-muted-foreground" />
           <input
-            className="w-full rounded-xl border border-border bg-surface-card py-2 pr-4 pl-10 text-xs text-on-surface placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-            }}
-            placeholder="Cari nama siswa, topik bimbingan, atau komitmen..."
             type="text"
-            value={searchQuery}
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+            placeholder="Cari siswa, kelas, atau topik bimbingan..."
+            className="w-full bg-transparent text-xs focus:outline-hidden"
           />
-        </div>
-
-        <div className="flex flex-wrap items-center gap-1.5">
-          <button
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-              filterCategory === 'all'
-                ? 'bg-pine-deep text-white shadow-xs'
-                : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
-            }`}
-            onClick={() => {
-              setFilterCategory('all');
-            }}
-            type="button"
-          >
-            Semua Topik
-          </button>
-          <button
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-              filterCategory === 'disiplin'
-                ? 'bg-pine-deep text-white shadow-xs'
-                : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
-            }`}
-            onClick={() => {
-              setFilterCategory('disiplin');
-            }}
-            type="button"
-          >
-            Kedisiplinan
-          </button>
-          <button
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-              filterCategory === 'sosial'
-                ? 'bg-pine-deep text-white shadow-xs'
-                : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
-            }`}
-            onClick={() => {
-              setFilterCategory('sosial');
-            }}
-            type="button"
-          >
-            Sosial & Mediasi
-          </button>
-          <button
-            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-              filterCategory === 'akademik'
-                ? 'bg-pine-deep text-white shadow-xs'
-                : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
-            }`}
-            onClick={() => {
-              setFilterCategory('akademik');
-            }}
-            type="button"
-          >
-            Kebiasaan Belajar
-          </button>
-        </div>
+        </label>
       </div>
 
-      {/* Counseling Feed List */}
+      {/* Counseling Cards */}
       <div className="space-y-4">
-        {filtered.map((record) => (
-          <div
-            className="rounded-2xl border border-border bg-card p-5 shadow-xs transition-colors hover:border-pine-deep/30"
-            key={record.id}
-          >
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-              <div className="flex items-start gap-3">
-                <div className="flex size-10 items-center justify-center rounded-xl bg-pine-light font-bold text-pine-deep">
-                  {record.studentName
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')
-                    .slice(0, 2)}
+        {filtered.map((rec) => {
+          const meta = statusMeta[rec.status] ?? statusMeta.scheduled;
+          return (
+            <div
+              key={rec.id}
+              className="rounded-2xl border border-border bg-card p-5 shadow-xs transition-colors hover:border-pine-light"
+            >
+              <div className="flex flex-col justify-between gap-3 border-b border-border pb-3 sm:flex-row sm:items-center">
+                <div className="flex items-center gap-3">
+                  <div className="flex size-10 items-center justify-center rounded-xl bg-pine-light text-pine-deep">
+                    <HeartHandshake className="size-5" />
+                  </div>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3 className="text-sm font-bold text-foreground">{rec.student_name}</h3>
+                      <span className="rounded bg-surface-container-low px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                        Kelas {rec.nama_kelas ?? '-'} • NIS: {rec.nis ?? '-'}
+                      </span>
+                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${meta.className}`}>
+                        {meta.label}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                      <Clock className="size-3 text-pine-deep" />
+                      <span>
+                        Tanggal: {rec.tanggal} • Konselor: {rec.counselor_name ?? 'Petugas BK / Kesiswaan'}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      openEditModal(rec);
+                    }}
+                    className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs font-semibold text-foreground hover:bg-muted"
+                  >
+                    <Pencil className="size-3.5" />
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void handleDelete(rec);
+                    }}
+                    className="inline-flex items-center gap-1 rounded-lg border border-red-200 px-2.5 py-1.5 text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    <Trash2 className="size-3.5" />
+                    <span>Hapus</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-3 grid grid-cols-1 gap-4 text-xs md:grid-cols-3">
+                <div>
+                  <span className="font-semibold text-muted-foreground">Topik Pembinaan</span>
+                  <p className="mt-1 font-bold text-foreground">{rec.topik}</p>
                 </div>
                 <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3 className="font-heading text-sm font-bold text-on-surface">
-                      {record.studentName}
-                    </h3>
-                    <span className="rounded border border-border bg-surface-card px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
-                      {record.studentClass} • NIS {record.studentNis}
-                    </span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                        categoryBadges[record.category].className
-                      }`}
-                    >
-                      {categoryBadges[record.category].label}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs font-semibold text-pine-deep">Topik: {record.topic}</p>
+                  <span className="flex items-center gap-1 font-semibold text-muted-foreground">
+                    <MessageSquare className="size-3.5 text-pine-deep" />
+                    <span>Catatan Konseling</span>
+                  </span>
+                  <p className="mt-1 text-foreground">{rec.catatan ?? 'Belum ada catatan.'}</p>
+                </div>
+                <div>
+                  <span className="font-semibold text-muted-foreground">Rencana Tindak Lanjut</span>
+                  <p className="mt-1 text-foreground">{rec.tindak_lanjut ?? '-'}</p>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2 text-right">
-                {record.status === 'resolved' ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-800">
-                    <CheckCircle2 className="size-3 text-emerald-700" />
-                    Kasus Selesai (Restoratif)
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 rounded-full border border-amber-gold/40 bg-amber-surface px-2.5 py-1 text-xs font-semibold text-amber-dark">
-                    <Clock className="size-3" />
-                    Monitoring s.d {record.followupDate}
-                  </span>
-                )}
-              </div>
             </div>
+          );
+        })}
 
-            {/* Approach & Commitment Details */}
-            <div className="mt-4 grid grid-cols-1 gap-3 rounded-xl border border-border bg-surface-card/60 p-4 text-xs md:grid-cols-2">
-              <div>
-                <span className="font-bold text-muted-foreground">
-                  Pendekatan / Layanan Konseling:
-                </span>
-                <p className="mt-0.5 text-on-surface">{record.approach}</p>
-                <div className="mt-2 text-[11px] text-muted-foreground">
-                  Konselor: <strong>{record.counselorName}</strong> • {record.date}
-                </div>
-              </div>
-
-              <div>
-                <span className="font-bold text-muted-foreground">
-                  Komitmen Siswa & Solusi Disepakati:
-                </span>
-                <p className="mt-0.5 text-on-surface italic">
-                  &ldquo;{record.studentCommitment}&rdquo;
-                </p>
-              </div>
-            </div>
+        {filtered.length === 0 && (
+          <div className="rounded-2xl border border-border bg-card py-12 text-center text-xs text-muted-foreground">
+            Belum ada sesi bimbingan konseling yang sesuai filter.
           </div>
-        ))}
+        )}
       </div>
 
-      {/* Modal Catat Sesi Baru */}
+      {/* Create / Edit Counseling Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-lg animate-in rounded-2xl border border-border bg-card p-6 shadow-2xl zoom-in-95">
-            <div className="flex items-center justify-between border-b border-border pb-4">
-              <h3 className="font-heading text-base font-bold text-on-surface">
-                Catat Sesi Bimbingan Konseling Baru
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div>
+                <h3 className="text-base font-bold text-foreground">
+                  {editingRecord ? 'Edit Catatan Bimbingan BK' : 'Tambah Sesi Bimbingan BK'}
+                </h3>
+                <p className="text-xs text-muted-foreground">SD Islam Bakti Asih</p>
+              </div>
               <button
-                className="rounded-lg p-1 text-muted-foreground hover:bg-surface-card hover:text-on-surface"
+                type="button"
                 onClick={() => {
                   setIsModalOpen(false);
                 }}
-                type="button"
+                className="rounded-lg p-1 text-muted-foreground hover:bg-muted"
               >
-                <X className="size-5" />
+                <X className="size-4" />
               </button>
             </div>
 
-            <form className="mt-4 space-y-4 text-xs" onSubmit={handleCreateRecord}>
-              <div>
-                <label
-                  htmlFor="counseling-student"
-                  className="mb-1 block font-semibold text-on-surface"
-                >
-                  Nama Siswa
-                </label>
-                <select
-                  id="counseling-student"
-                  className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                  onChange={(e) => {
-                    setNewStudent(e.target.value);
-                    if (e.target.value.includes('Bagus')) {
-                      setNewClass('Kelas VIII A');
-                    }
-                    if (e.target.value.includes('Rizky')) {
-                      setNewClass('Kelas IX A');
-                    }
-                  }}
-                  value={newStudent}
-                >
-                  <option value="Bagus Pamungkas">Bagus Pamungkas (Kelas VIII A)</option>
-                  <option value="Rizky Pratama">Rizky Pratama (Kelas IX A)</option>
-                  <option value="Dimas Saputra">Dimas Saputra (Kelas VIII A)</option>
-                </select>
+            <form
+              onSubmit={(e) => {
+                void handleSubmit(e);
+              }}
+              className="mt-4 space-y-3 text-xs"
+            >
+              {editingRecord ? (
+                <div className="rounded-xl border border-border bg-surface-container-low p-3 font-bold">
+                  {editingRecord.student_name} (Kelas {editingRecord.nama_kelas ?? '-'})
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  <label className="block font-bold">Pilih Siswa *</label>
+                  <select
+                    value={selectedStudentId}
+                    onChange={(e) => {
+                      setSelectedStudentId(Number(e.target.value));
+                    }}
+                    className="w-full rounded-xl border border-border bg-surface-container-low p-2.5"
+                  >
+                    {students.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        Kelas {s.nama_kelas} — {s.nama} (NIS: {s.nis ?? '-'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="block font-bold">Tanggal *</label>
+                  <input
+                    type="date"
+                    value={tanggal}
+                    onChange={(e) => {
+                      setTanggal(e.target.value);
+                    }}
+                    className="w-full rounded-xl border border-border bg-surface-container-low p-2"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block font-bold">Status Pembinaan</label>
+                  <select
+                    value={status}
+                    onChange={(e) => {
+                      setStatus(e.target.value as CounselingStatus);
+                    }}
+                    className="w-full rounded-xl border border-border bg-surface-container-low p-2"
+                  >
+                    <option value="scheduled">Terjadwal</option>
+                    <option value="ongoing">Dalam Pendampingan</option>
+                    <option value="completed">Selesai</option>
+                  </select>
+                </div>
               </div>
 
-              <div>
-                <label
-                  htmlFor="counseling-topic"
-                  className="mb-1 block font-semibold text-on-surface"
-                >
-                  Topik Bimbingan
-                </label>
+              <div className="space-y-1">
+                <label className="block font-bold">Topik Pembinaan *</label>
                 <input
-                  id="counseling-topic"
-                  className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                  onChange={(e) => {
-                    setNewTopic(e.target.value);
-                  }}
-                  required
                   type="text"
-                  value={newTopic}
+                  value={topik}
+                  onChange={(e) => {
+                    setTopik(e.target.value);
+                  }}
+                  placeholder="Misal: Pembinaan kedisiplinan masuk tepat waktu"
+                  className="w-full rounded-xl border border-border bg-surface-container-low p-2.5"
                 />
               </div>
 
-              <div>
-                <label
-                  htmlFor="counseling-approach"
-                  className="mb-1 block font-semibold text-on-surface"
-                >
-                  Pendekatan / Layanan Konseling
-                </label>
-                <input
-                  id="counseling-approach"
-                  className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                  onChange={(e) => {
-                    setNewApproach(e.target.value);
-                  }}
-                  required
-                  type="text"
-                  value={newApproach}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="counseling-commitment"
-                  className="mb-1 block font-semibold text-on-surface"
-                >
-                  Komitmen & Solusi Restoratif Siswa
-                </label>
+              <div className="space-y-1">
+                <label className="block font-bold">Catatan Konseling & Komitmen Siswa</label>
                 <textarea
-                  id="counseling-commitment"
-                  className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                  onChange={(e) => {
-                    setNewCommitment(e.target.value);
-                  }}
-                  required
                   rows={3}
-                  value={newCommitment}
+                  value={catatan}
+                  onChange={(e) => {
+                    setCatatan(e.target.value);
+                  }}
+                  className="w-full rounded-xl border border-border bg-surface-container-low p-2.5"
                 />
               </div>
 
-              <div className="mt-6 flex items-center justify-end gap-2 border-t border-border pt-2">
+              <div className="space-y-1">
+                <label className="block font-bold">Rencana Tindak Lanjut</label>
+                <input
+                  type="text"
+                  value={tindakLanjut}
+                  onChange={(e) => {
+                    setTindakLanjut(e.target.value);
+                  }}
+                  placeholder="Misal: Pemantauan wali kelas 1 minggu"
+                  className="w-full rounded-xl border border-border bg-surface-container-low p-2.5"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
                 <button
-                  className="rounded-xl border border-border px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-card"
+                  type="button"
                   onClick={() => {
                     setIsModalOpen(false);
                   }}
-                  type="button"
+                  className="rounded-xl border border-border px-4 py-2 font-semibold"
                 >
                   Batal
                 </button>
                 <button
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2 text-xs font-semibold text-white hover:opacity-95"
                   type="submit"
+                  className="rounded-xl bg-pine-deep px-4 py-2 font-bold text-white hover:bg-pine-hover"
                 >
-                  <CheckCircle2 className="size-3.5 text-amber-gold" />
-                  Simpan Sesi BK
+                  {editingRecord ? 'Simpan Perubahan' : 'Simpan Sesi Bimbingan'}
                 </button>
               </div>
             </form>

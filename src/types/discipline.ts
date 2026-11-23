@@ -2,6 +2,10 @@
  * Valid category types for disciplinary violations.
  */
 export type DisciplineCategory =
+  | 'atribut'
+  | 'kerapihan'
+  | 'perilaku'
+  | 'lainnya'
   | 'keterlambatan'
   | 'seragam'
   | 'tatatertib'
@@ -18,6 +22,11 @@ export type IncidentStatus = 'baru' | 'tinjau' | 'tindak' | 'selesai';
  */
 export type DisciplineIncident = {
   id: string;
+  studentId?: number;
+  violationTypeId?: number;
+  violationCode: string;
+  violationName: string;
+  backendCategory: string;
   date: string;
   time: string;
   studentName: string;
@@ -30,6 +39,7 @@ export type DisciplineIncident = {
   points: number;
   description: string;
   location: string;
+  immediateAction: string;
   recorderName: string;
   recorderRole: string;
   studentTotalPoints: number;
@@ -38,7 +48,7 @@ export type DisciplineIncident = {
 };
 
 /**
- * High-risk student under guidance watchlist (>= 30 points).
+ * High-risk student under guidance watchlist (>= 15 / 30 points).
  */
 export type DisciplineWatchStudent = {
   id: string;
@@ -69,14 +79,20 @@ export type DisciplineFilterState = {
 };
 
 /**
- * Form inputs for creating a new disciplinary violation incident.
+ * Form inputs for creating or editing a disciplinary violation incident.
  */
 export type NewIncidentFormData = {
+  studentId: number;
   studentName: string;
   studentNis: string;
   studentClass: string;
-  categoryKey: DisciplineCategory;
-  dateTime: string;
+  violationTypeId: number;
+  violationCode: string;
+  violationName: string;
+  backendCategory: string;
+  points: number;
+  date: string;
+  time: string;
   location: string;
   description: string;
   immediateAction: string;

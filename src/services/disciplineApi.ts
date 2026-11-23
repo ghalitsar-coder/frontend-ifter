@@ -12,10 +12,18 @@ export type ViolationTypeRecord = {
   school_id: number;
   kode: string;
   nama: string;
-  kategori: string;
+  kategori: 'atribut' | 'kerapihan' | 'perilaku' | 'lainnya' | string;
   poin_default: number;
   is_active: boolean;
   created_at: string;
+};
+
+export type UpsertViolationTypePayload = {
+  kode: string;
+  nama: string;
+  kategori: 'atribut' | 'kerapihan' | 'perilaku' | 'lainnya';
+  poin_default: number;
+  is_active?: boolean;
 };
 
 export type StudentViolationRecord = {
@@ -48,6 +56,7 @@ export type DisciplineInspectionRecord = {
   created_at: string;
   nama_kelas: string;
   inspector_name: string;
+  violations?: StudentViolationRecord[];
 };
 
 export type StudentSummaryRecord = {
@@ -65,9 +74,126 @@ export type ClassStudentRecord = {
   nama_kelas: string;
 };
 
+export type SchoolStudentRecord = {
+  id: number;
+  nis: string | null;
+  nama: string;
+  jenis_kelamin: string;
+  no_hp_ortu: string | null;
+  class_id: number;
+  nama_kelas: string;
+  tingkat: number;
+};
+
+export type WatchlistStudentRecord = {
+  student_id: number;
+  nis: string | null;
+  student_name: string;
+  no_hp_ortu: string | null;
+  class_id: number | null;
+  nama_kelas: string | null;
+  total_points: number;
+  total_incidents: number;
+  last_violation_date: string;
+  status_sp: string;
+};
+
+export type CounselingStatus = 'scheduled' | 'ongoing' | 'completed';
+
+export type CounselingRecord = {
+  id: number;
+  school_id: number;
+  student_id: number;
+  counselor_id: number | null;
+  tanggal: string;
+  topik: string;
+  catatan: string | null;
+  tindak_lanjut: string | null;
+  status: CounselingStatus;
+  created_at: string;
+  nis: string | null;
+  student_name: string;
+  nama_kelas: string | null;
+  counselor_name: string | null;
+};
+
+export type CreateCounselingPayload = {
+  student_id: number;
+  tanggal: string;
+  topik: string;
+  catatan?: string;
+  tindak_lanjut?: string;
+  status?: CounselingStatus;
+};
+
+export type UpdateCounselingPayload = {
+  tanggal: string;
+  topik: string;
+  catatan?: string;
+  tindak_lanjut?: string;
+  status: CounselingStatus;
+};
+
+export type ParentSummonsStatus = 'draft' | 'sent' | 'completed';
+
+export type ParentSummonsRecord = {
+  id: number;
+  school_id: number;
+  student_id: number;
+  created_by: number | null;
+  nomor_surat: string;
+  tanggal_surat: string;
+  jadwal_pertemuan: string;
+  ruangan: string;
+  alasan: string;
+  nama_ortu: string | null;
+  no_hp_ortu: string | null;
+  status: ParentSummonsStatus;
+  sent_at: string | null;
+  completed_at: string | null;
+  catatan_hasil: string | null;
+  created_at: string;
+  nis: string | null;
+  student_name: string;
+  nama_kelas: string | null;
+  created_by_name: string | null;
+  total_points: number;
+};
+
+export type CreateParentSummonsPayload = {
+  student_id: number;
+  nomor_surat: string;
+  tanggal_surat: string;
+  jadwal_pertemuan: string;
+  ruangan: string;
+  alasan: string;
+  nama_ortu?: string;
+  no_hp_ortu?: string;
+  status?: ParentSummonsStatus;
+};
+
+export type UpdateParentSummonsPayload = {
+  nomor_surat: string;
+  tanggal_surat: string;
+  jadwal_pertemuan: string;
+  ruangan: string;
+  alasan: string;
+  nama_ortu?: string;
+  no_hp_ortu?: string;
+  catatan_hasil?: string;
+};
+
 export type RecordViolationPayload = {
   inspection_id?: number | null;
   student_id: number;
+  violation_type_id: number;
+  poin?: number;
+  keterangan?: string;
+  tindak_lanjut?: string;
+  tanggal: string;
+};
+
+export type UpdateViolationPayload = {
   violation_type_id: number;
   poin?: number;
   keterangan?: string;
@@ -88,6 +214,13 @@ export type CreateInspectionPayload = {
   jumlah_diperiksa: number;
   catatan?: string;
   violations: CreateInspectionViolationItem[];
+};
+
+export type UpdateInspectionPayload = {
+  tanggal: string;
+  jumlah_diperiksa: number;
+  catatan?: string;
+  violations?: CreateInspectionViolationItem[];
 };
 
 export class DisciplineApiError extends Error {
@@ -145,22 +278,39 @@ function requireData<T>(envelope: Envelope<T>): T {
   return envelope.data;
 }
 
-/**
- * Lists active violation types.
- *
- * @returns The active violation catalog.
- */
-export async function fetchViolationTypes(): Promise<ViolationTypeRecord[]> {
-  const envelope = await requestEnvelope<ViolationTypeRecord[]>('v1/discipline/types');
+export async function fetchViolationTypes(includeInactive = false): Promise<ViolationTypeRecord[]> {
+  const path = includeInactive ? 'v1/discipline/types?include_inactive=true' : 'v1/discipline/types';
+  const envelope = await requestEnvelope<ViolationTypeRecord[]>(path);
   return requireData(envelope);
 }
 
-/**
- * Lists recorded student violations.
- *
- * @param filter - Optional class, student, and category criteria.
- * @returns Matching violations.
- */
+export async function createViolationType(
+  payload: UpsertViolationTypePayload,
+): Promise<ViolationTypeRecord> {
+  const envelope = await requestEnvelope<ViolationTypeRecord>('v1/discipline/types', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return requireData(envelope);
+}
+
+export async function updateViolationType(
+  id: number,
+  payload: UpsertViolationTypePayload,
+): Promise<ViolationTypeRecord> {
+  const envelope = await requestEnvelope<ViolationTypeRecord>(`v1/discipline/types/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+  return requireData(envelope);
+}
+
+export async function deleteViolationType(id: number): Promise<void> {
+  await requestEnvelope<{ deleted: boolean }>(`v1/discipline/types/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function fetchStudentViolations(filter?: {
   classId?: number;
   studentId?: number;
@@ -183,12 +333,6 @@ export async function fetchStudentViolations(filter?: {
   return requireData(envelope);
 }
 
-/**
- * Records a student disciplinary incident.
- *
- * @param payload - The incident details.
- * @returns The recorded violation.
- */
 export async function postRecordViolation(
   payload: RecordViolationPayload,
 ): Promise<StudentViolationRecord> {
@@ -199,13 +343,17 @@ export async function postRecordViolation(
   return requireData(envelope);
 }
 
-/**
- * Updates the follow-up notes for a violation.
- *
- * @param id - The violation identifier.
- * @param tindakLanjut - The new follow-up notes.
- * @returns The updated violation.
- */
+export async function updateViolationRecord(
+  id: number,
+  payload: UpdateViolationPayload,
+): Promise<StudentViolationRecord> {
+  const envelope = await requestEnvelope<StudentViolationRecord>(`v1/discipline/records/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+  return requireData(envelope);
+}
+
 export async function updateViolationFollowup(
   id: number,
   tindakLanjut: string,
@@ -220,12 +368,12 @@ export async function updateViolationFollowup(
   return requireData(envelope);
 }
 
-/**
- * Records a class inspection and its violations.
- *
- * @param payload - The inspection details and violation checklist.
- * @returns The recorded inspection.
- */
+export async function deleteViolationRecord(id: number): Promise<void> {
+  await requestEnvelope<{ deleted: boolean }>(`v1/discipline/records/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function postCreateInspection(
   payload: CreateInspectionPayload,
 ): Promise<DisciplineInspectionRecord> {
@@ -236,12 +384,6 @@ export async function postCreateInspection(
   return requireData(envelope);
 }
 
-/**
- * Lists class inspections.
- *
- * @param filter - Optional class and date criteria.
- * @returns Matching inspections.
- */
 export async function fetchInspections(filter?: {
   classId?: number;
   tanggal?: string;
@@ -260,12 +402,26 @@ export async function fetchInspections(filter?: {
   return requireData(envelope);
 }
 
-/**
- * Lists students enrolled in a class.
- *
- * @param classId - The class identifier.
- * @returns The class roster.
- */
+export async function updateInspection(
+  id: number,
+  payload: UpdateInspectionPayload,
+): Promise<DisciplineInspectionRecord> {
+  const envelope = await requestEnvelope<DisciplineInspectionRecord>(
+    `v1/discipline/inspections/${id}`,
+    {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    },
+  );
+  return requireData(envelope);
+}
+
+export async function deleteInspection(id: number): Promise<void> {
+  await requestEnvelope<{ deleted: boolean }>(`v1/discipline/inspections/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function fetchClassStudents(classId: number): Promise<ClassStudentRecord[]> {
   const envelope = await requestEnvelope<ClassStudentRecord[]>(
     `v1/discipline/classes/${classId}/students`,
@@ -273,15 +429,127 @@ export async function fetchClassStudents(classId: number): Promise<ClassStudentR
   return requireData(envelope);
 }
 
-/**
- * Retrieves cumulative points and sanction status for a student.
- *
- * @param studentId - The student identifier.
- * @returns The student’s discipline summary.
- */
+export async function fetchSchoolStudents(classId?: number): Promise<SchoolStudentRecord[]> {
+  const path = classId ? `v1/discipline/students?class_id=${classId}` : 'v1/discipline/students';
+  const envelope = await requestEnvelope<SchoolStudentRecord[]>(path);
+  return requireData(envelope);
+}
+
+export async function fetchWatchlist(minPoints = 1): Promise<WatchlistStudentRecord[]> {
+  const envelope = await requestEnvelope<WatchlistStudentRecord[]>(
+    `v1/discipline/watchlist?min_points=${minPoints}`,
+  );
+  return requireData(envelope);
+}
+
 export async function fetchStudentSummary(studentId: number): Promise<StudentSummaryRecord> {
   const envelope = await requestEnvelope<StudentSummaryRecord>(
     `v1/discipline/students/${studentId}/summary`,
   );
   return requireData(envelope);
+}
+
+export async function fetchCounselingRecords(filter?: {
+  studentId?: number;
+  status?: CounselingStatus;
+}): Promise<CounselingRecord[]> {
+  const params = new URLSearchParams();
+  if (filter?.studentId) {
+    params.set('student_id', String(filter.studentId));
+  }
+  if (filter?.status) {
+    params.set('status', filter.status);
+  }
+  const q = params.toString();
+  const envelope = await requestEnvelope<CounselingRecord[]>(
+    q ? `v1/discipline/counseling?${q}` : 'v1/discipline/counseling',
+  );
+  return requireData(envelope);
+}
+
+export async function createCounselingRecord(
+  payload: CreateCounselingPayload,
+): Promise<CounselingRecord> {
+  const envelope = await requestEnvelope<CounselingRecord>('v1/discipline/counseling', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return requireData(envelope);
+}
+
+export async function updateCounselingRecord(
+  id: number,
+  payload: UpdateCounselingPayload,
+): Promise<CounselingRecord> {
+  const envelope = await requestEnvelope<CounselingRecord>(`v1/discipline/counseling/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+  return requireData(envelope);
+}
+
+export async function deleteCounselingRecord(id: number): Promise<void> {
+  await requestEnvelope<{ deleted: boolean }>(`v1/discipline/counseling/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function fetchParentSummons(filter?: {
+  studentId?: number;
+  status?: ParentSummonsStatus;
+}): Promise<ParentSummonsRecord[]> {
+  const params = new URLSearchParams();
+  if (filter?.studentId) {
+    params.set('student_id', String(filter.studentId));
+  }
+  if (filter?.status) {
+    params.set('status', filter.status);
+  }
+  const q = params.toString();
+  const envelope = await requestEnvelope<ParentSummonsRecord[]>(
+    q ? `v1/discipline/summons?${q}` : 'v1/discipline/summons',
+  );
+  return requireData(envelope);
+}
+
+export async function createParentSummons(
+  payload: CreateParentSummonsPayload,
+): Promise<ParentSummonsRecord> {
+  const envelope = await requestEnvelope<ParentSummonsRecord>('v1/discipline/summons', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return requireData(envelope);
+}
+
+export async function updateParentSummons(
+  id: number,
+  payload: UpdateParentSummonsPayload,
+): Promise<ParentSummonsRecord> {
+  const envelope = await requestEnvelope<ParentSummonsRecord>(`v1/discipline/summons/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+  return requireData(envelope);
+}
+
+export async function updateParentSummonsStatus(
+  id: number,
+  status: ParentSummonsStatus,
+  catatanHasil?: string,
+): Promise<ParentSummonsRecord> {
+  const envelope = await requestEnvelope<ParentSummonsRecord>(
+    `v1/discipline/summons/${id}/status`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ status, catatan_hasil: catatanHasil }),
+    },
+  );
+  return requireData(envelope);
+}
+
+export async function deleteParentSummons(id: number): Promise<void> {
+  await requestEnvelope<{ deleted: boolean }>(`v1/discipline/summons/${id}`, {
+    method: 'DELETE',
+  });
 }

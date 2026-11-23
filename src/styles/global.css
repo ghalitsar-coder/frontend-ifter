@@ -332,3 +332,14 @@
 body:has(.attendly-landing) .demo-badge {
   display: none;
 }
+
+@media print {
+  nextjs-portal,
+  .demo-badge {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+  }
+}

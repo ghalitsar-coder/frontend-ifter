@@ -1,6 +1,7 @@
 import { AlertOctagon, Calendar, Download, Eye, Headphones, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { mockDisciplineWatchlist } from '@/data/mockDiscipline';
+import type { WatchlistStudentRecord } from '@/services/disciplineApi';
 import type { DisciplineWatchStudent } from '@/types/discipline';
 
 /**
@@ -116,15 +117,43 @@ function WatchlistActionButton(props: {
  */
 function handleHandbookDownload(e: React.MouseEvent) {
   e.preventDefault();
-  const handbookContent = 'Buku Panduan Tata Tertib & Sanksi SMPN 1 Sleman';
+  const handbookContent =
+    'Buku Panduan Tata Tertib & Sanksi SD Islam Bakti Asih\nPanggilan Ortu: >=30 poin | SP1: >=50 poin | SP2: >=75 poin | SP3: >=100 poin';
   const blob = new Blob([handbookContent], { type: 'text/plain;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.setAttribute('download', 'Buku_Pedoman_Disiplin_SMPN1.txt');
+  link.setAttribute('download', 'Buku_Pedoman_Disiplin_SD_Bakti_Asih.txt');
   document.body.append(link);
   link.click();
   link.remove();
+}
+
+function mapWatchlist(records?: WatchlistStudentRecord[]): DisciplineWatchStudent[] {
+  if (!records || records.length === 0) {
+    return mockDisciplineWatchlist;
+  }
+  return records.slice(0, 4).map((r) => {
+    let riskLevel: 'tinggi' | 'waspada' | 'tinjau' = 'tinjau';
+    let actionType: 'parent_call' | 'schedule_bk' | 'review_history' = 'review_history';
+    if (r.total_points >= 50) {
+      riskLevel = 'tinggi';
+      actionType = 'parent_call';
+    } else if (r.total_points >= 15) {
+      riskLevel = 'waspada';
+      actionType = r.total_points >= 30 ? 'parent_call' : 'schedule_bk';
+    }
+    return {
+      id: String(r.student_id),
+      name: r.student_name,
+      nis: r.nis ?? '-',
+      className: r.nama_kelas ? `Kelas ${r.nama_kelas}` : 'SD Islam Bakti Asih',
+      points: r.total_points,
+      statusLabel: r.status_sp,
+      riskLevel,
+      actionType,
+    };
+  });
 }
 
 /**
@@ -137,8 +166,10 @@ export function DisciplineSidebar(props: {
   onReviewHistory: (studentName: string) => void;
   onScheduleBk: (studentName: string) => void;
   onSendParentCall: (studentName: string) => void;
+  watchlist?: WatchlistStudentRecord[];
 }) {
   const t = useTranslations('DisciplinePage');
+  const displayList = mapWatchlist(props.watchlist);
 
   return (
     <aside className="space-y-5">
@@ -150,7 +181,7 @@ export function DisciplineSidebar(props: {
             <h3 className="text-sm font-bold text-foreground">{t('watchlist_title')}</h3>
           </div>
           <span className="rounded-full border border-amber-gold/40 bg-amber-surface px-2 py-0.5 text-[11px] font-bold text-amber-dark">
-            {t('watchlist_students_count', { count: mockDisciplineWatchlist.length })}
+            {t('watchlist_students_count', { count: displayList.length })}
           </span>
         </div>
 
@@ -159,7 +190,7 @@ export function DisciplineSidebar(props: {
         </p>
 
         <div className="space-y-3">
-          {mockDisciplineWatchlist.map((student) => (
+          {displayList.map((student) => (
             <div
               key={student.id}
               className={`space-y-2 rounded-xl border p-3 ${getRiskContainerClass(student.riskLevel)}`}

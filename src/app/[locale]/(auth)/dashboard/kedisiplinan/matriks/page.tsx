@@ -15,7 +15,7 @@ export async function generateMetadata(props: SubpageProps): Promise<Metadata> {
 
   return {
     description: t('meta_description'),
-    title: `Matriks Kedisiplinan & Laporan Rombel - ${t('meta_title')}`,
+    title: `Matriks Kedisiplinan & Laporan Kelas - ${t('meta_title')}`,
   };
 }
 

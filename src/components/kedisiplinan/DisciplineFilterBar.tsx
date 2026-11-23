@@ -2,6 +2,21 @@ import { Search } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { DisciplineFilterState, DisciplineQuickTab } from '@/types/discipline';
 
+const defaultSDClasses = [
+  '1A',
+  '1B',
+  '2A',
+  '2B',
+  '3A',
+  '3B',
+  '4A',
+  '4B',
+  '5A',
+  '5B',
+  '6A',
+  '6B',
+];
+
 /**
  * Filter and search toolbar for disciplinary incidents.
  *
@@ -9,6 +24,7 @@ import type { DisciplineFilterState, DisciplineQuickTab } from '@/types/discipli
  * @returns Rendered discipline filter bar.
  */
 export function DisciplineFilterBar(props: {
+  classes?: { id: number; nama_kelas: string }[];
   counts: {
     all: number;
     highPoints: number;
@@ -21,6 +37,11 @@ export function DisciplineFilterBar(props: {
   onFilterChange: (next: DisciplineFilterState) => void;
 }) {
   const t = useTranslations('DisciplinePage');
+
+  const classOptions =
+    props.classes && props.classes.length > 0
+      ? props.classes.map((c) => c.nama_kelas)
+      : defaultSDClasses;
 
   const handleQuickTab = (tab: DisciplineQuickTab) => {
     props.onFilterChange({
@@ -65,12 +86,11 @@ export function DisciplineFilterBar(props: {
             className="h-10 w-full rounded-xl border border-border bg-surface-container-low px-3 text-xs font-medium text-foreground focus:border-pine-deep focus:outline-hidden"
           >
             <option value="">{t('filter_class_all')}</option>
-            <option value="VII A">VII A</option>
-            <option value="VII B">VII B</option>
-            <option value="VII C">VII C</option>
-            <option value="VIII A">VIII A</option>
-            <option value="VIII B">VIII B</option>
-            <option value="IX A">IX A</option>
+            {classOptions.map((cls) => (
+              <option key={cls} value={cls}>
+                Kelas {cls}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -87,11 +107,10 @@ export function DisciplineFilterBar(props: {
             className="h-10 w-full rounded-xl border border-border bg-surface-container-low px-3 text-xs font-medium text-foreground focus:border-pine-deep focus:outline-hidden"
           >
             <option value="">{t('filter_category_all')}</option>
-            <option value="keterlambatan">Keterlambatan (+2)</option>
-            <option value="seragam">Atribut Seragam (+3)</option>
-            <option value="tatatertib">Tata Tertib Kelas (+5)</option>
-            <option value="barang_terlarang">Barang Terlarang (+25)</option>
-            <option value="bullying">Etika & Bullying (+50)</option>
+            <option value="atribut">Atribut Seragam</option>
+            <option value="kerapihan">Kerapihan</option>
+            <option value="perilaku">Perilaku & Tata Tertib</option>
+            <option value="lainnya">Lainnya</option>
           </select>
         </div>
 

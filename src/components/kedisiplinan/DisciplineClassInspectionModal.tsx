@@ -125,9 +125,15 @@ export function DisciplineClassInspectionModal(props: {
     setCheckMap(cleared);
   };
 
-  const getViolationTypeIdByCode = (prefix: string): number => {
-    const match = props.violationTypes.find((vt) => vt.kode.startsWith(prefix));
-    return match ? match.id : 1;
+  const getViolationTypeIdByCode = (prefixes: string[], fallbackCategory: string): number => {
+    for (const prefix of prefixes) {
+      const match = props.violationTypes.find((vt) => vt.kode.startsWith(prefix));
+      if (match) {
+        return match.id;
+      }
+    }
+    const byCategory = props.violationTypes.find((vt) => vt.kategori === fallbackCategory);
+    return byCategory?.id ?? props.violationTypes[0]?.id ?? 1;
   };
 
   const handleSubmit = async () => {
@@ -145,29 +151,29 @@ export function DisciplineClassInspectionModal(props: {
       if (c.uniformAttr) {
         violationsToSubmit.push({
           student_id: student.id,
-          violation_type_id: getViolationTypeIdByCode('S01'),
+          violation_type_id: getViolationTypeIdByCode(['ATR-01', 'ATR-03'], 'atribut'),
           keterangan: 'Kelengkapan atribut seragam/dasi tidak lengkap',
         });
       }
       if (c.grooming) {
         violationsToSubmit.push({
           student_id: student.id,
-          violation_type_id: getViolationTypeIdByCode('K01'),
-          keterangan: 'Kerapian rambut atau seragam tidak rapi',
+          violation_type_id: getViolationTypeIdByCode(['KRP-01', 'KRP-02'], 'kerapihan'),
+          keterangan: 'Kerapian rambut atau kuku tidak rapi',
         });
       }
       if (c.socksShoes) {
         violationsToSubmit.push({
           student_id: student.id,
-          violation_type_id: getViolationTypeIdByCode('S03'),
+          violation_type_id: getViolationTypeIdByCode(['ATR-02'], 'atribut'),
           keterangan: 'Kaos kaki atau sepatu tidak sesuai standar',
         });
       }
       if (c.conduct) {
         violationsToSubmit.push({
           student_id: student.id,
-          violation_type_id: getViolationTypeIdByCode('G01'),
-          keterangan: 'Membawa/menggunakan gadget atau membuat gaduh',
+          violation_type_id: getViolationTypeIdByCode(['PRL-03', 'PRL-04'], 'perilaku'),
+          keterangan: 'Mengganggu ketertiban kelas / membawa barang terlarang',
         });
       }
     }

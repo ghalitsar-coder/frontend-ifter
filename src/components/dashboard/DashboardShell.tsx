@@ -193,7 +193,7 @@ export const DashboardShell = (props: { children: React.ReactNode; role: Dashboa
       ) : null}
       <aside
         aria-label="Navigasi utama"
-        className={`fixed top-0 left-0 z-50 flex h-full flex-col justify-between bg-pine-deep text-on-primary shadow-[0_8px_24px_rgba(23,63,54,0.12)] transition-all duration-300 ${asideWidth} ${asideSlide}`}
+        className={`fixed top-0 left-0 z-50 flex h-full flex-col justify-between bg-pine-deep text-on-primary shadow-[0_8px_24px_rgba(23,63,54,0.12)] transition-all duration-300 print:hidden ${asideWidth} ${asideSlide}`}
         id="app-sidebar"
       >
         <div className="flex min-h-0 flex-1 flex-col">
@@ -281,9 +281,11 @@ export const DashboardShell = (props: { children: React.ReactNode; role: Dashboa
         </ProfileMenu>
       </aside>
 
-      <div className={`flex min-h-screen flex-col transition-all duration-300 ${contentPad}`}>
+      <div
+        className={`flex min-h-screen flex-col transition-all duration-300 print:pl-0 ${contentPad}`}
+      >
         <header
-          className={`fixed top-0 right-0 z-40 flex h-20 items-center justify-between gap-2 border-b border-border-subtle bg-surface-card/90 px-4 shadow-[0_1px_8px_rgba(23,63,54,0.03)] backdrop-blur-xl transition-all duration-300 ${headerInset} md:justify-between md:px-8`}
+          className={`fixed top-0 right-0 z-40 flex h-20 items-center justify-between gap-2 border-b border-border-subtle bg-surface-card/90 px-4 shadow-[0_1px_8px_rgba(23,63,54,0.03)] backdrop-blur-xl transition-all duration-300 print:hidden ${headerInset} md:justify-between md:px-8`}
         >
           <div className="flex items-center gap-4">
             {isMobile ? (
@@ -314,7 +316,7 @@ export const DashboardShell = (props: { children: React.ReactNode; role: Dashboa
               <div className="flex flex-col">
                 <div className="flex items-center gap-2">
                   <span className="font-headline-sm text-base font-bold text-text-primary">
-                    SMP Negeri 1 Harapan Bangsa
+                    SD Islam Bakti Asih
                   </span>
                   <span className="inline-flex items-center rounded-full bg-status-present px-2 py-0.5 text-[11px] font-semibold tracking-wide text-pine-deep">
                     TA 2026/2027 Ganjil
@@ -377,8 +379,8 @@ export const DashboardShell = (props: { children: React.ReactNode; role: Dashboa
           </div>
         </header>
 
-        <main className="relative flex-1 bg-surface pt-20">
-          <div className="flex w-full flex-col px-6 py-6 sm:px-8">{props.children}</div>
+        <main className="relative flex-1 bg-surface pt-20 print:bg-white print:pt-0">
+          <div className="flex w-full flex-col px-6 py-6 sm:px-8 print:p-0">{props.children}</div>
         </main>
       </div>
     </div>

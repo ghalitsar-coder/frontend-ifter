@@ -6,45 +6,51 @@ import type {
 } from '@/types/discipline';
 
 /**
- * Standard rule catalog and point weights according to school handbook.
+ * Standard rule catalog and point weights according to SD Islam Bakti Asih handbook.
  */
 export const mockDisciplineRules: {
   key: DisciplineCategory;
+  code: string;
   title: string;
   subtitle: string;
   points: number;
   badgeClass: string;
 }[] = [
   {
-    key: 'keterlambatan',
+    key: 'perilaku',
+    code: 'PRL-01',
     title: 'Terlambat Masuk',
     subtitle: 'Apel / Jam Pelajaran',
     points: 2,
     badgeClass: 'bg-surface-card text-pine-deep border border-border-subtle',
   },
   {
-    key: 'seragam',
+    key: 'atribut',
+    code: 'ATR-01',
     title: 'Atribut Seragam',
-    subtitle: 'Tidak Lengkap/Sesuai',
+    subtitle: 'Topi / Dasi / Sepatu',
     points: 3,
     badgeClass: 'bg-surface-card text-pine-deep border border-border-subtle',
   },
   {
-    key: 'tatatertib',
-    title: 'Tata Tertib Kelas',
-    subtitle: 'Gadget / Gaduh',
-    points: 5,
+    key: 'kerapihan',
+    code: 'KRP-01',
+    title: 'Kerapihan Siswa',
+    subtitle: 'Rambut / Kuku',
+    points: 3,
     badgeClass: 'bg-amber-surface text-amber-dark border border-amber-gold/40',
   },
   {
-    key: 'barang_terlarang',
+    key: 'perilaku',
+    code: 'PRL-04',
     title: 'Barang Terlarang',
-    subtitle: 'Rokok / Vape / Sajam',
-    points: 25,
+    subtitle: 'Gadget / Mainan',
+    points: 15,
     badgeClass: 'bg-error-container text-red-700 border border-red-200',
   },
   {
-    key: 'bullying',
+    key: 'perilaku',
+    code: 'PRL-05',
     title: 'Etika & Bullying',
     subtitle: 'Perkelahian / Agresi',
     points: 50,
@@ -59,158 +65,132 @@ export const mockDisciplineWatchlist: DisciplineWatchStudent[] = [
   {
     id: 'w-1',
     name: 'Rizky Pratama',
-    nis: '00829103',
-    className: 'Kelas IX A',
-    points: 42,
-    statusLabel: 'Menunggu Sanksi SP1',
+    nis: '1015',
+    className: 'Kelas 5A',
+    points: 50,
+    statusLabel: 'SP1 (Surat Peringatan 1)',
     riskLevel: 'tinggi',
     actionType: 'parent_call',
   },
   {
     id: 'w-2',
     name: 'Fajar Maulana',
-    nis: '00829311',
-    className: 'Kelas VIII A',
-    points: 32,
-    statusLabel: 'Ambang Panggilan 1',
+    nis: '1007',
+    className: 'Kelas 3A',
+    points: 20,
+    statusLabel: 'Pembinaan Wali Kelas',
     riskLevel: 'waspada',
     actionType: 'schedule_bk',
   },
   {
     id: 'w-3',
     name: 'Aldo Firmansyah',
-    nis: '00829440',
-    className: 'Kelas VIII B',
-    points: 30,
-    statusLabel: 'Baru Capai Ambang',
+    nis: '1011',
+    className: 'Kelas 4A',
+    points: 6,
+    statusLabel: 'Pemantauan Ringan',
     riskLevel: 'tinjau',
     actionType: 'review_history',
   },
 ];
 
 /**
- * Initial incidents list matching Stitch prototype.
+ * Fallback SD Islam Bakti Asih incidents when backend is offline.
  */
 export const mockDisciplineIncidents: DisciplineIncident[] = [
   {
     id: 'inc-1',
-    date: '05 Okt 2026',
-    time: '07:25 WIB',
+    violationCode: 'PRL-05',
+    violationName: 'Perkelahian / bullying',
+    backendCategory: 'perilaku',
+    date: '2026-11-20',
+    time: '09:30 WIB',
     studentName: 'Rizky Pratama',
-    studentNis: '00829103',
-    studentClass: 'IX A',
+    studentNis: '1015',
+    studentClass: '5A',
     studentInitials: 'RP',
     studentAvatarBg: 'bg-red-100 text-red-700 border border-red-200',
-    categoryKey: 'bullying',
-    categoryLabel: 'Perkelahian (+25)',
-    points: 25,
-    description:
-      'Terlibat perkelahian di area kantin belakang sekolah saat pergantian jam istirahat ke-2.',
-    location: 'Kantin Belakang Gazebo',
-    recorderName: 'Drs. Agus Subagyo, M.Pd.',
-    recorderRole: 'Guru Piket',
-    studentTotalPoints: 42,
-    studentPointStatus: 'SP1 Waspada',
+    categoryKey: 'perilaku',
+    categoryLabel: 'PRL-05 • Perkelahian / bullying (+50)',
+    points: 50,
+    description: 'Mendorong teman saat istirahat di halaman SD Islam Bakti Asih.',
+    location: 'Halaman Sekolah',
+    immediateAction: 'Pemanggilan Orang Tua & SP1',
+    recorderName: 'Ibu Rina, S.Pd.',
+    recorderRole: 'Kesiswaan & BK',
+    studentTotalPoints: 50,
+    studentPointStatus: 'SP1',
     status: 'tindak',
   },
   {
     id: 'inc-2',
-    date: '05 Okt 2026',
-    time: '09:40 WIB',
+    violationCode: 'PRL-04',
+    violationName: 'Membawa barang terlarang/gadget',
+    backendCategory: 'perilaku',
+    date: '2026-11-21',
+    time: '08:40 WIB',
     studentName: 'Fajar Maulana',
-    studentNis: '00829311',
-    studentClass: 'VIII A',
+    studentNis: '1007',
+    studentClass: '3A',
     studentInitials: 'FM',
     studentAvatarBg: 'bg-amber-surface text-amber-dark border border-amber-gold/40',
-    categoryKey: 'tatatertib',
-    categoryLabel: 'Gadget Saat KBM (+5)',
-    points: 5,
-    description:
-      'Bermain game online di smartphone saat guru sedang menerangkan materi Matematika.',
-    location: 'Ruang Kelas VIII A',
-    recorderName: 'Sarah Rahma, S.Pd.',
+    categoryKey: 'perilaku',
+    categoryLabel: 'PRL-04 • Membawa barang terlarang/gadget (+15)',
+    points: 15,
+    description: 'Membawa jam tangan pintar berkamera saat pelajaran berlangsung.',
+    location: 'Ruang Kelas 3A',
+    immediateAction: 'Disita sementara oleh wali kelas',
+    recorderName: 'Ibu Sari',
     recorderRole: 'Wali Kelas',
-    studentTotalPoints: 32,
-    studentPointStatus: 'Panggilan Ortu',
+    studentTotalPoints: 20,
+    studentPointStatus: 'Pembinaan',
     status: 'baru',
   },
   {
     id: 'inc-3',
-    date: '05 Okt 2026',
-    time: '06:55 WIB',
-    studentName: 'Dimas Saputra',
-    studentNis: '00829103',
-    studentClass: 'VIII A',
-    studentInitials: 'DS',
-    studentAvatarBg: 'bg-pine-light text-pine-deep',
-    categoryKey: 'keterlambatan',
-    categoryLabel: 'Keterlambatan (+2)',
-    points: 2,
-    description: 'Terlambat 20 menit saat apel pagi gerbang utama dikarenakan ban motor bocor.',
-    location: 'Gerbang Depan SMPN 1 Sleman',
-    recorderName: 'Drs. Agus Subagyo, M.Pd.',
-    recorderRole: 'Guru Piket',
-    studentTotalPoints: 12,
-    studentPointStatus: 'Aman',
-    status: 'selesai',
-  },
-  {
-    id: 'inc-4',
-    date: '04 Okt 2026',
+    violationCode: 'ATR-01',
+    violationName: 'Seragam tidak lengkap',
+    backendCategory: 'atribut',
+    date: '2026-11-22',
     time: '07:10 WIB',
     studentName: 'Aldo Firmansyah',
-    studentNis: '00829440',
-    studentClass: 'VIII B',
+    studentNis: '1011',
+    studentClass: '4A',
     studentInitials: 'AF',
-    studentAvatarBg: 'bg-yellow-100 text-yellow-900 border border-yellow-200',
-    categoryKey: 'seragam',
-    categoryLabel: 'Atribut Seragam (+3)',
+    studentAvatarBg: 'bg-pine-light text-pine-deep',
+    categoryKey: 'atribut',
+    categoryLabel: 'ATR-01 • Seragam tidak lengkap (+3)',
     points: 3,
-    description: 'Tidak memakai dasi dan ikat pinggang standar SMPN 1 Sleman saat upacara bendera.',
-    location: 'Lapangan Upacara',
-    recorderName: 'Bambang Irawan, S.Pd.',
+    description: 'Tidak mengenakan topi dan dasi seragam saat upacara hari Senin.',
+    location: 'Lapangan Upacara SD Islam Bakti Asih',
+    immediateAction: 'Sudah dicatat pada apel pagi',
+    recorderName: 'Ibu Rina, S.Pd.',
     recorderRole: 'Kesiswaan',
-    studentTotalPoints: 30,
-    studentPointStatus: 'Batas Ortu',
+    studentTotalPoints: 6,
+    studentPointStatus: 'Aman',
     status: 'tinjau',
   },
   {
-    id: 'inc-5',
-    date: '03 Okt 2026',
-    time: '11:15 WIB',
-    studentName: 'Nabila Aulia',
-    studentNis: '00829801',
-    studentClass: 'VII C',
-    studentInitials: 'NA',
+    id: 'inc-4',
+    violationCode: 'PRL-01',
+    violationName: 'Terlambat masuk sekolah',
+    backendCategory: 'perilaku',
+    date: '2026-11-23',
+    time: '07:20 WIB',
+    studentName: 'Budi Santoso',
+    studentNis: '0002',
+    studentClass: '1A',
+    studentInitials: 'BS',
     studentAvatarBg: 'bg-pastel-mint text-pine-deep',
-    categoryKey: 'keterlambatan',
-    categoryLabel: 'Terlambat Masuk (+2)',
+    categoryKey: 'perilaku',
+    categoryLabel: 'PRL-01 • Terlambat masuk sekolah (+2)',
     points: 2,
-    description: 'Terlambat masuk kelas setelah jam istirahat pertama selama 15 menit.',
-    location: 'Lorong Lantai 2 Gedung B',
-    recorderName: 'Sri Wahyuni, S.Pd.',
-    recorderRole: 'Guru Mapel',
-    studentTotalPoints: 4,
-    studentPointStatus: 'Aman',
-    status: 'selesai',
-  },
-  {
-    id: 'inc-6',
-    date: '02 Okt 2026',
-    time: '08:30 WIB',
-    studentName: 'Bagus Pamungkas',
-    studentNis: '00829562',
-    studentClass: 'VIII A',
-    studentInitials: 'BP',
-    studentAvatarBg: 'bg-surface-container-high text-text-primary',
-    categoryKey: 'tatatertib',
-    categoryLabel: 'Tata Tertib (+5)',
-    points: 5,
-    description: 'Meninggalkan jam pelajaran tanpa izin surat dari guru piket atau UKS.',
-    location: 'Area Parkir Sepeda',
-    recorderName: 'Sarah Rahma, S.Pd.',
-    recorderRole: 'Wali Kelas',
-    studentTotalPoints: 10,
+    description: 'Terlambat datang 10 menit saat jam masuk kelas 1A.',
+    location: 'Gerbang Depan SD Islam Bakti Asih',
+    immediateAction: 'selesai',
+    recorderName: 'Ibu Sari',
+    recorderRole: 'Guru Kelas 1A',
+    studentTotalPoints: 2,
     studentPointStatus: 'Aman',
     status: 'selesai',
   },
@@ -228,7 +208,6 @@ export function filterDisciplineIncidents(
   filter: DisciplineFilterState,
 ): DisciplineIncident[] {
   return incidents.filter((item) => {
-    // Quick Tab filter
     if (filter.quickTab === 'need_action' && item.status === 'selesai') {
       return false;
     }
@@ -239,29 +218,30 @@ export function filterDisciplineIncidents(
       return false;
     }
 
-    // Class dropdown
     if (filter.selectedClass && item.studentClass !== filter.selectedClass) {
       return false;
     }
 
-    // Category dropdown
-    if (filter.selectedCategory && item.categoryKey !== filter.selectedCategory) {
+    if (
+      filter.selectedCategory &&
+      item.categoryKey !== filter.selectedCategory &&
+      item.backendCategory !== filter.selectedCategory
+    ) {
       return false;
     }
 
-    // Status dropdown
     if (filter.selectedStatus && item.status !== filter.selectedStatus) {
       return false;
     }
 
-    // Search input
     if (filter.search.trim()) {
       const q = filter.search.toLowerCase().trim();
       const matchName = item.studentName.toLowerCase().includes(q);
       const matchNis = item.studentNis.includes(q);
       const matchDesc = item.description.toLowerCase().includes(q);
-      const matchLocation = item.location.toLowerCase().includes(q);
-      if (!matchName && !matchNis && !matchDesc && !matchLocation) {
+      const matchCode = item.violationCode.toLowerCase().includes(q);
+      const matchViolation = item.violationName.toLowerCase().includes(q);
+      if (!matchName && !matchNis && !matchDesc && !matchCode && !matchViolation) {
         return false;
       }
     }

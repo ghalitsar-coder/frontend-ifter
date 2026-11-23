@@ -5,10 +5,10 @@ import {
   ChevronRight,
   Clock,
   Eye,
-  History,
   Hourglass,
   Pencil,
   Search,
+  Trash2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import type { DisciplineIncident, IncidentStatus } from '@/types/discipline';
@@ -35,27 +35,40 @@ function getBarColor(totalPoints: number) {
  * @param props - Component properties.
  * @returns Rendered category badge.
  */
-function CategoryBadge(props: { categoryLabel: string; points: number }) {
+function CategoryBadge(props: {
+  categoryLabel: string;
+  points: number;
+  violationCode: string;
+}) {
   if (props.points >= 25) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-lg border border-red-200 bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700">
-        <AlertTriangle className="size-3.5" />
-        {props.categoryLabel}
+      <span className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-100 px-2.5 py-1 text-xs font-bold text-red-700">
+        <AlertTriangle className="size-3.5 shrink-0" />
+        <span className="rounded bg-red-700 px-1.5 py-0.2 font-mono text-[10px] text-white">
+          {props.violationCode}
+        </span>
+        <span>{props.categoryLabel}</span>
       </span>
     );
   }
 
   if (props.points >= 5) {
     return (
-      <span className="inline-flex items-center gap-1 rounded-lg border border-amber-gold/40 bg-amber-surface px-2.5 py-1 text-xs font-bold text-amber-dark">
-        {props.categoryLabel}
+      <span className="inline-flex items-center gap-1.5 rounded-lg border border-amber-gold/40 bg-amber-surface px-2.5 py-1 text-xs font-bold text-amber-dark">
+        <span className="rounded bg-amber-dark px-1.5 py-0.2 font-mono text-[10px] text-white">
+          {props.violationCode}
+        </span>
+        <span>{props.categoryLabel}</span>
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-1 rounded-lg border border-border bg-surface-container-low px-2.5 py-1 text-xs font-semibold text-foreground">
-      {props.categoryLabel}
+    <span className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-surface-container-low px-2.5 py-1 text-xs font-semibold text-foreground">
+      <span className="rounded bg-pine-deep/10 px-1.5 py-0.2 font-mono text-[10px] font-bold text-pine-deep">
+        {props.violationCode}
+      </span>
+      <span>{props.categoryLabel}</span>
     </span>
   );
 }
@@ -110,9 +123,9 @@ function StatusBadge(props: { status: IncidentStatus }) {
  */
 export function DisciplineIncidentTable(props: {
   incidents: DisciplineIncident[];
+  onDeleteIncident: (incident: DisciplineIncident) => void;
   onEditIncident: (incident: DisciplineIncident) => void;
   onViewDetail: (incident: DisciplineIncident) => void;
-  onViewHistory: (incident: DisciplineIncident) => void;
 }) {
   const t = useTranslations('DisciplinePage');
 
@@ -204,7 +217,8 @@ export function DisciplineIncidentTable(props: {
                     {/* Kategori Pelanggaran */}
                     <td className="px-4 py-3.5 whitespace-nowrap">
                       <CategoryBadge
-                        categoryLabel={incident.categoryLabel}
+                        violationCode={incident.violationCode}
+                        categoryLabel={`${incident.violationName} (+${incident.points})`}
                         points={incident.points}
                       />
                     </td>
@@ -291,13 +305,13 @@ export function DisciplineIncidentTable(props: {
                         <button
                           type="button"
                           onClick={() => {
-                            props.onViewHistory(incident);
+                            props.onDeleteIncident(incident);
                           }}
-                          className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-muted md:p-1.5"
-                          title="Histori Audit"
-                          aria-label="Histori Audit"
+                          className="rounded-lg p-2 text-red-600 transition-colors hover:bg-red-50 md:p-1.5"
+                          title="Hapus Catatan Pelanggaran"
+                          aria-label="Hapus Catatan Pelanggaran"
                         >
-                          <History className="size-4" />
+                          <Trash2 className="size-4" />
                         </button>
                       </div>
                     </td>
