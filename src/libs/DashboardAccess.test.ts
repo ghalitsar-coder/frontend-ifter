@@ -62,14 +62,16 @@ describe(isAllowedPage, () => {
     expect(isAllowedPage(['kesiswaan'], 'kedisiplinan')).toBeTruthy();
   });
 
-  it('denies non-kesiswaan roles on kedisiplinan and other roles on restricted pages', () => {
+  it('denies TU access to teacher attendance', () => {
     expect(isAllowedPage(['tu'], 'presensi')).toBeFalsy();
-    expect(isAllowedPage(['guru'], 'kedisiplinan')).toBeFalsy();
-    expect(isAllowedPage(['admin'], 'kedisiplinan')).toBeFalsy();
-    expect(isAllowedPage(['school_admin'], 'kedisiplinan')).toBeFalsy();
-    expect(isAllowedPage(['kepsek'], 'kedisiplinan')).toBeFalsy();
-    expect(isAllowedPage(['tu'], 'kedisiplinan')).toBeFalsy();
   });
+
+  it.each(['guru', 'admin', 'school_admin', 'kepsek', 'tu'])(
+    'denies %s access to kedisiplinan',
+    (role) => {
+      expect(isAllowedPage([role], 'kedisiplinan')).toBeFalsy();
+    },
+  );
 
   it('treats any role containing admin as allowed on general restricted pages', () => {
     expect(isAllowedPage(['school_admin'], 'presensi')).toBeTruthy();

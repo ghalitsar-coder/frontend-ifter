@@ -70,6 +70,15 @@ test.describe('Staff QR session', () => {
       await expect(
         page.getByRole('img', { name: 'Rotating staff attendance QR code' }),
       ).toBeVisible();
+      await page.getByRole('button', { name: 'Perbesar QR' }).click();
+      const enlarged = page.getByRole('dialog');
+      await expect(enlarged.getByRole('img')).toBeInViewport();
+      await expect(
+        page.locator('section img[alt="Rotating staff attendance QR code"]'),
+      ).toBeHidden();
+      await page.screenshot({ path: `test-results/qr-enlarged-${width}.png` });
+      await enlarged.getByRole('button', { name: 'Tutup tampilan besar' }).click();
+      await expect(enlarged).toHaveCount(0);
       const previousCodes = codes;
       await page.reload();
       await expect(
@@ -94,6 +103,71 @@ test.describe('Staff QR session', () => {
       await page.screenshot({ path: `test-results/qr-restored-${width}.png`, fullPage: true });
     });
   }
+
+  test('keeps a valid code during a network interruption and removes it on closure', async ({
+    page,
+  }) => {
+    await page.route(activePath, async (route) => {
+      await route.fulfill({ json: { data: session } });
+    });
+    let requests = 0;
+    await page.route(codePath, async (route) => {
+      requests += 1;
+      if (requests === 1) {
+        await route.fulfill({
+          json: {
+            data: {
+              session_id: session.id,
+              image_png: image,
+              payload: 'signed',
+              valid_until: new Date(Date.now() + 60_000).toISOString(),
+            },
+          },
+        });
+        return;
+      }
+      const closed = requests >= 3;
+      await route.fulfill({
+        status: closed ? 409 : 502,
+        json: { error: { code: closed ? 'session_closed' : 'unreachable', message: 'test' } },
+      });
+    });
+    await page.goto('/dashboard/qr?role=tu');
+    const code = page.getByRole('img', { name: 'Rotating staff attendance QR code' });
+    await expect(code).toBeVisible();
+    await page.waitForResponse((response) => response.status() === 502);
+    await page.getByRole('button', { name: 'Perbesar QR' }).click({ timeout: 2000 });
+    await expect(page.getByRole('dialog').getByRole('img')).toBeVisible();
+    await expect(code).toHaveCount(0);
+  });
+
+  test('removes an expired code while the next code is unavailable', async ({ page }) => {
+    await page.route(activePath, async (route) => {
+      await route.fulfill({ json: { data: session } });
+    });
+    let expiry = '';
+    await page.route(codePath, async (route) => {
+      if (expiry) {
+        await route.abort('connectionfailed');
+        return;
+      }
+      expiry = new Date(Date.now() + 4500).toISOString();
+      await route.fulfill({
+        json: {
+          data: {
+            session_id: session.id,
+            payload: 'signed',
+            image_png: image,
+            valid_until: expiry,
+          },
+        },
+      });
+    });
+    await page.goto('/dashboard/qr?role=tu');
+    const code = page.getByRole('img', { name: 'Rotating staff attendance QR code' });
+    await expect(code).toBeVisible();
+    await expect(code).toBeHidden({ timeout: 6500 });
+  });
 
   test('keeps a closed session closed after refresh', async ({ page }) => {
     let active: StaffQrSession | null = session;

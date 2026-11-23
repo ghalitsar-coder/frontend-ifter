@@ -135,6 +135,7 @@ export function PresensiDispensationForm(props: { student: PresensiStudent; ordi
               className={`${RADIO_OPTION_BASE} ${
                 subCategory === index ? 'bg-amber-surface' : 'bg-surface-card hover:bg-canvas-base'
               }`}
+              aria-label={t(option.titleKey)}
               key={option.titleKey}
             >
               <input
@@ -225,6 +226,7 @@ export function PresensiDispensationForm(props: { student: PresensiStudent; ordi
           {sessionScopes.map((scope, index) => (
             <label
               className="flex flex-1 cursor-pointer items-center gap-space-sm rounded-xl bg-surface-card p-3 shadow-sm transition-all hover:bg-canvas-base"
+              aria-label={t(scope.titleKey)}
               key={scope.titleKey}
             >
               <input
@@ -256,7 +258,7 @@ export function PresensiDispensationForm(props: { student: PresensiStudent; ordi
         </div>
         <div className="flex items-center justify-between gap-space-md rounded-xl bg-surface-card p-space-md shadow-sm">
           <div className="flex min-w-0 items-center gap-space-md">
-            <div className="text-error flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-error-container shadow-sm">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-error-container text-error shadow-sm">
               <span className="material-symbols-outlined text-[24px]">picture_as_pdf</span>
             </div>
             <div className="min-w-0">
@@ -281,7 +283,7 @@ export function PresensiDispensationForm(props: { student: PresensiStudent; ordi
               <span className="material-symbols-outlined text-[18px]">visibility</span>
             </button>
             <button
-              className="hover:text-error flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-error-container"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-error-container hover:text-error"
               title={t('form_file_remove')}
               type="button"
             >
@@ -317,7 +319,10 @@ export function PresensiDispensationForm(props: { student: PresensiStudent; ordi
       </div>
 
       <div className="space-y-space-sm rounded-xl bg-surface-container-low p-space-md shadow-sm">
-        <label className="flex cursor-pointer items-start gap-space-sm select-none">
+        <label
+          aria-label={t('form_notify_parent')}
+          className="flex cursor-pointer items-start gap-space-sm select-none"
+        >
           <input
             checked={notifyParent}
             className="mt-0.5 h-4 w-4 rounded text-pine-deep accent-pine-deep"
@@ -337,7 +342,10 @@ export function PresensiDispensationForm(props: { student: PresensiStudent; ordi
             </span>
           </div>
         </label>
-        <label className="flex cursor-pointer items-start gap-space-sm select-none">
+        <label
+          aria-label={t('form_sync_journal')}
+          className="flex cursor-pointer items-start gap-space-sm select-none"
+        >
           <input
             checked={syncJournal}
             className="mt-0.5 h-4 w-4 rounded text-pine-deep accent-pine-deep"

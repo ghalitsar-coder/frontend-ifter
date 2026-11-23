@@ -1,11 +1,6 @@
-import type {
-  ClassRecapSummary,
-  RecapVerification,
-  StaffRecap,
-  StudentRecap,
-} from '@/types/recap';
 import type { Envelope } from '@/services/presensiApi';
 import { PresensiApiError } from '@/services/presensiApi';
+import type { ClassRecapSummary, RecapVerification, StaffRecap, StudentRecap } from '@/types/recap';
 
 /**
  * Call the Go backend through the /api/backend passthrough.
@@ -205,5 +200,5 @@ export function toClassSummaries(students: StudentRecap[]): ClassRecapSummary[] 
       recordedSessions === 0 ? 0 : Math.round((summary.total_hadir / recordedSessions) * 100);
   }
 
-  return Array.from(map.values()).sort((a, b) => a.class_name.localeCompare(b.class_name));
+  return [...map.values()].toSorted((a, b) => a.class_name.localeCompare(b.class_name));
 }

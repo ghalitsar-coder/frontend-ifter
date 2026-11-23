@@ -15,12 +15,6 @@ export async function AttendlyShell(props: { children: React.ReactNode; signedIn
 
   return (
     <div className="attendly flex min-h-screen flex-col bg-canvas-base text-body-md text-on-surface antialiased">
-      <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        precedence="default"
-        rel="stylesheet"
-      />
-
       <AttendlyHeader signedIn={props.signedIn} />
 
       <main className="w-full flex-1 bg-canvas-base pt-16">{props.children}</main>

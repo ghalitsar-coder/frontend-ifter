@@ -3,7 +3,7 @@ import type { PresensiStatus, PresensiStudent } from '@/types/presensi';
 /**
  * Translation key of the default status badge label.
  */
-export type PresensiBadgeLabelKey =
+type PresensiBadgeLabelKey =
   | 'badge_hadir'
   | 'badge_sakit'
   | 'badge_izin'

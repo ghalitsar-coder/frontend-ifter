@@ -5,7 +5,6 @@ import {
   Award,
   BarChart3,
   CheckCircle2,
-  Download,
   FileSpreadsheet,
   Printer,
   ShieldAlert,
@@ -30,7 +29,7 @@ type ClassMatrixRow = {
   status: 'teladan' | 'tertib' | 'waspada';
 };
 
-const initialMatrixData: ClassMatrixRow[] = [
+const matrixData: ClassMatrixRow[] = [
   {
     className: 'Kelas VII A',
     homeroom: 'Dra. Hj. Maimunah',
@@ -56,7 +55,7 @@ const initialMatrixData: ClassMatrixRow[] = [
     bullyingCount: 0,
     totalIncidents: 0,
     totalPoints: 0,
-    complianceRate: 100.0,
+    complianceRate: 100,
     status: 'teladan',
   },
   {
@@ -98,7 +97,7 @@ const initialMatrixData: ClassMatrixRow[] = [
     bullyingCount: 0,
     totalIncidents: 6,
     totalPoints: 19,
-    complianceRate: 91.0,
+    complianceRate: 91,
     status: 'tertib',
   },
   {
@@ -126,10 +125,17 @@ const initialMatrixData: ClassMatrixRow[] = [
     bullyingCount: 0,
     totalIncidents: 2,
     totalPoints: 5,
-    complianceRate: 98.0,
+    complianceRate: 98,
     status: 'tertib',
   },
 ];
+
+function pointBadgeClass(points: number) {
+  if (points >= 40) {
+    return 'bg-red-100 text-red-700';
+  }
+  return points >= 20 ? 'bg-amber-surface text-amber-dark' : 'bg-pine-light text-pine-deep';
+}
 
 /**
  * Page view for School Discipline Class Matrix and Monthly Reporting.
@@ -137,7 +143,6 @@ const initialMatrixData: ClassMatrixRow[] = [
  * @returns Rendered matrix reporting screen.
  */
 export function DisciplineMatrixView() {
-  const [matrixData] = useState<ClassMatrixRow[]>(initialMatrixData);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -151,16 +156,13 @@ export function DisciplineMatrixView() {
     showToast('Mengunduh berkas Matriks Kedisiplinan Siswa (Format XLSX)...');
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   const grandTotalStudents = matrixData.reduce((acc, r) => acc + r.totalStudents, 0);
   const grandTotalIncidents = matrixData.reduce((acc, r) => acc + r.totalIncidents, 0);
   const grandTotalPoints = matrixData.reduce((acc, r) => acc + r.totalPoints, 0);
-  const averageCompliance = Math.round(
-    (matrixData.reduce((acc, r) => acc + r.complianceRate, 0) / matrixData.length) * 10,
-  ) / 10;
+  const averageCompliance =
+    Math.round(
+      (matrixData.reduce((acc, r) => acc + r.complianceRate, 0) / matrixData.length) * 10,
+    ) / 10;
 
   return (
     <div className="space-y-6">
@@ -196,7 +198,9 @@ export function DisciplineMatrixView() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold text-on-surface shadow-xs transition-colors hover:bg-surface-card"
-            onClick={handlePrint}
+            onClick={() => {
+              window.print();
+            }}
             type="button"
           >
             <Printer className="size-3.5 text-pine-deep" />
@@ -217,11 +221,17 @@ export function DisciplineMatrixView() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Rata-rata Kepatuhan Sekolah</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Rata-rata Kepatuhan Sekolah
+            </span>
             <ShieldCheck className="size-4 text-emerald-700" />
           </div>
-          <p className="mt-2 font-heading text-2xl font-bold text-emerald-900">{averageCompliance}%</p>
-          <span className="text-[11px] text-muted-foreground">Dari {grandTotalStudents} total siswa</span>
+          <p className="mt-2 font-heading text-2xl font-bold text-emerald-900">
+            {averageCompliance}%
+          </p>
+          <span className="text-[11px] text-muted-foreground">
+            Dari {grandTotalStudents} total siswa
+          </span>
         </div>
 
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-xs">
@@ -230,7 +240,9 @@ export function DisciplineMatrixView() {
             <Award className="size-4 text-emerald-700" />
           </div>
           <p className="mt-2 font-heading text-2xl font-bold text-emerald-900">Kelas VII B</p>
-          <span className="text-[11px] font-medium text-emerald-700">0 insiden & kepatuhan 100%</span>
+          <span className="text-[11px] font-medium text-emerald-700">
+            0 insiden & kepatuhan 100%
+          </span>
         </div>
 
         <div className="rounded-2xl border border-amber-gold/40 bg-amber-surface/60 p-4 shadow-xs">
@@ -238,8 +250,12 @@ export function DisciplineMatrixView() {
             <span className="text-xs font-medium text-amber-900">Total Insiden Bulan Ini</span>
             <TrendingUp className="size-4 text-amber-dark" />
           </div>
-          <p className="mt-2 font-heading text-2xl font-bold text-amber-900">{grandTotalIncidents} Kasus</p>
-          <span className="text-[11px] font-medium text-amber-800">Akumulasi {grandTotalPoints} poin</span>
+          <p className="mt-2 font-heading text-2xl font-bold text-amber-900">
+            {grandTotalIncidents} Kasus
+          </p>
+          <span className="text-[11px] font-medium text-amber-800">
+            Akumulasi {grandTotalPoints} poin
+          </span>
         </div>
 
         <div className="rounded-2xl border border-red-200 bg-red-50/70 p-4 shadow-xs">
@@ -248,7 +264,9 @@ export function DisciplineMatrixView() {
             <ShieldAlert className="size-4 text-red-700" />
           </div>
           <p className="mt-2 font-heading text-2xl font-bold text-red-900">Kelas IX A</p>
-          <span className="text-[11px] font-medium text-red-700">68 Poin (Perkelahian di kantin)</span>
+          <span className="text-[11px] font-medium text-red-700">
+            68 Poin (Perkelahian di kantin)
+          </span>
         </div>
       </div>
 
@@ -265,7 +283,7 @@ export function DisciplineMatrixView() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-on-surface">
-            <thead className="border-b border-border bg-surface-card/30 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <thead className="border-b border-border bg-surface-card/30 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
               <tr>
                 <th className="px-6 py-3.5">Rombongan Belajar</th>
                 <th className="px-4 py-3.5">Wali Kelas</th>
@@ -310,7 +328,7 @@ export function DisciplineMatrixView() {
 
                   <td className="px-3 py-4 text-center font-mono">
                     {row.rulesCount > 0 ? (
-                      <span className="text-amber-dark font-bold">{row.rulesCount}</span>
+                      <span className="font-bold text-amber-dark">{row.rulesCount}</span>
                     ) : (
                       <span className="text-muted-foreground/40">-</span>
                     )}
@@ -318,7 +336,7 @@ export function DisciplineMatrixView() {
 
                   <td className="px-3 py-4 text-center font-mono">
                     {row.bullyingCount > 0 ? (
-                      <span className="text-red-700 font-bold">{row.bullyingCount}</span>
+                      <span className="font-bold text-red-700">{row.bullyingCount}</span>
                     ) : (
                       <span className="text-muted-foreground/40">-</span>
                     )}
@@ -331,18 +349,14 @@ export function DisciplineMatrixView() {
                   <td className="px-4 py-4 text-center">
                     {row.totalPoints > 0 ? (
                       <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-bold ${
-                          row.totalPoints >= 40
-                            ? 'bg-red-100 text-red-700'
-                            : row.totalPoints >= 20
-                            ? 'bg-amber-surface text-amber-dark'
-                            : 'bg-pine-light text-pine-deep'
-                        }`}
+                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-bold ${pointBadgeClass(
+                          row.totalPoints,
+                        )}`}
                       >
                         +{row.totalPoints}
                       </span>
                     ) : (
-                      <span className="text-emerald-700 font-bold">0</span>
+                      <span className="font-bold text-emerald-700">0</span>
                     )}
                   </td>
 
@@ -370,7 +384,7 @@ export function DisciplineMatrixView() {
                 </tr>
               ))}
             </tbody>
-            <tfoot className="border-t-2 border-border bg-surface-card/60 font-bold text-xs text-on-surface">
+            <tfoot className="border-t-2 border-border bg-surface-card/60 text-xs font-bold text-on-surface">
               <tr>
                 <td className="px-6 py-3.5" colSpan={2}>
                   Total / Rata-Rata Seluruh Rombel

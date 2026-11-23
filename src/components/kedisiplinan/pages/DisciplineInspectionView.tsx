@@ -28,25 +28,144 @@ type StudentCheckItem = {
 
 const initialStudentsByClass: Record<string, StudentCheckItem[]> = {
   'VIII A': [
-    { id: 's-1', name: 'Fajar Maulana', nis: '00829311', missingTie: true, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
-    { id: 's-2', name: 'Dimas Saputra', nis: '00829103', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: true },
-    { id: 's-3', name: 'Bagus Pamungkas', nis: '00829562', missingTie: false, missingBelt: true, missingSocks: false, untidyHair: false, lateArrival: false },
-    { id: 's-4', name: 'Aisyah Zahra', nis: '00829670', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
-    { id: 's-5', name: 'Dewi Anggraini', nis: '00829712', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
+    {
+      id: 's-1',
+      name: 'Fajar Maulana',
+      nis: '00829311',
+      missingTie: true,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
+    {
+      id: 's-2',
+      name: 'Dimas Saputra',
+      nis: '00829103',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: true,
+    },
+    {
+      id: 's-3',
+      name: 'Bagus Pamungkas',
+      nis: '00829562',
+      missingTie: false,
+      missingBelt: true,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
+    {
+      id: 's-4',
+      name: 'Aisyah Zahra',
+      nis: '00829670',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
+    {
+      id: 's-5',
+      name: 'Dewi Anggraini',
+      nis: '00829712',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
   ],
   'VIII B': [
-    { id: 's-6', name: 'Aldo Firmansyah', nis: '00829440', missingTie: true, missingBelt: true, missingSocks: false, untidyHair: true, lateArrival: false },
-    { id: 's-7', name: 'Budi Santoso', nis: '00829202', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
-    { id: 's-8', name: 'Citra Lestari', nis: '00829505', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
+    {
+      id: 's-6',
+      name: 'Aldo Firmansyah',
+      nis: '00829440',
+      missingTie: true,
+      missingBelt: true,
+      missingSocks: false,
+      untidyHair: true,
+      lateArrival: false,
+    },
+    {
+      id: 's-7',
+      name: 'Budi Santoso',
+      nis: '00829202',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
+    {
+      id: 's-8',
+      name: 'Citra Lestari',
+      nis: '00829505',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
   ],
   'IX A': [
-    { id: 's-9', name: 'Rizky Pratama', nis: '00829103', missingTie: true, missingBelt: false, missingSocks: true, untidyHair: false, lateArrival: false },
-    { id: 's-10', name: 'Bayu Nugroho', nis: '00829215', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
-    { id: 's-11', name: 'Farhan Ramadhan', nis: '00829330', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
+    {
+      id: 's-9',
+      name: 'Rizky Pratama',
+      nis: '00829103',
+      missingTie: true,
+      missingBelt: false,
+      missingSocks: true,
+      untidyHair: false,
+      lateArrival: false,
+    },
+    {
+      id: 's-10',
+      name: 'Bayu Nugroho',
+      nis: '00829215',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
+    {
+      id: 's-11',
+      name: 'Farhan Ramadhan',
+      nis: '00829330',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
   ],
 };
 
 const inspectionClasses = ['VIII A', 'VIII B', 'IX A', 'VII A', 'VII B', 'VII C'];
+
+function inspectionPoints(student: StudentCheckItem) {
+  let points = 0;
+  if (student.missingTie) {
+    points += 3;
+  }
+  if (student.missingBelt) {
+    points += 3;
+  }
+  if (student.missingSocks) {
+    points += 3;
+  }
+  if (student.untidyHair) {
+    points += 3;
+  }
+  if (student.lateArrival) {
+    points += 2;
+  }
+  return points;
+}
 
 /**
  * Page view for daily class attribute and discipline inspection.
@@ -55,17 +174,47 @@ const inspectionClasses = ['VIII A', 'VIII B', 'IX A', 'VII A', 'VII B', 'VII C'
  */
 export function DisciplineInspectionView() {
   const [selectedClass, setSelectedClass] = useState('VIII A');
-  const [sessionName, setSessionName] = useState('Sesi Pagi (Apel & Pembiasaan)');
-  const [students, setStudents] = useState<Record<string, StudentCheckItem[]>>(initialStudentsByClass);
+  const [students, setStudents] =
+    useState<Record<string, StudentCheckItem[]>>(initialStudentsByClass);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const currentClassStudents = students[selectedClass] ?? [
-    { id: 's-gen-1', name: 'Ahmad Fauzi', nis: '00829911', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
-    { id: 's-gen-2', name: 'Nabila Syahrani', nis: '00829912', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
-    { id: 's-gen-3', name: 'Rian Kurniawan', nis: '00829913', missingTie: false, missingBelt: false, missingSocks: false, untidyHair: false, lateArrival: false },
+    {
+      id: 's-gen-1',
+      name: 'Ahmad Fauzi',
+      nis: '00829911',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
+    {
+      id: 's-gen-2',
+      name: 'Nabila Syahrani',
+      nis: '00829912',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
+    {
+      id: 's-gen-3',
+      name: 'Rian Kurniawan',
+      nis: '00829913',
+      missingTie: false,
+      missingBelt: false,
+      missingSocks: false,
+      untidyHair: false,
+      lateArrival: false,
+    },
   ];
 
-  const handleToggle = (studentId: string, field: keyof Omit<StudentCheckItem, 'id' | 'name' | 'nis'>) => {
+  const handleToggle = (
+    studentId: string,
+    field: keyof Omit<StudentCheckItem, 'id' | 'name' | 'nis'>,
+  ) => {
     setStudents((prev) => {
       const classList = (prev[selectedClass] ?? currentClassStudents).map((s) => {
         if (s.id === studentId) {
@@ -75,6 +224,13 @@ export function DisciplineInspectionView() {
       });
       return { ...prev, [selectedClass]: classList };
     });
+  };
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3500);
   };
 
   const handleMarkAllClean = () => {
@@ -96,28 +252,16 @@ export function DisciplineInspectionView() {
     showToast(`Hasil pemeriksaan ${selectedClass} berhasil disimpan ke basis data.`);
   };
 
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 3500);
-  };
-
   // Calculate statistics for the active class
   const totalCount = currentClassStudents.length;
   const violationCount = currentClassStudents.filter(
     (s) => s.missingTie || s.missingBelt || s.missingSocks || s.untidyHair || s.lateArrival,
   ).length;
   const compliantCount = totalCount - violationCount;
-  const totalClassPoints = currentClassStudents.reduce((acc, s) => {
-    let p = 0;
-    if (s.missingTie) p += 3;
-    if (s.missingBelt) p += 3;
-    if (s.missingSocks) p += 3;
-    if (s.untidyHair) p += 3;
-    if (s.lateArrival) p += 2;
-    return acc + p;
-  }, 0);
+  let totalClassPoints = 0;
+  for (const student of currentClassStudents) {
+    totalClassPoints += inspectionPoints(student);
+  }
 
   return (
     <div className="space-y-6">
@@ -185,7 +329,9 @@ export function DisciplineInspectionView() {
                       : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
                   }`}
                   key={cls}
-                  onClick={() => setSelectedClass(cls)}
+                  onClick={() => {
+                    setSelectedClass(cls);
+                  }}
                   type="button"
                 >
                   {cls}
@@ -202,7 +348,7 @@ export function DisciplineInspectionView() {
             <span>•</span>
             <span className="flex items-center gap-1">
               <ClipboardCheck className="size-3.5 text-amber-gold" />
-              {sessionName}
+              Sesi Pagi (Apel &amp; Pembiasaan)
             </span>
           </div>
         </div>
@@ -241,7 +387,9 @@ export function DisciplineInspectionView() {
 
         <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Poin Terakumulasi Hari Ini</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Poin Terakumulasi Hari Ini
+            </span>
             <ShieldCheck className="size-4 text-pine-deep" />
           </div>
           <p className="mt-2 font-heading text-2xl font-bold text-pine-deep">+{totalClassPoints}</p>
@@ -258,7 +406,9 @@ export function DisciplineInspectionView() {
                 Checklist Seragam & Ketertiban: Kelas {selectedClass}
               </h2>
               <p className="text-xs text-muted-foreground">
-                Centang kotak atribut yang <strong className="text-red-700">TIDAK LENGKAP / MELANGGAR</strong> untuk memberikan bobot poin otomatis.
+                Centang kotak atribut yang{' '}
+                <strong className="text-red-700">TIDAK LENGKAP / MELANGGAR</strong> untuk memberikan
+                bobot poin otomatis.
               </p>
             </div>
             <span className="inline-flex items-center rounded-full bg-pine-light px-2.5 py-1 text-xs font-semibold text-pine-deep">
@@ -269,26 +419,31 @@ export function DisciplineInspectionView() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-on-surface">
-            <thead className="border-b border-border bg-surface-card/30 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <thead className="border-b border-border bg-surface-card/30 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
               <tr>
                 <th className="px-6 py-3.5">Nama & NIS Siswa</th>
-                <th className="px-3 py-3.5 text-center">Dasi (+3)</th>
-                <th className="px-3 py-3.5 text-center">Ikat Pinggang (+3)</th>
-                <th className="px-3 py-3.5 text-center">Kaus Kaki (+3)</th>
-                <th className="px-3 py-3.5 text-center">Rambut / Jilbab (+3)</th>
-                <th className="px-3 py-3.5 text-center">Terlambat (+2)</th>
+                <th id="inspection-missingTie" className="px-3 py-3.5 text-center">
+                  Dasi (+3)
+                </th>
+                <th id="inspection-missingBelt" className="px-3 py-3.5 text-center">
+                  Ikat Pinggang (+3)
+                </th>
+                <th id="inspection-missingSocks" className="px-3 py-3.5 text-center">
+                  Kaus Kaki (+3)
+                </th>
+                <th id="inspection-untidyHair" className="px-3 py-3.5 text-center">
+                  Rambut / Jilbab (+3)
+                </th>
+                <th id="inspection-lateArrival" className="px-3 py-3.5 text-center">
+                  Terlambat (+2)
+                </th>
                 <th className="px-4 py-3.5 text-center">Poin Tercatat</th>
                 <th className="px-6 py-3.5 text-right">Status Kepatuhan</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
               {currentClassStudents.map((student) => {
-                let p = 0;
-                if (student.missingTie) p += 3;
-                if (student.missingBelt) p += 3;
-                if (student.missingSocks) p += 3;
-                if (student.untidyHair) p += 3;
-                if (student.lateArrival) p += 2;
+                const p = inspectionPoints(student);
                 const hasInfraction = p > 0;
 
                 return (
@@ -299,51 +454,82 @@ export function DisciplineInspectionView() {
                     key={student.id}
                   >
                     <td className="px-6 py-3.5">
-                      <div className="font-semibold text-on-surface">{student.name}</div>
-                      <div className="font-mono text-[11px] text-muted-foreground">NIS {student.nis}</div>
+                      <div
+                        id={`inspection-student-${student.id}`}
+                        className="font-semibold text-on-surface"
+                      >
+                        {student.name}
+                      </div>
+                      <div className="font-mono text-[11px] text-muted-foreground">
+                        NIS {student.nis}
+                      </div>
                     </td>
 
-                    <td className="px-3 py-3.5 text-center">
+                    <td aria-labelledby="inspection-missingTie" className="px-3 py-3.5 text-center">
                       <input
+                        aria-labelledby={`inspection-missingTie inspection-student-${student.id}`}
                         checked={student.missingTie}
                         className="size-4 cursor-pointer rounded border-border text-red-600 focus:ring-red-500"
-                        onChange={() => handleToggle(student.id, 'missingTie')}
+                        onChange={() => {
+                          handleToggle(student.id, 'missingTie');
+                        }}
                         type="checkbox"
                       />
                     </td>
 
-                    <td className="px-3 py-3.5 text-center">
+                    <td
+                      aria-labelledby="inspection-missingBelt"
+                      className="px-3 py-3.5 text-center"
+                    >
                       <input
+                        aria-labelledby={`inspection-missingBelt inspection-student-${student.id}`}
                         checked={student.missingBelt}
                         className="size-4 cursor-pointer rounded border-border text-red-600 focus:ring-red-500"
-                        onChange={() => handleToggle(student.id, 'missingBelt')}
+                        onChange={() => {
+                          handleToggle(student.id, 'missingBelt');
+                        }}
                         type="checkbox"
                       />
                     </td>
 
-                    <td className="px-3 py-3.5 text-center">
+                    <td
+                      aria-labelledby="inspection-missingSocks"
+                      className="px-3 py-3.5 text-center"
+                    >
                       <input
+                        aria-labelledby={`inspection-missingSocks inspection-student-${student.id}`}
                         checked={student.missingSocks}
                         className="size-4 cursor-pointer rounded border-border text-red-600 focus:ring-red-500"
-                        onChange={() => handleToggle(student.id, 'missingSocks')}
+                        onChange={() => {
+                          handleToggle(student.id, 'missingSocks');
+                        }}
                         type="checkbox"
                       />
                     </td>
 
-                    <td className="px-3 py-3.5 text-center">
+                    <td aria-labelledby="inspection-untidyHair" className="px-3 py-3.5 text-center">
                       <input
+                        aria-labelledby={`inspection-untidyHair inspection-student-${student.id}`}
                         checked={student.untidyHair}
                         className="size-4 cursor-pointer rounded border-border text-red-600 focus:ring-red-500"
-                        onChange={() => handleToggle(student.id, 'untidyHair')}
+                        onChange={() => {
+                          handleToggle(student.id, 'untidyHair');
+                        }}
                         type="checkbox"
                       />
                     </td>
 
-                    <td className="px-3 py-3.5 text-center">
+                    <td
+                      aria-labelledby="inspection-lateArrival"
+                      className="px-3 py-3.5 text-center"
+                    >
                       <input
+                        aria-labelledby={`inspection-lateArrival inspection-student-${student.id}`}
                         checked={student.lateArrival}
                         className="size-4 cursor-pointer rounded border-border text-red-600 focus:ring-red-500"
-                        onChange={() => handleToggle(student.id, 'lateArrival')}
+                        onChange={() => {
+                          handleToggle(student.id, 'lateArrival');
+                        }}
                         type="checkbox"
                       />
                     </td>
@@ -379,7 +565,9 @@ export function DisciplineInspectionView() {
 
         {/* Footer Notes */}
         <div className="border-t border-border bg-surface-card/40 px-6 py-3 text-xs text-muted-foreground">
-          Sesuai Buku Pedoman Tata Tertib: Pelanggaran seragam dikenakan +3 poin per item, keterlambatan apel +2 poin. Hasil pemeriksaan otomatis tersinkron ke profil bimbingan wali kelas.
+          Sesuai Buku Pedoman Tata Tertib: Pelanggaran seragam dikenakan +3 poin per item,
+          keterlambatan apel +2 poin. Hasil pemeriksaan otomatis tersinkron ke profil bimbingan wali
+          kelas.
         </div>
       </div>
     </div>

@@ -3,12 +3,11 @@
 import { Check, CheckCircle2, ClipboardCheck, Sparkles, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
-import {
-  type ClassStudentRecord,
-  type CreateInspectionViolationItem,
-  fetchClassStudents,
-  postCreateInspection,
-  type ViolationTypeRecord,
+import { fetchClassStudents, postCreateInspection } from '@/services/disciplineApi';
+import type {
+  ClassStudentRecord,
+  CreateInspectionViolationItem,
+  ViolationTypeRecord,
 } from '@/services/disciplineApi';
 
 type StudentCheckState = {
@@ -34,11 +33,9 @@ export function DisciplineClassInspectionModal(props: {
 }) {
   const t = useTranslations('DisciplinePage');
 
-  const [selectedClassId, setSelectedClassId] = useState<number>(
-    props.classes[0]?.id ?? 1,
-  );
-  const [inspectionDate, setInspectionDate] = useState<string>(
-    () => new Date().toISOString().slice(0, 10),
+  const [selectedClassId, setSelectedClassId] = useState<number>(props.classes[0]?.id ?? 1);
+  const [inspectionDate, setInspectionDate] = useState<string>(() =>
+    new Date().toISOString().slice(0, 10),
   );
   const [generalNotes, setGeneralNotes] = useState<string>('');
   const [students, setStudents] = useState<ClassStudentRecord[]>([]);
@@ -48,12 +45,10 @@ export function DisciplineClassInspectionModal(props: {
 
   // Load roster whenever selected class changes
   useEffect(() => {
-    if (!props.isOpen || selectedClassId <= 0) {
-      return;
-    }
     let isMounted = true;
-    fetchClassStudents(selectedClassId)
-      .then((data) => {
+    async function loadRoster() {
+      try {
+        const data = await fetchClassStudents(selectedClassId);
         if (!isMounted) {
           return;
         }
@@ -69,8 +64,7 @@ export function DisciplineClassInspectionModal(props: {
           };
         }
         setCheckMap(initialChecks);
-      })
-      .catch(() => {
+      } catch {
         // Fallback demo students if network fails
         if (!isMounted) {
           return;
@@ -81,7 +75,12 @@ export function DisciplineClassInspectionModal(props: {
           { id: 3, nama: 'Citra Lestari', nis: '0003', jenis_kelamin: 'P', nama_kelas: '1A' },
         ];
         setStudents(fallback);
-      });
+      }
+    }
+
+    if (props.isOpen && selectedClassId > 0) {
+      void loadRoster();
+    }
 
     return () => {
       isMounted = false;
@@ -199,7 +198,7 @@ export function DisciplineClassInspectionModal(props: {
 
   return (
     <div className="fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-xs duration-150 fade-in">
-      <div className="flex max-h-[92vh] w-full max-w-4xl flex-col animate-in overflow-hidden rounded-2xl border border-border bg-card shadow-2xl duration-150 zoom-in-95">
+      <div className="flex max-h-[92vh] w-full max-w-4xl animate-in flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl duration-150 zoom-in-95">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border bg-surface-container-low px-6 py-4">
           <div className="flex items-center gap-3">
@@ -207,12 +206,8 @@ export function DisciplineClassInspectionModal(props: {
               <ClipboardCheck className="size-5" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-foreground">
-                {t('inspection_modal_title')}
-              </h3>
-              <p className="text-xs text-muted-foreground">
-                {t('inspection_modal_subtitle')}
-              </p>
+              <h3 className="text-base font-bold text-foreground">{t('inspection_modal_title')}</h3>
+              <p className="text-xs text-muted-foreground">{t('inspection_modal_subtitle')}</p>
             </div>
           </div>
           <button
@@ -279,7 +274,8 @@ export function DisciplineClassInspectionModal(props: {
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-2">
             <div className="flex items-center gap-3 text-xs">
               <span className="font-medium text-muted-foreground">
-                {t('summary_inspected')}: <strong className="text-foreground">{students.length}</strong>
+                {t('summary_inspected')}:{' '}
+                <strong className="text-foreground">{students.length}</strong>
               </span>
               <span className="inline-flex items-center gap-1 rounded-full bg-pine-light px-2.5 py-0.5 font-semibold text-pine-deep">
                 <Check className="size-3" />
@@ -336,15 +332,20 @@ export function DisciplineClassInspectionModal(props: {
                   const hasViolation = c.uniformAttr || c.grooming || c.socksShoes || c.conduct;
 
                   return (
-                    <tr key={student.id} className="transition-colors hover:bg-surface-container-low/50">
-                      <td className="p-3 font-medium text-foreground">
+                    <tr
+                      key={student.id}
+                      className="transition-colors hover:bg-surface-container-low/50"
+                    >
+                      <td aria-label={student.nama} className="p-3 font-medium text-foreground">
                         <div className="flex items-center gap-2.5">
                           <div className="flex size-7 items-center justify-center rounded-full bg-pine-light text-[11px] font-bold text-pine-deep">
                             {student.nama.slice(0, 2).toUpperCase()}
                           </div>
                           <div>
                             <p className="font-semibold">{student.nama}</p>
-                            <p className="text-[10px] text-muted-foreground">NIS: {student.nis ?? '-'}</p>
+                            <p className="text-[10px] text-muted-foreground">
+                              NIS: {student.nis ?? '-'}
+                            </p>
                           </div>
                         </div>
                       </td>

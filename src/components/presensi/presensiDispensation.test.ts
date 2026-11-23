@@ -160,8 +160,12 @@ describe(isDispensationUploadReady, () => {
   });
 
   it('blocks the action in the error screen until the violation is replaced', () => {
-    expect(isDispensationUploadReady('error', draftWith({ document: fileOfMegabytes(6.8) }))).toBeFalsy();
-    expect(isDispensationUploadReady('error', draftWith({ document: fileOfMegabytes(1.2) }))).toBeTruthy();
+    expect(
+      isDispensationUploadReady('error', draftWith({ document: fileOfMegabytes(6.8) })),
+    ).toBeFalsy();
+    expect(
+      isDispensationUploadReady('error', draftWith({ document: fileOfMegabytes(1.2) })),
+    ).toBeTruthy();
   });
 
   it('leaves the action out of the progress and verified states', () => {

@@ -1,9 +1,7 @@
-import type { DisciplineCategory, IncidentStatus } from '@/types/discipline';
-
 /**
  * Envelope wrapper matching the backend HTTP response.
  */
-export type Envelope<T> = {
+type Envelope<T> = {
   data?: T;
   error?: { code: string; message: string; request_id?: string };
   meta?: { request_id?: string };
@@ -106,12 +104,13 @@ export class DisciplineApiError extends Error {
 }
 
 async function requestEnvelope<T>(path: string, init?: RequestInit): Promise<Envelope<T>> {
+  const headers = new Headers(init?.headers);
+  if (!headers.has('Content-Type')) {
+    headers.set('Content-Type', 'application/json');
+  }
   const response = await fetch(`/api/backend/${path}`, {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...init?.headers,
-    },
+    headers,
   });
 
   const envelope: Envelope<T> = await response.json();
@@ -147,7 +146,9 @@ function requireData<T>(envelope: Envelope<T>): T {
 }
 
 /**
- * Fetch all active violation types (catalog) from backend.
+ * Lists active violation types.
+ *
+ * @returns The active violation catalog.
  */
 export async function fetchViolationTypes(): Promise<ViolationTypeRecord[]> {
   const envelope = await requestEnvelope<ViolationTypeRecord[]>('v1/discipline/types');
@@ -155,7 +156,10 @@ export async function fetchViolationTypes(): Promise<ViolationTypeRecord[]> {
 }
 
 /**
- * Fetch recorded student violations with optional filters.
+ * Lists recorded student violations.
+ *
+ * @param filter - Optional class, student, and category criteria.
+ * @returns Matching violations.
  */
 export async function fetchStudentViolations(filter?: {
   classId?: number;
@@ -180,9 +184,14 @@ export async function fetchStudentViolations(filter?: {
 }
 
 /**
- * Record a single student disciplinary incident.
+ * Records a student disciplinary incident.
+ *
+ * @param payload - The incident details.
+ * @returns The recorded violation.
  */
-export async function postRecordViolation(payload: RecordViolationPayload): Promise<StudentViolationRecord> {
+export async function postRecordViolation(
+  payload: RecordViolationPayload,
+): Promise<StudentViolationRecord> {
   const envelope = await requestEnvelope<StudentViolationRecord>('v1/discipline/records', {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -191,23 +200,35 @@ export async function postRecordViolation(payload: RecordViolationPayload): Prom
 }
 
 /**
- * Update follow-up resolution notes for a violation.
+ * Updates the follow-up notes for a violation.
+ *
+ * @param id - The violation identifier.
+ * @param tindakLanjut - The new follow-up notes.
+ * @returns The updated violation.
  */
 export async function updateViolationFollowup(
   id: number,
   tindakLanjut: string,
 ): Promise<StudentViolationRecord> {
-  const envelope = await requestEnvelope<StudentViolationRecord>(`v1/discipline/records/${id}/followup`, {
-    method: 'PATCH',
-    body: JSON.stringify({ tindak_lanjut: tindakLanjut }),
-  });
+  const envelope = await requestEnvelope<StudentViolationRecord>(
+    `v1/discipline/records/${id}/followup`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ tindak_lanjut: tindakLanjut }),
+    },
+  );
   return requireData(envelope);
 }
 
 /**
- * Create batch class daily inspection with violations checklist.
+ * Records a class inspection and its violations.
+ *
+ * @param payload - The inspection details and violation checklist.
+ * @returns The recorded inspection.
  */
-export async function postCreateInspection(payload: CreateInspectionPayload): Promise<DisciplineInspectionRecord> {
+export async function postCreateInspection(
+  payload: CreateInspectionPayload,
+): Promise<DisciplineInspectionRecord> {
   const envelope = await requestEnvelope<DisciplineInspectionRecord>('v1/discipline/inspections', {
     method: 'POST',
     body: JSON.stringify(payload),
@@ -216,7 +237,10 @@ export async function postCreateInspection(payload: CreateInspectionPayload): Pr
 }
 
 /**
- * Fetch list of class daily inspections.
+ * Lists class inspections.
+ *
+ * @param filter - Optional class and date criteria.
+ * @returns Matching inspections.
  */
 export async function fetchInspections(filter?: {
   classId?: number;
@@ -237,17 +261,27 @@ export async function fetchInspections(filter?: {
 }
 
 /**
- * Fetch students enrolled in a class for the checklist inspection modal.
+ * Lists students enrolled in a class.
+ *
+ * @param classId - The class identifier.
+ * @returns The class roster.
  */
 export async function fetchClassStudents(classId: number): Promise<ClassStudentRecord[]> {
-  const envelope = await requestEnvelope<ClassStudentRecord[]>(`v1/discipline/classes/${classId}/students`);
+  const envelope = await requestEnvelope<ClassStudentRecord[]>(
+    `v1/discipline/classes/${classId}/students`,
+  );
   return requireData(envelope);
 }
 
 /**
- * Fetch cumulative points and sanction status for a student.
+ * Retrieves cumulative points and sanction status for a student.
+ *
+ * @param studentId - The student identifier.
+ * @returns The student’s discipline summary.
  */
 export async function fetchStudentSummary(studentId: number): Promise<StudentSummaryRecord> {
-  const envelope = await requestEnvelope<StudentSummaryRecord>(`v1/discipline/students/${studentId}/summary`);
+  const envelope = await requestEnvelope<StudentSummaryRecord>(
+    `v1/discipline/students/${studentId}/summary`,
+  );
   return requireData(envelope);
 }

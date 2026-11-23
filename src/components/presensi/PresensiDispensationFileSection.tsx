@@ -19,7 +19,9 @@ const MAX_MEGABYTES = String(DISPENSATION_FILE_MAX_BYTES / (1024 * 1024));
 
 /**
  * Document picker rendered as a label, so both clicking and dropping a file
- * reach the same hidden input without any imperative open call.
+ * reach the same file picker.
+ * @param props - Picker content, style, field name and selection handler.
+ * @returns A keyboard-accessible file drop zone.
  */
 function PresensiFilePicker(props: {
   children: React.ReactNode;
@@ -28,18 +30,20 @@ function PresensiFilePicker(props: {
   onSelect: (file: File | undefined) => void;
 }) {
   return (
-    <label
-      className={props.className}
-      onDragOver={(event) =>{  event.preventDefault(); }}
-      onDrop={(event) => {
-        event.preventDefault();
-        props.onSelect(event.dataTransfer.files[0]);
-      }}
-    >
+    <label className={`relative focus-within:ring-2 ${props.className}`}>
       <input
-        className="sr-only"
+        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+        onDragOver={(event) => {
+          event.preventDefault();
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+          props.onSelect(event.dataTransfer.files[0]);
+        }}
         name={props.inputName}
-        onChange={(event) =>{  props.onSelect(event.target.files?.[0]); }}
+        onChange={(event) => {
+          props.onSelect(event.target.files?.[0]);
+        }}
         type="file"
       />
       {props.children}
@@ -103,7 +107,7 @@ export function PresensiDispensationFileSection(props: {
                 {t('uploading_percent_badge', { percent: props.percent })}
               </span>
               <button
-                className="border-error/20 text-error rounded-lg border px-2.5 py-1 font-caption text-caption font-semibold transition-colors hover:bg-error-container/40"
+                className="rounded-lg border border-error/20 px-2.5 py-1 font-caption text-caption font-semibold text-error transition-colors hover:bg-error-container/40"
                 onClick={props.onCancelUpload}
                 type="button"
               >
@@ -137,7 +141,7 @@ export function PresensiDispensationFileSection(props: {
           <span className="font-label-md text-label-md font-semibold text-on-surface">
             {t('upload_file_label')}
           </span>
-          <span className="text-error font-caption text-caption font-semibold">
+          <span className="font-caption text-caption font-semibold text-error">
             {t('error_file_limit', {
               max: MAX_MEGABYTES,
               size: formatMegabytes(oversized.size),
@@ -149,11 +153,11 @@ export function PresensiDispensationFileSection(props: {
           inputName="dispensation-document"
           onSelect={props.onSelectFile}
         >
-          <span className="text-error flex h-11 w-11 items-center justify-center rounded-full border border-red-300 bg-white shadow-xs transition-transform group-hover:scale-105">
+          <span className="flex h-11 w-11 items-center justify-center rounded-full border border-red-300 bg-white text-error shadow-xs transition-transform group-hover:scale-105">
             <span className="material-symbols-outlined text-[24px]">cloud_sync</span>
           </span>
           <span className="flex flex-col">
-            <span className="text-error font-label-md text-label-md font-semibold">
+            <span className="font-label-md text-label-md font-semibold text-error">
               {t.rich('error_dropzone_title', {
                 browse: (chunks) => (
                   <span className="font-bold text-pine-deep underline hover:text-pine-hover">
@@ -169,19 +173,19 @@ export function PresensiDispensationFileSection(props: {
         </PresensiFilePicker>
         <div className="flex items-center justify-between gap-3 rounded-xl border-2 border-red-300 bg-red-50/40 p-3.5 shadow-xs">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="text-error flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-red-200 bg-red-100">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-red-200 bg-red-100 text-error">
               <span className="material-symbols-outlined text-[22px] [font-variation-settings:'FILL'_1]">
                 warning
               </span>
             </div>
             <div className="flex min-w-0 flex-col">
-              <span className="decoration-error/70 truncate font-label-md text-label-md font-bold text-on-surface line-through">
+              <span className="truncate font-label-md text-label-md font-bold text-on-surface line-through decoration-error/70">
                 {oversized.name}
               </span>
               <span className="flex items-center gap-2 font-caption text-caption">
-                <span className="text-error font-bold">{formatMegabytes(oversized.size)} MB</span>
+                <span className="font-bold text-error">{formatMegabytes(oversized.size)} MB</span>
                 <span className="text-red-400">•</span>
-                <span className="text-error inline-flex items-center gap-1 rounded-md bg-red-100/80 px-2 py-0.5 font-bold">
+                <span className="inline-flex items-center gap-1 rounded-md bg-red-100/80 px-2 py-0.5 font-bold text-error">
                   <span className="material-symbols-outlined text-[13px] font-bold">cancel</span>
                   {t('error_file_failed')}
                 </span>
@@ -190,7 +194,7 @@ export function PresensiDispensationFileSection(props: {
           </div>
           <div className="flex shrink-0 items-center gap-2">
             <button
-              className="text-error hover:border-error inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-3 py-1.5 font-caption text-caption font-bold shadow-xs transition-colors hover:bg-red-50"
+              className="inline-flex items-center gap-1 rounded-lg border border-red-300 bg-white px-3 py-1.5 font-caption text-caption font-bold text-error shadow-xs transition-colors hover:border-error hover:bg-red-50"
               onClick={props.onRetry}
               title={t('error_retry')}
               type="button"
@@ -218,7 +222,7 @@ export function PresensiDispensationFileSection(props: {
         <span>{t('upload_file_label')}</span>
         <span className="font-caption text-caption text-text-muted">
           {oversized ? (
-            <span className="text-error font-semibold">
+            <span className="font-semibold text-error">
               {t('error_file_limit', {
                 max: MAX_MEGABYTES,
                 size: formatMegabytes(oversized.size),

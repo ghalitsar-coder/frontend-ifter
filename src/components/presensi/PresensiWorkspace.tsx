@@ -137,7 +137,18 @@ function readDemoSnapshot(storageKey: string): Record<string, Exclude<PresensiSt
   try {
     const raw = localStorage.getItem(storageKey);
 
-    return raw === null ? {} : (JSON.parse(raw) as Record<string, Exclude<PresensiStatus, 'none'>>);
+    const saved: unknown = raw === null ? null : JSON.parse(raw);
+    if (typeof saved !== 'object' || saved === null || Array.isArray(saved)) {
+      return {};
+    }
+    const statuses: Record<string, Exclude<PresensiStatus, 'none'>> = {};
+    for (const [id, value] of Object.entries(saved)) {
+      const status: unknown = value;
+      if (status === 'hadir' || status === 'sakit' || status === 'izin' || status === 'alpa') {
+        statuses[id] = status;
+      }
+    }
+    return statuses;
   } catch {
     return {};
   }
@@ -208,7 +219,10 @@ export function PresensiWorkspace() {
       const detail = await guard(openSession({ classId: selectedClassId, tanggal }));
 
       if (demoMode && localStorage.getItem(demoSnapshotKey) === null) {
-        localStorage.setItem(demoSnapshotKey, JSON.stringify(collectSavedStatuses(detail.attendances)));
+        localStorage.setItem(
+          demoSnapshotKey,
+          JSON.stringify(collectSavedStatuses(detail.attendances)),
+        );
       }
 
       return detail;

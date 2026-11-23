@@ -13,13 +13,18 @@ export function useHighlightedCode(value: string, language: string) {
   React.useEffect(() => {
     let cancelled = false;
 
-    loadHighlighter(language)
-      .then((next) => {
-        if (!cancelled) {
-          setLoaded({ language, highlighter: next });
-        }
-      })
-      .catch(() => {});
+    async function load() {
+      let next: Awaited<ReturnType<typeof loadHighlighter>>;
+      try {
+        next = await loadHighlighter(language);
+      } catch {
+        next = null;
+      }
+      if (!cancelled) {
+        setLoaded({ language, highlighter: next });
+      }
+    }
+    void load();
 
     return () => {
       cancelled = true;

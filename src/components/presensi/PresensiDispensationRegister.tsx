@@ -21,7 +21,7 @@ export function PresensiDispensationRegister(props: {
   const t = useTranslations('PresensiPage');
   return (
     <>
-      <div className="text-on-primary flex flex-wrap items-center justify-between gap-space-xs bg-pine-deep px-space-xl py-space-sm">
+      <div className="flex flex-wrap items-center justify-between gap-space-xs bg-pine-deep px-space-xl py-space-sm text-on-primary">
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 rounded-full bg-pine-light/15 px-2.5 py-1 font-eyebrow text-[11px] tracking-wider text-amber-gold uppercase">
             <span className="material-symbols-outlined text-[14px] [font-variation-settings:'FILL'_1]">
@@ -29,13 +29,13 @@ export function PresensiDispensationRegister(props: {
             </span>
             {t('ratified_rail_badge')}
           </span>
-          <span className="bg-on-primary/30 hidden h-1 w-1 rounded-full sm:inline-block" />
-          <span className="text-primary-fixed-dim font-caption text-caption">
+          <span className="hidden h-1 w-1 rounded-full bg-on-primary/30 sm:inline-block" />
+          <span className="font-caption text-caption text-primary-fixed-dim">
             {t('ratified_rail_portal')}
           </span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="text-on-primary/60 font-caption text-caption">
+          <span className="font-caption text-caption text-on-primary/60">
             {t('ratified_registration_label')}
           </span>
           <span className="font-caption font-mono text-caption font-semibold tracking-tight text-amber-gold">
@@ -272,15 +272,19 @@ export function PresensiDispensationRegister(props: {
             <div className="flex w-full shrink-0 items-center justify-end gap-2 sm:w-auto">
               <button
                 className="flex items-center gap-1.5 rounded-xl bg-surface-container-low px-3.5 py-2 font-label-md text-label-md font-medium text-pine-deep transition-colors hover:bg-surface-container"
-                onClick={() =>{  openDispensationDocument(props.file, 'preview'); }}
+                onClick={() => {
+                  openDispensationDocument(props.file, 'preview');
+                }}
                 type="button"
               >
                 <span className="material-symbols-outlined text-[16px]">visibility</span>
                 <span>{t('ratified_preview')}</span>
               </button>
               <button
-                className="hover:text-on-primary flex items-center gap-1.5 rounded-xl bg-pine-light px-3.5 py-2 font-label-md text-label-md font-medium text-pine-deep transition-colors hover:bg-pine-deep"
-                onClick={() =>{  openDispensationDocument(props.file, 'download'); }}
+                className="flex items-center gap-1.5 rounded-xl bg-pine-light px-3.5 py-2 font-label-md text-label-md font-medium text-pine-deep transition-colors hover:bg-pine-deep hover:text-on-primary"
+                onClick={() => {
+                  openDispensationDocument(props.file, 'download');
+                }}
                 type="button"
               >
                 <span className="material-symbols-outlined text-[16px]">download</span>
@@ -312,14 +316,16 @@ export function PresensiDispensationRegister(props: {
       <div className="flex flex-col items-center justify-between gap-space-md bg-surface-card px-space-xl py-space-lg sm:flex-row">
         <button
           className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-surface-card px-space-lg font-label-md text-label-md font-semibold text-pine-deep transition-colors hover:bg-surface-container-low sm:w-auto"
-          onClick={() =>{  window.print(); }}
+          onClick={() => {
+            window.print();
+          }}
           type="button"
         >
           <span className="material-symbols-outlined text-[18px]">print</span>
           <span>{t('ratified_print')}</span>
         </button>
         <button
-          className="text-on-primary flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md font-semibold shadow-md transition-all duration-150 hover:bg-pine-hover hover:shadow-lg sm:w-auto"
+          className="flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md font-semibold text-on-primary shadow-md transition-all duration-150 hover:bg-pine-hover hover:shadow-lg sm:w-auto"
           onClick={props.onClose}
           type="button"
         >

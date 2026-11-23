@@ -4,7 +4,7 @@ import { Env } from '@/libs/Env';
 /**
  * Name of the httpOnly cookie holding the backend JWT; the browser never reads it.
  */
-export const BACKEND_SESSION_COOKIE = 'ifter_token';
+const BACKEND_SESSION_COOKIE = 'ifter_token';
 
 // Matches APP_AUTH_ACCESS_TOKEN_TTL on the backend.
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 12;

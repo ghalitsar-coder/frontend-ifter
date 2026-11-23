@@ -238,7 +238,9 @@ export function PendaftaranDocumentsStep(props: {
             <label
               className="group relative flex cursor-pointer flex-col items-center justify-center rounded-2xl bg-surface-container-low p-space-xl text-center transition-all duration-200 hover:bg-pine-light/40"
               htmlFor="surat-kuasa-input"
-              onDragOver={(event) => event.preventDefault()}
+              onDragOver={(event) => {
+                event.preventDefault();
+              }}
               onDrop={(event) => {
                 event.preventDefault();
                 setSuratKuasaFile(event.dataTransfer.files[0]);
@@ -284,7 +286,9 @@ export function PendaftaranDocumentsStep(props: {
             accept=".pdf,.jpg,.jpeg"
             className="hidden"
             id="surat-kuasa-input"
-            onChange={(event) => setSuratKuasaFile(event.target.files?.[0])}
+            onChange={(event) => {
+              setSuratKuasaFile(event.target.files?.[0]);
+            }}
             ref={suratKuasaInputRef}
             type="file"
           />
@@ -351,7 +355,9 @@ export function PendaftaranDocumentsStep(props: {
           <input
             accept=".pdf,.png,.jpg,.jpeg"
             className="hidden"
-            onChange={(event) => setPiagamFile(event.target.files?.[0])}
+            onChange={(event) => {
+              setPiagamFile(event.target.files?.[0]);
+            }}
             ref={piagamInputRef}
             type="file"
           />
@@ -368,7 +374,9 @@ export function PendaftaranDocumentsStep(props: {
                 checked={attested}
                 className="peer sr-only"
                 id="legal-agreement"
-                onChange={(event) => setAttested(event.target.checked)}
+                onChange={(event) => {
+                  setAttested(event.target.checked);
+                }}
                 type="checkbox"
               />
               <div className="flex h-5 w-5 items-center justify-center rounded-md bg-surface-card shadow-sm transition-all peer-checked:bg-pine-deep">

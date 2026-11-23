@@ -119,7 +119,10 @@ export function PresensiRosterToolbar(props: {
           <select
             className="h-11 cursor-pointer appearance-none rounded-xl border border-border-subtle bg-surface-container-low pr-8 pl-3.5 font-label-md text-label-md text-on-surface focus:outline-none"
             onChange={(event) => {
-              props.onSortChange(event.target.value as PresensiSortOption);
+              const sort = SORT_OPTIONS.find((option) => option === event.target.value);
+              if (sort) {
+                props.onSortChange(sort);
+              }
             }}
             value={props.sortOption}
           >

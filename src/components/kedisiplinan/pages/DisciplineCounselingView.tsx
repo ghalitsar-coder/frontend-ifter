@@ -2,17 +2,12 @@
 
 import {
   ArrowLeft,
-  Calendar,
   CheckCircle2,
   Clock,
   HeartHandshake,
-  History,
   MessageSquare,
   PlusCircle,
   Search,
-  ShieldCheck,
-  UserCheck,
-  Users,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -33,6 +28,15 @@ type CounselingRecord = {
   followupDate: string;
 };
 
+const categoryBadges = {
+  disiplin: {
+    label: 'Kedisiplinan',
+    className: 'border border-amber-gold/40 bg-amber-surface text-amber-dark',
+  },
+  sosial: { label: 'Mediasi Sosial', className: 'bg-purple-100 text-purple-800' },
+  akademik: { label: 'Akademik', className: 'bg-blue-100 text-blue-800' },
+};
+
 const initialCounselingRecords: CounselingRecord[] = [
   {
     id: 'c-1',
@@ -44,7 +48,8 @@ const initialCounselingRecords: CounselingRecord[] = [
     topic: 'Klarifikasi & Mediasi Konflik Fisik di Area Kantin',
     category: 'sosial',
     approach: 'Restitusi Tiga Segitiga & Mediasi Empati Teman Sebaya',
-    studentCommitment: 'Menyadari kesalahan, meminta maaf secara terbuka kepada pihak terkait, serta bersedia membantu piket kebersihan perpustakaan selama 3 hari sebagai wujud tanggung jawab.',
+    studentCommitment:
+      'Menyadari kesalahan, meminta maaf secara terbuka kepada pihak terkait, serta bersedia membantu piket kebersihan perpustakaan selama 3 hari sebagai wujud tanggung jawab.',
     status: 'monitoring',
     followupDate: '12 Okt 2026',
   },
@@ -58,7 +63,8 @@ const initialCounselingRecords: CounselingRecord[] = [
     topic: 'Bimbingan Kelengkapan Atribut & Kebiasaan Disiplin Diri',
     category: 'disiplin',
     approach: 'Konseling Individual & Pembuatan Lembar Kontrak Diri',
-    studentCommitment: 'Berkomitmen menyiapkan kelengkapan seragam (dasi & sabuk) di malam hari sebelum tidur, dengan paraf kontrol harian dari orang tua pada buku penghubung.',
+    studentCommitment:
+      'Berkomitmen menyiapkan kelengkapan seragam (dasi & sabuk) di malam hari sebelum tidur, dengan paraf kontrol harian dari orang tua pada buku penghubung.',
     status: 'resolved',
     followupDate: 'Selesai',
   },
@@ -72,7 +78,8 @@ const initialCounselingRecords: CounselingRecord[] = [
     topic: 'Kecanduan Game Online & Penggunaan Smartphone Saat Belajar',
     category: 'akademik',
     approach: 'Restrukturisasi Kognitif & Manajemen Waktu Layar',
-    studentCommitment: 'Smartphone dititipkan pada loker piket setiap pagi sebelum jam 07.00 WIB selama 2 pekan ke depan.',
+    studentCommitment:
+      'Smartphone dititipkan pada loker piket setiap pagi sebelum jam 07.00 WIB selama 2 pekan ke depan.',
     status: 'monitoring',
     followupDate: '09 Okt 2026',
   },
@@ -99,7 +106,9 @@ const initialCounselingRecords: CounselingRecord[] = [
  */
 export function DisciplineCounselingView() {
   const [records, setRecords] = useState<CounselingRecord[]>(initialCounselingRecords);
-  const [filterCategory, setFilterCategory] = useState<'all' | 'disiplin' | 'sosial' | 'akademik'>('all');
+  const [filterCategory, setFilterCategory] = useState<'all' | 'disiplin' | 'sosial' | 'akademik'>(
+    'all',
+  );
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -107,12 +116,18 @@ export function DisciplineCounselingView() {
   // New Record State
   const [newStudent, setNewStudent] = useState('Bagus Pamungkas');
   const [newClass, setNewClass] = useState('Kelas VIII A');
-  const [newTopic, setNewTopic] = useState('Meninggalkan kelas tanpa izin dan evaluasi kejenuhan belajar');
+  const [newTopic, setNewTopic] = useState(
+    'Meninggalkan kelas tanpa izin dan evaluasi kejenuhan belajar',
+  );
   const [newApproach, setNewApproach] = useState('Konseling Individual & Kontrak Perilaku');
-  const [newCommitment, setNewCommitment] = useState('Siswa berjanji melapor ke wali kelas sebelum keluar kelas.');
+  const [newCommitment, setNewCommitment] = useState(
+    'Siswa berjanji melapor ke wali kelas sebelum keluar kelas.',
+  );
 
   const filtered = records.filter((r) => {
-    if (filterCategory !== 'all' && r.category !== filterCategory) return false;
+    if (filterCategory !== 'all' && r.category !== filterCategory) {
+      return false;
+    }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase().trim();
       return (
@@ -131,7 +146,7 @@ export function DisciplineCounselingView() {
     }, 3500);
   };
 
-  const handleCreateRecord = (e: React.FormEvent) => {
+  const handleCreateRecord = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newEntry: CounselingRecord = {
       id: `c-${Date.now()}`,
@@ -185,11 +200,12 @@ export function DisciplineCounselingView() {
 
         <button
           className="inline-flex items-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-95"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setIsModalOpen(true);
+          }}
           type="button"
         >
-          <PlusCircle className="size-3.5 text-amber-gold" />
-          + Catat Sesi Konseling Baru
+          <PlusCircle className="size-3.5 text-amber-gold" />+ Catat Sesi Konseling Baru
         </button>
       </div>
 
@@ -200,8 +216,12 @@ export function DisciplineCounselingView() {
             <span className="text-xs font-medium text-muted-foreground">Total Sesi Bulan Ini</span>
             <MessageSquare className="size-4 text-pine-deep" />
           </div>
-          <p className="mt-2 font-heading text-2xl font-bold text-on-surface">{records.length} Sesi</p>
-          <span className="text-[11px] text-muted-foreground">Terdokumentasi lengkap di portal BK</span>
+          <p className="mt-2 font-heading text-2xl font-bold text-on-surface">
+            {records.length} Sesi
+          </p>
+          <span className="text-[11px] text-muted-foreground">
+            Terdokumentasi lengkap di portal BK
+          </span>
         </div>
 
         <div className="rounded-2xl border border-emerald-200 bg-emerald-50/70 p-4 shadow-xs">
@@ -212,7 +232,9 @@ export function DisciplineCounselingView() {
           <p className="mt-2 font-heading text-2xl font-bold text-emerald-900">
             {records.filter((r) => r.status === 'resolved').length} Kasus
           </p>
-          <span className="text-[11px] font-medium text-emerald-700">Perilaku kembali sesuai tata tertib</span>
+          <span className="text-[11px] font-medium text-emerald-700">
+            Perilaku kembali sesuai tata tertib
+          </span>
         </div>
 
         <div className="rounded-2xl border border-amber-gold/40 bg-amber-surface/60 p-4 shadow-xs">
@@ -233,7 +255,9 @@ export function DisciplineCounselingView() {
           <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             className="w-full rounded-xl border border-border bg-surface-card py-2 pr-4 pl-10 text-xs text-on-surface placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+            }}
             placeholder="Cari nama siswa, topik bimbingan, atau komitmen..."
             type="text"
             value={searchQuery}
@@ -247,7 +271,9 @@ export function DisciplineCounselingView() {
                 ? 'bg-pine-deep text-white shadow-xs'
                 : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
             }`}
-            onClick={() => setFilterCategory('all')}
+            onClick={() => {
+              setFilterCategory('all');
+            }}
             type="button"
           >
             Semua Topik
@@ -258,7 +284,9 @@ export function DisciplineCounselingView() {
                 ? 'bg-pine-deep text-white shadow-xs'
                 : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
             }`}
-            onClick={() => setFilterCategory('disiplin')}
+            onClick={() => {
+              setFilterCategory('disiplin');
+            }}
             type="button"
           >
             Kedisiplinan
@@ -269,7 +297,9 @@ export function DisciplineCounselingView() {
                 ? 'bg-pine-deep text-white shadow-xs'
                 : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
             }`}
-            onClick={() => setFilterCategory('sosial')}
+            onClick={() => {
+              setFilterCategory('sosial');
+            }}
             type="button"
           >
             Sosial & Mediasi
@@ -280,7 +310,9 @@ export function DisciplineCounselingView() {
                 ? 'bg-pine-deep text-white shadow-xs'
                 : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
             }`}
-            onClick={() => setFilterCategory('akademik')}
+            onClick={() => {
+              setFilterCategory('akademik');
+            }}
             type="button"
           >
             Kebiasaan Belajar
@@ -298,31 +330,29 @@ export function DisciplineCounselingView() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-3">
                 <div className="flex size-10 items-center justify-center rounded-xl bg-pine-light font-bold text-pine-deep">
-                  {record.studentName.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                  {record.studentName
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .slice(0, 2)}
                 </div>
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <h3 className="font-heading text-sm font-bold text-on-surface">
                       {record.studentName}
                     </h3>
-                    <span className="rounded bg-surface-card px-2 py-0.5 text-[11px] font-semibold text-muted-foreground border border-border">
+                    <span className="rounded border border-border bg-surface-card px-2 py-0.5 text-[11px] font-semibold text-muted-foreground">
                       {record.studentClass} • NIS {record.studentNis}
                     </span>
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                        record.category === 'sosial'
-                          ? 'bg-purple-100 text-purple-800'
-                          : record.category === 'akademik'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-amber-surface text-amber-dark border border-amber-gold/40'
+                        categoryBadges[record.category].className
                       }`}
                     >
-                      {record.category === 'sosial' ? 'Mediasi Sosial' : record.category === 'akademik' ? 'Akademik' : 'Kedisiplinan'}
+                      {categoryBadges[record.category].label}
                     </span>
                   </div>
-                  <p className="mt-1 font-semibold text-xs text-pine-deep">
-                    Topik: {record.topic}
-                  </p>
+                  <p className="mt-1 text-xs font-semibold text-pine-deep">Topik: {record.topic}</p>
                 </div>
               </div>
 
@@ -344,7 +374,9 @@ export function DisciplineCounselingView() {
             {/* Approach & Commitment Details */}
             <div className="mt-4 grid grid-cols-1 gap-3 rounded-xl border border-border bg-surface-card/60 p-4 text-xs md:grid-cols-2">
               <div>
-                <span className="font-bold text-muted-foreground">Pendekatan / Layanan Konseling:</span>
+                <span className="font-bold text-muted-foreground">
+                  Pendekatan / Layanan Konseling:
+                </span>
                 <p className="mt-0.5 text-on-surface">{record.approach}</p>
                 <div className="mt-2 text-[11px] text-muted-foreground">
                   Konselor: <strong>{record.counselorName}</strong> • {record.date}
@@ -352,8 +384,12 @@ export function DisciplineCounselingView() {
               </div>
 
               <div>
-                <span className="font-bold text-muted-foreground">Komitmen Siswa & Solusi Disepakati:</span>
-                <p className="mt-0.5 text-on-surface italic">&ldquo;{record.studentCommitment}&rdquo;</p>
+                <span className="font-bold text-muted-foreground">
+                  Komitmen Siswa & Solusi Disepakati:
+                </span>
+                <p className="mt-0.5 text-on-surface italic">
+                  &ldquo;{record.studentCommitment}&rdquo;
+                </p>
               </div>
             </div>
           </div>
@@ -370,7 +406,9 @@ export function DisciplineCounselingView() {
               </h3>
               <button
                 className="rounded-lg p-1 text-muted-foreground hover:bg-surface-card hover:text-on-surface"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setIsModalOpen(false);
+                }}
                 type="button"
               >
                 <X className="size-5" />
@@ -379,13 +417,23 @@ export function DisciplineCounselingView() {
 
             <form className="mt-4 space-y-4 text-xs" onSubmit={handleCreateRecord}>
               <div>
-                <label className="block font-semibold text-on-surface mb-1">Nama Siswa</label>
+                <label
+                  htmlFor="counseling-student"
+                  className="mb-1 block font-semibold text-on-surface"
+                >
+                  Nama Siswa
+                </label>
                 <select
+                  id="counseling-student"
                   className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
                   onChange={(e) => {
                     setNewStudent(e.target.value);
-                    if (e.target.value.includes('Bagus')) setNewClass('Kelas VIII A');
-                    if (e.target.value.includes('Rizky')) setNewClass('Kelas IX A');
+                    if (e.target.value.includes('Bagus')) {
+                      setNewClass('Kelas VIII A');
+                    }
+                    if (e.target.value.includes('Rizky')) {
+                      setNewClass('Kelas IX A');
+                    }
                   }}
                   value={newStudent}
                 >
@@ -396,10 +444,18 @@ export function DisciplineCounselingView() {
               </div>
 
               <div>
-                <label className="block font-semibold text-on-surface mb-1">Topik Bimbingan</label>
+                <label
+                  htmlFor="counseling-topic"
+                  className="mb-1 block font-semibold text-on-surface"
+                >
+                  Topik Bimbingan
+                </label>
                 <input
+                  id="counseling-topic"
                   className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                  onChange={(e) => setNewTopic(e.target.value)}
+                  onChange={(e) => {
+                    setNewTopic(e.target.value);
+                  }}
                   required
                   type="text"
                   value={newTopic}
@@ -407,10 +463,18 @@ export function DisciplineCounselingView() {
               </div>
 
               <div>
-                <label className="block font-semibold text-on-surface mb-1">Pendekatan / Layanan Konseling</label>
+                <label
+                  htmlFor="counseling-approach"
+                  className="mb-1 block font-semibold text-on-surface"
+                >
+                  Pendekatan / Layanan Konseling
+                </label>
                 <input
+                  id="counseling-approach"
                   className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                  onChange={(e) => setNewApproach(e.target.value)}
+                  onChange={(e) => {
+                    setNewApproach(e.target.value);
+                  }}
                   required
                   type="text"
                   value={newApproach}
@@ -418,20 +482,30 @@ export function DisciplineCounselingView() {
               </div>
 
               <div>
-                <label className="block font-semibold text-on-surface mb-1">Komitmen & Solusi Restoratif Siswa</label>
+                <label
+                  htmlFor="counseling-commitment"
+                  className="mb-1 block font-semibold text-on-surface"
+                >
+                  Komitmen & Solusi Restoratif Siswa
+                </label>
                 <textarea
+                  id="counseling-commitment"
                   className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                  onChange={(e) => setNewCommitment(e.target.value)}
+                  onChange={(e) => {
+                    setNewCommitment(e.target.value);
+                  }}
                   required
                   rows={3}
                   value={newCommitment}
                 />
               </div>
 
-              <div className="mt-6 flex items-center justify-end gap-2 pt-2 border-t border-border">
+              <div className="mt-6 flex items-center justify-end gap-2 border-t border-border pt-2">
                 <button
                   className="rounded-xl border border-border px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-card"
-                  onClick={() => setIsModalOpen(false)}
+                  onClick={() => {
+                    setIsModalOpen(false);
+                  }}
                   type="button"
                 >
                   Batal

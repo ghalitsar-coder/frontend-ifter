@@ -2,7 +2,6 @@
 
 import {
   ArrowLeft,
-  Calendar,
   CheckCircle2,
   Clock,
   Eye,
@@ -15,7 +14,6 @@ import {
   Printer,
   Send,
   User,
-  Users,
   X,
 } from 'lucide-react';
 import { useState } from 'react';
@@ -135,9 +133,7 @@ export function DisciplineSummonsView() {
   };
 
   const handleMarkSent = (id: string) => {
-    setLetters((prev) =>
-      prev.map((l) => (l.id === id ? { ...l, status: 'sent' as const } : l)),
-    );
+    setLetters((prev) => prev.map((l) => (l.id === id ? { ...l, status: 'sent' as const } : l)));
     showToast('Status surat diperbarui menjadi: Terkirim ke Wali Murid.');
   };
 
@@ -148,7 +144,7 @@ export function DisciplineSummonsView() {
     showToast('Pertemuan wali murid selesai dilaksanakan & dicatat di buku konseling.');
   };
 
-  const handleCreateLetter = (e: React.FormEvent) => {
+  const handleCreateLetter = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     const newLetter: SummonsLetter = {
       id: `let-${Date.now()}`,
@@ -204,7 +200,9 @@ export function DisciplineSummonsView() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold text-on-surface shadow-xs transition-colors hover:bg-surface-card"
-            onClick={() => showToast('Mengekspor rekapitulasi antrean surat panggilan...')}
+            onClick={() => {
+              showToast('Mengekspor rekapitulasi antrean surat panggilan...');
+            }}
             type="button"
           >
             <FileSpreadsheet className="size-3.5 text-pine-deep" />
@@ -212,11 +210,12 @@ export function DisciplineSummonsView() {
           </button>
           <button
             className="inline-flex items-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2 text-xs font-semibold text-white shadow-sm transition-opacity hover:opacity-95"
-            onClick={() => setIsNewModalOpen(true)}
+            onClick={() => {
+              setIsNewModalOpen(true);
+            }}
             type="button"
           >
-            <PlusCircle className="size-3.5 text-amber-gold" />
-            + Buat Surat Panggilan Baru
+            <PlusCircle className="size-3.5 text-amber-gold" />+ Buat Surat Panggilan Baru
           </button>
         </div>
       </div>
@@ -225,7 +224,9 @@ export function DisciplineSummonsView() {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Total Surat Diterbitkan</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Total Surat Diterbitkan
+            </span>
             <FileText className="size-4 text-pine-deep" />
           </div>
           <p className="mt-2 font-heading text-2xl font-bold text-on-surface">{letters.length}</p>
@@ -240,7 +241,9 @@ export function DisciplineSummonsView() {
           <p className="mt-2 font-heading text-2xl font-bold text-amber-900">
             {letters.filter((l) => l.status === 'draft').length} Surat
           </p>
-          <span className="text-[11px] font-medium text-amber-800">Perlu pengesahan kepala kesiswaan</span>
+          <span className="text-[11px] font-medium text-amber-800">
+            Perlu pengesahan kepala kesiswaan
+          </span>
         </div>
 
         <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4 shadow-xs">
@@ -269,45 +272,53 @@ export function DisciplineSummonsView() {
       {/* Tabs Filter */}
       <div className="flex border-b border-border text-xs font-semibold">
         <button
-          className={`px-4 py-2.5 border-b-2 transition-colors ${
+          className={`border-b-2 px-4 py-2.5 transition-colors ${
             statusFilter === 'all'
-              ? 'border-pine-deep text-pine-deep font-bold'
+              ? 'border-pine-deep font-bold text-pine-deep'
               : 'border-transparent text-muted-foreground hover:text-on-surface'
           }`}
-          onClick={() => setStatusFilter('all')}
+          onClick={() => {
+            setStatusFilter('all');
+          }}
           type="button"
         >
           Semua Surat ({letters.length})
         </button>
         <button
-          className={`px-4 py-2.5 border-b-2 transition-colors ${
+          className={`border-b-2 px-4 py-2.5 transition-colors ${
             statusFilter === 'draft'
-              ? 'border-pine-deep text-pine-deep font-bold'
+              ? 'border-pine-deep font-bold text-pine-deep'
               : 'border-transparent text-muted-foreground hover:text-on-surface'
           }`}
-          onClick={() => setStatusFilter('draft')}
+          onClick={() => {
+            setStatusFilter('draft');
+          }}
           type="button"
         >
           Menunggu Dikirim ({letters.filter((l) => l.status === 'draft').length})
         </button>
         <button
-          className={`px-4 py-2.5 border-b-2 transition-colors ${
+          className={`border-b-2 px-4 py-2.5 transition-colors ${
             statusFilter === 'sent'
-              ? 'border-pine-deep text-pine-deep font-bold'
+              ? 'border-pine-deep font-bold text-pine-deep'
               : 'border-transparent text-muted-foreground hover:text-on-surface'
           }`}
-          onClick={() => setStatusFilter('sent')}
+          onClick={() => {
+            setStatusFilter('sent');
+          }}
           type="button"
         >
           Menunggu Kehadiran ({letters.filter((l) => l.status === 'sent').length})
         </button>
         <button
-          className={`px-4 py-2.5 border-b-2 transition-colors ${
+          className={`border-b-2 px-4 py-2.5 transition-colors ${
             statusFilter === 'completed'
-              ? 'border-pine-deep text-pine-deep font-bold'
+              ? 'border-pine-deep font-bold text-pine-deep'
               : 'border-transparent text-muted-foreground hover:text-on-surface'
           }`}
-          onClick={() => setStatusFilter('completed')}
+          onClick={() => {
+            setStatusFilter('completed');
+          }}
           type="button"
         >
           Selesai Konseling ({letters.filter((l) => l.status === 'completed').length})
@@ -318,7 +329,7 @@ export function DisciplineSummonsView() {
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-on-surface">
-            <thead className="border-b border-border bg-surface-card/40 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <thead className="border-b border-border bg-surface-card/40 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
               <tr>
                 <th className="px-6 py-3.5">Nomor & Tanggal Surat</th>
                 <th className="px-4 py-3.5">Siswa & Wali Murid</th>
@@ -332,14 +343,18 @@ export function DisciplineSummonsView() {
               {filteredLetters.map((letter) => (
                 <tr className="transition-colors hover:bg-surface-card/40" key={letter.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="font-mono font-bold text-pine-deep">{letter.letterNumber}</span>
-                    <div className="mt-0.5 text-[11px] text-muted-foreground">{letter.scheduledDate}</div>
+                    <span className="font-mono font-bold text-pine-deep">
+                      {letter.letterNumber}
+                    </span>
+                    <div className="mt-0.5 text-[11px] text-muted-foreground">
+                      {letter.scheduledDate}
+                    </div>
                   </td>
 
                   <td className="px-4 py-4">
                     <div className="font-semibold text-on-surface">{letter.studentName}</div>
                     <div className="text-[11px] text-muted-foreground">{letter.studentClass}</div>
-                    <div className="mt-0.5 flex items-center gap-1 text-[11px] text-pine-deep font-medium">
+                    <div className="mt-0.5 flex items-center gap-1 text-[11px] font-medium text-pine-deep">
                       <User className="size-3" />
                       Wali: {letter.parentName}
                     </div>
@@ -388,7 +403,9 @@ export function DisciplineSummonsView() {
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-semibold text-on-surface hover:bg-surface-card"
-                        onClick={() => setSelectedLetter(letter)}
+                        onClick={() => {
+                          setSelectedLetter(letter);
+                        }}
                         type="button"
                       >
                         <Eye className="size-3.5 text-pine-deep" />
@@ -398,7 +415,9 @@ export function DisciplineSummonsView() {
                       {letter.status === 'draft' && (
                         <button
                           className="inline-flex items-center gap-1 rounded-lg bg-pine-deep px-2.5 py-1.5 text-xs font-semibold text-white hover:opacity-95"
-                          onClick={() => handleMarkSent(letter.id)}
+                          onClick={() => {
+                            handleMarkSent(letter.id);
+                          }}
                           type="button"
                         >
                           <Send className="size-3.5 text-amber-gold" />
@@ -409,7 +428,9 @@ export function DisciplineSummonsView() {
                       {letter.status === 'sent' && (
                         <button
                           className="inline-flex items-center gap-1 rounded-lg bg-emerald-700 px-2.5 py-1.5 text-xs font-semibold text-white hover:opacity-95"
-                          onClick={() => handleMarkCompleted(letter.id)}
+                          onClick={() => {
+                            handleMarkCompleted(letter.id);
+                          }}
                           type="button"
                         >
                           <CheckCircle2 className="size-3.5 text-white" />
@@ -438,7 +459,9 @@ export function DisciplineSummonsView() {
               </div>
               <button
                 className="rounded-lg p-1 text-muted-foreground hover:bg-surface-card hover:text-on-surface"
-                onClick={() => setSelectedLetter(null)}
+                onClick={() => {
+                  setSelectedLetter(null);
+                }}
                 type="button"
               >
                 <X className="size-5" />
@@ -447,7 +470,7 @@ export function DisciplineSummonsView() {
 
             <div className="mt-4 space-y-4 rounded-xl border border-border bg-surface-card/60 p-5 text-xs leading-relaxed text-on-surface">
               <div className="border-b border-border/80 pb-3 text-center">
-                <h4 className="font-heading text-sm font-bold uppercase tracking-wider text-pine-deep">
+                <h4 className="font-heading text-sm font-bold tracking-wider text-pine-deep uppercase">
                   SD / SMP Islam Bakti Asih
                 </h4>
                 <p className="text-[11px] text-muted-foreground">
@@ -459,20 +482,35 @@ export function DisciplineSummonsView() {
               </div>
 
               <div className="space-y-2">
-                <p>Kepada Yth. Bapak/Ibu Wali dari <strong>{selectedLetter.studentName}</strong> ({selectedLetter.studentClass}):</p>
                 <p>
-                  Berdasarkan evaluasi kedisiplinan semester berjalan, siswa yang bersangkutan telah mencapai akumulasi{' '}
-                  <span className="font-bold text-red-700">+{selectedLetter.pointsAccumulated} Poin</span> atas catatan:
+                  Kepada Yth. Bapak/Ibu Wali dari <strong>{selectedLetter.studentName}</strong> (
+                  {selectedLetter.studentClass}):
                 </p>
-                <div className="rounded-lg bg-card p-3 border border-border italic text-[11px]">
+                <p>
+                  Berdasarkan evaluasi kedisiplinan semester berjalan, siswa yang bersangkutan telah
+                  mencapai akumulasi{' '}
+                  <span className="font-bold text-red-700">
+                    +{selectedLetter.pointsAccumulated} Poin
+                  </span>{' '}
+                  atas catatan:
+                </p>
+                <div className="rounded-lg border border-border bg-card p-3 text-[11px] italic">
                   &ldquo;{selectedLetter.reason}&rdquo;
                 </div>
                 <p>Maka kami mengundang kehadiran Bapak/Ibu pada:</p>
-                <div className="grid grid-cols-2 gap-2 rounded-lg bg-card p-3 border border-border text-[11px]">
-                  <div><strong>Hari / Tanggal:</strong> {selectedLetter.scheduledDate}</div>
-                  <div><strong>Waktu:</strong> {selectedLetter.scheduledTime}</div>
-                  <div><strong>Ruangan:</strong> {selectedLetter.room}</div>
-                  <div><strong>Pendamping:</strong> {selectedLetter.counselor}</div>
+                <div className="grid grid-cols-2 gap-2 rounded-lg border border-border bg-card p-3 text-[11px]">
+                  <div>
+                    <strong>Hari / Tanggal:</strong> {selectedLetter.scheduledDate}
+                  </div>
+                  <div>
+                    <strong>Waktu:</strong> {selectedLetter.scheduledTime}
+                  </div>
+                  <div>
+                    <strong>Ruangan:</strong> {selectedLetter.room}
+                  </div>
+                  <div>
+                    <strong>Pendamping:</strong> {selectedLetter.counselor}
+                  </div>
                 </div>
               </div>
             </div>
@@ -480,14 +518,18 @@ export function DisciplineSummonsView() {
             <div className="mt-6 flex items-center justify-end gap-2">
               <button
                 className="rounded-xl border border-border px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-card"
-                onClick={() => setSelectedLetter(null)}
+                onClick={() => {
+                  setSelectedLetter(null);
+                }}
                 type="button"
               >
                 Tutup
               </button>
               <button
                 className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-card"
-                onClick={() => window.print()}
+                onClick={() => {
+                  window.print();
+                }}
                 type="button"
               >
                 <Printer className="size-3.5 text-pine-deep" />
@@ -496,7 +538,9 @@ export function DisciplineSummonsView() {
               <button
                 className="inline-flex items-center gap-1.5 rounded-xl bg-pine-deep px-4 py-2 text-xs font-semibold text-white hover:opacity-95"
                 onClick={() => {
-                  showToast('Tautan surat panggilan telah dikirimkan ke kontak WhatsApp wali murid.');
+                  showToast(
+                    'Tautan surat panggilan telah dikirimkan ke kontak WhatsApp wali murid.',
+                  );
                   setSelectedLetter(null);
                 }}
                 type="button"
@@ -519,7 +563,9 @@ export function DisciplineSummonsView() {
               </h3>
               <button
                 className="rounded-lg p-1 text-muted-foreground hover:bg-surface-card hover:text-on-surface"
-                onClick={() => setIsNewModalOpen(false)}
+                onClick={() => {
+                  setIsNewModalOpen(false);
+                }}
                 type="button"
               >
                 <X className="size-5" />
@@ -528,13 +574,23 @@ export function DisciplineSummonsView() {
 
             <form className="mt-4 space-y-4 text-xs" onSubmit={handleCreateLetter}>
               <div>
-                <label className="block font-semibold text-on-surface mb-1">Pilih Siswa</label>
+                <label
+                  htmlFor="summons-student"
+                  className="mb-1 block font-semibold text-on-surface"
+                >
+                  Pilih Siswa
+                </label>
                 <select
+                  id="summons-student"
                   className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
                   onChange={(e) => {
                     setNewStudentName(e.target.value);
-                    if (e.target.value.includes('Dimas')) setNewStudentClass('Kelas VIII A');
-                    if (e.target.value.includes('Bayu')) setNewStudentClass('Kelas IX A');
+                    if (e.target.value.includes('Dimas')) {
+                      setNewStudentClass('Kelas VIII A');
+                    }
+                    if (e.target.value.includes('Bayu')) {
+                      setNewStudentClass('Kelas IX A');
+                    }
                   }}
                   value={newStudentName}
                 >
@@ -545,10 +601,18 @@ export function DisciplineSummonsView() {
               </div>
 
               <div>
-                <label className="block font-semibold text-on-surface mb-1">Nama Orang Tua / Wali Murid</label>
+                <label
+                  htmlFor="summons-guardian"
+                  className="mb-1 block font-semibold text-on-surface"
+                >
+                  Nama Orang Tua / Wali Murid
+                </label>
                 <input
+                  id="summons-guardian"
                   className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                  onChange={(e) => setNewParentName(e.target.value)}
+                  onChange={(e) => {
+                    setNewParentName(e.target.value);
+                  }}
                   required
                   type="text"
                   value={newParentName}
@@ -556,10 +620,18 @@ export function DisciplineSummonsView() {
               </div>
 
               <div>
-                <label className="block font-semibold text-on-surface mb-1">Alasan / Pokok Perkara Pemanggilan</label>
+                <label
+                  htmlFor="summons-reason"
+                  className="mb-1 block font-semibold text-on-surface"
+                >
+                  Alasan / Pokok Perkara Pemanggilan
+                </label>
                 <textarea
+                  id="summons-reason"
                   className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                  onChange={(e) => setNewReason(e.target.value)}
+                  onChange={(e) => {
+                    setNewReason(e.target.value);
+                  }}
                   required
                   rows={2}
                   value={newReason}
@@ -568,20 +640,36 @@ export function DisciplineSummonsView() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-on-surface mb-1">Tanggal Menghadap</label>
+                  <label
+                    htmlFor="summons-date"
+                    className="mb-1 block font-semibold text-on-surface"
+                  >
+                    Tanggal Menghadap
+                  </label>
                   <input
+                    id="summons-date"
                     className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                    onChange={(e) => setNewDate(e.target.value)}
+                    onChange={(e) => {
+                      setNewDate(e.target.value);
+                    }}
                     required
                     type="date"
                     value={newDate}
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-on-surface mb-1">Waktu</label>
+                  <label
+                    htmlFor="summons-time"
+                    className="mb-1 block font-semibold text-on-surface"
+                  >
+                    Waktu
+                  </label>
                   <input
+                    id="summons-time"
                     className="w-full rounded-xl border border-border bg-surface-card p-2.5 text-xs text-on-surface"
-                    onChange={(e) => setNewTime(e.target.value)}
+                    onChange={(e) => {
+                      setNewTime(e.target.value);
+                    }}
                     required
                     type="time"
                     value={newTime}
@@ -589,10 +677,12 @@ export function DisciplineSummonsView() {
                 </div>
               </div>
 
-              <div className="mt-6 flex items-center justify-end gap-2 pt-2 border-t border-border">
+              <div className="mt-6 flex items-center justify-end gap-2 border-t border-border pt-2">
                 <button
                   className="rounded-xl border border-border px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-card"
-                  onClick={() => setIsNewModalOpen(false)}
+                  onClick={() => {
+                    setIsNewModalOpen(false);
+                  }}
                   type="button"
                 >
                   Batal

@@ -114,6 +114,7 @@ const STATUS_CARDS = [
       </div>
 
       <button
+        aria-label={t('metric_unrecorded')}
         className="relative col-span-2 flex cursor-pointer flex-col justify-between overflow-hidden rounded-2xl border-[1.5px] border-amber-gold bg-amber-surface p-5 text-left shadow-sm transition-all duration-300 hover:shadow-md md:col-span-1"
         onClick={props.onFilterUnrecorded}
         type="button"

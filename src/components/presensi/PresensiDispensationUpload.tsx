@@ -36,6 +36,166 @@ const CATEGORY_OPTIONS = [
   { glyph: 'military_tech', labelKey: 'form_category_dispensation', value: 'izin' },
 ] as const satisfies readonly { glyph: string; labelKey: string; value: DispensationCategory }[];
 
+function UploadDates(props: {
+  draft: DispensationDraft;
+  rejected: boolean;
+  uploading: boolean;
+  onDraftChange: (draft: DispensationDraft) => void;
+}) {
+  const t = useTranslations('PresensiPage');
+  let endDateIconClass = props.uploading ? 'text-pine-deep' : 'text-text-muted';
+  if (props.rejected) {
+    endDateIconClass = 'text-error';
+  }
+  return (
+    <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
+      <label className="flex flex-col gap-1.5 font-label-md text-label-md font-semibold text-on-surface">
+        <span>{t('upload_start_date_label')}</span>
+        <span className="relative">
+          <span
+            className={`material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-[18px] ${props.uploading ? 'text-pine-deep' : 'text-text-muted'}`}
+          >
+            calendar_month
+          </span>
+          <input
+            className={INPUT_CLASS}
+            disabled={props.uploading}
+            name="dispensation-start-date"
+            onChange={(event) => {
+              props.onDraftChange({ ...props.draft, startDate: event.target.value });
+            }}
+            placeholder={t('upload_start_date_placeholder')}
+            type="date"
+            value={props.draft.startDate}
+          />
+        </span>
+      </label>
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center justify-between">
+          <label
+            className={`font-label-md text-label-md font-semibold ${props.rejected ? 'text-error' : 'text-on-surface'}`}
+            htmlFor="dispensation-end-date"
+          >
+            {t('upload_end_date_label')}
+          </label>
+          {props.rejected ? (
+            <span className="inline-flex items-center gap-1 font-caption text-[11px] font-semibold text-error">
+              <span className="material-symbols-outlined text-[14px]">error</span>
+              {t('error_end_date_invalid')}
+            </span>
+          ) : null}
+          {props.uploading ? (
+            <span className="rounded-md bg-pine-light px-2 py-0.5 font-caption text-caption font-semibold text-pine-deep">
+              {t('uploading_duration_badge')}
+            </span>
+          ) : null}
+        </div>
+        <span className="relative">
+          <span
+            className={`material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-[18px] ${endDateIconClass}`}
+          >
+            event_repeat
+          </span>
+          <input
+            className={props.rejected ? ERROR_INPUT_CLASS : INPUT_CLASS}
+            disabled={props.uploading}
+            id="dispensation-end-date"
+            name="dispensation-end-date"
+            onChange={(event) => {
+              props.onDraftChange({ ...props.draft, endDate: event.target.value });
+            }}
+            placeholder={t('upload_end_date_placeholder')}
+            type="date"
+            value={props.draft.endDate}
+          />
+          {props.rejected ? (
+            <span className="material-symbols-outlined absolute top-1/2 right-3 -translate-y-1/2 text-[18px] text-error">
+              warning
+            </span>
+          ) : null}
+        </span>
+        {props.rejected ? (
+          <p className="mt-0.5 inline-flex items-center gap-1 font-caption text-caption font-medium text-error">
+            <span className="material-symbols-outlined text-[13px]">info</span>
+            {t('error_issue_date_range')}
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function UploadActions(props: {
+  isError: boolean;
+  uploading: boolean;
+  ready: boolean;
+  issueCount: number;
+  onClose: () => void;
+  onSubmit: () => void;
+}) {
+  const t = useTranslations('PresensiPage');
+  let submitClass =
+    'cursor-not-allowed bg-surface-container text-text-muted opacity-60 shadow-none transition-all';
+  if (props.isError) {
+    submitClass =
+      'cursor-not-allowed border border-border-control bg-surface-container-highest text-text-muted transition-all';
+  } else if (props.uploading) {
+    submitClass = 'bg-pine-deep text-white opacity-70 transition-none select-none';
+  } else if (props.ready) {
+    submitClass =
+      'bg-pine-deep text-white shadow-xs transition-all enabled:hover:bg-pine-hover enabled:active:scale-95';
+  }
+  let submitTitle = props.ready ? undefined : t('upload_submit_hint');
+  if (props.uploading) {
+    submitTitle = t('uploading_submit_title');
+  }
+  return (
+    <div className="flex items-center justify-between gap-3 border-t border-border-subtle bg-surface-container-low/70 p-4 sm:px-6">
+      <button
+        className="rounded-xl border border-border-subtle bg-surface-card px-5 py-2.5 font-label-md text-label-md font-semibold text-on-surface-variant shadow-xs transition-all hover:bg-surface-container active:scale-95"
+        onClick={props.onClose}
+        type="button"
+      >
+        {t('modal_cancel')}
+      </button>
+      {props.isError ? (
+        <span className="inline-flex items-center gap-1 font-caption text-caption font-medium text-error sm:hidden">
+          <span className="material-symbols-outlined text-[14px]">warning</span>
+          {t('error_submit_issues', { count: props.issueCount })}
+        </span>
+      ) : null}
+      <div className="relative">
+        {props.isError ? (
+          <div className="pointer-events-none absolute right-0 bottom-full z-20 mb-2 flex max-w-[280px] items-start gap-2 rounded-xl border border-white/10 bg-inverse-surface p-2.5 font-caption text-[12px] text-inverse-on-surface shadow-xl">
+            <span className="material-symbols-outlined mt-0.5 shrink-0 text-[16px] text-amber-gold">
+              report_problem
+            </span>
+            <span>{t('error_submit_tooltip')}</span>
+          </div>
+        ) : null}
+        <button
+          className={`inline-flex items-center gap-2.5 rounded-xl px-6 py-2.5 font-label-md text-label-md font-semibold ${
+            submitClass
+          }`}
+          disabled={!props.ready}
+          onClick={props.onSubmit}
+          title={submitTitle}
+          type="button"
+        >
+          {props.uploading ? (
+            <PresensiSpinner className="h-4 w-4 text-amber-gold" />
+          ) : (
+            <span className="material-symbols-outlined text-[18px]">
+              {props.isError ? 'block' : 'check'}
+            </span>
+          )}
+          <span>{props.uploading ? t('uploading_submit_label') : t('upload_submit')}</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /**
  * Upload layout of the dispensation dialog: the empty form a teacher fills in to
  * file a competition permit, then its error, progress and verified bodies.
@@ -59,8 +219,6 @@ export function PresensiDispensationUpload(props: {
   const issues = listDispensationIssues(draft);
   const isUploading = props.state === 'uploading';
   const isError = props.state === 'error';
-  const dateRejected = issues.includes('end_before_start');
-  const submitReady = isDispensationUploadReady(props.state, draft);
 
   function selectFile(file: File | undefined) {
     if (file) {
@@ -161,17 +319,17 @@ export function PresensiDispensationUpload(props: {
             className="flex animate-in items-start gap-3 rounded-xl border border-red-200 bg-red-50/90 p-3.5 text-red-900 shadow-xs duration-200 fade-in"
             role="alert"
           >
-            <div className="text-error mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100 text-error">
               <span className="material-symbols-outlined text-[20px] [font-variation-settings:'FILL'_1]">
                 error
               </span>
             </div>
             <div className="flex min-w-0 flex-1 flex-col">
               <div className="flex items-center justify-between">
-                <span className="text-error font-label-md text-label-md font-bold">
+                <span className="font-label-md text-label-md font-bold text-error">
                   {t('error_banner_title')}
                 </span>
-                <span className="py-0.2 text-error rounded-full bg-red-100 px-2 font-caption text-[11px] font-bold">
+                <span className="py-0.2 rounded-full bg-red-100 px-2 font-caption text-[11px] font-bold text-error">
                   {t('error_banner_count', { count: issues.length })}
                 </span>
               </div>
@@ -208,7 +366,9 @@ export function PresensiDispensationUpload(props: {
                   className={`flex items-center justify-center gap-2 rounded-lg px-3 py-2.5 font-label-md text-label-md transition-all ${isActive ? CATEGORY_ACTIVE : CATEGORY_IDLE}`}
                   disabled={isUploading}
                   key={option.value}
-                  onClick={() =>{  props.onDraftChange({ ...draft, category: option.value }); }}
+                  onClick={() => {
+                    props.onDraftChange({ ...draft, category: option.value });
+                  }}
                   type="button"
                 >
                   <span
@@ -223,77 +383,12 @@ export function PresensiDispensationUpload(props: {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2">
-          <label className="flex flex-col gap-1.5 font-label-md text-label-md font-semibold text-on-surface">
-            <span>{t('upload_start_date_label')}</span>
-            <span className="relative">
-              <span
-                className={`material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-[18px] ${isUploading ? 'text-pine-deep' : 'text-text-muted'}`}
-              >
-                calendar_month
-              </span>
-              <input
-                className={INPUT_CLASS}
-                disabled={isUploading}
-                name="dispensation-start-date"
-                onChange={(event) =>{ 
-                  props.onDraftChange({ ...draft, startDate: event.target.value }); }
-                }
-                placeholder={t('upload_start_date_placeholder')}
-                type="date"
-                value={draft.startDate}
-              />
-            </span>
-          </label>
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between">
-              <label
-                className={`font-label-md text-label-md font-semibold ${dateRejected && isError ? 'text-error' : 'text-on-surface'}`}
-                htmlFor="dispensation-end-date"
-              >
-                {t('upload_end_date_label')}
-              </label>
-              {dateRejected && isError ? (
-                <span className="text-error inline-flex items-center gap-1 font-caption text-[11px] font-semibold">
-                  <span className="material-symbols-outlined text-[14px]">error</span>
-                  {t('error_end_date_invalid')}
-                </span>
-              ) : (isUploading ? (
-                <span className="rounded-md bg-pine-light px-2 py-0.5 font-caption text-caption font-semibold text-pine-deep">
-                  {t('uploading_duration_badge')}
-                </span>
-              ) : null)}
-            </div>
-            <span className="relative">
-              <span
-                className={`material-symbols-outlined absolute top-1/2 left-3 -translate-y-1/2 text-[18px] ${dateRejected && isError ? 'text-error' : (isUploading ? 'text-pine-deep' : 'text-text-muted')}`}
-              >
-                event_repeat
-              </span>
-              <input
-                className={dateRejected && isError ? ERROR_INPUT_CLASS : INPUT_CLASS}
-                disabled={isUploading}
-                id="dispensation-end-date"
-                name="dispensation-end-date"
-                onChange={(event) =>{  props.onDraftChange({ ...draft, endDate: event.target.value }); }}
-                placeholder={t('upload_end_date_placeholder')}
-                type="date"
-                value={draft.endDate}
-              />
-              {dateRejected && isError ? (
-                <span className="material-symbols-outlined text-error absolute top-1/2 right-3 -translate-y-1/2 text-[18px]">
-                  warning
-                </span>
-              ) : null}
-            </span>
-            {dateRejected && isError ? (
-              <p className="text-error mt-0.5 inline-flex items-center gap-1 font-caption text-caption font-medium">
-                <span className="material-symbols-outlined text-[13px]">info</span>
-                {t('error_issue_date_range')}
-              </p>
-            ) : null}
-          </div>
-        </div>
+        <UploadDates
+          draft={draft}
+          rejected={isError && issues.includes('end_before_start')}
+          uploading={isUploading}
+          onDraftChange={props.onDraftChange}
+        />
 
         <PresensiDispensationFileSection
           document={draft.document}
@@ -320,7 +415,7 @@ export function PresensiDispensationUpload(props: {
             name="dispensation-notes"
             placeholder={t('upload_notes_placeholder')}
             rows={isError ? 2 : 3}
-           />
+          />
         </div>
 
         <div
@@ -345,61 +440,14 @@ export function PresensiDispensationUpload(props: {
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-3 border-t border-border-subtle bg-surface-container-low/70 p-4 sm:px-6">
-        <button
-          className="rounded-xl border border-border-subtle bg-surface-card px-5 py-2.5 font-label-md text-label-md font-semibold text-on-surface-variant shadow-xs transition-all hover:bg-surface-container active:scale-95"
-          onClick={props.onClose}
-          type="button"
-        >
-          {t('modal_cancel')}
-        </button>
-        {isError ? (
-          <span className="text-error inline-flex items-center gap-1 font-caption text-caption font-medium sm:hidden">
-            <span className="material-symbols-outlined text-[14px]">warning</span>
-            {t('error_submit_issues', { count: issues.length })}
-          </span>
-        ) : null}
-        <div className="relative">
-          {isError ? (
-            <div className="bg-inverse-surface text-inverse-on-surface pointer-events-none absolute right-0 bottom-full z-20 mb-2 flex max-w-[280px] items-start gap-2 rounded-xl border border-white/10 p-2.5 font-caption text-[12px] shadow-xl">
-              <span className="material-symbols-outlined mt-0.5 shrink-0 text-[16px] text-amber-gold">
-                report_problem
-              </span>
-              <span>{t('error_submit_tooltip')}</span>
-            </div>
-          ) : null}
-          <button
-            className={`inline-flex items-center gap-2.5 rounded-xl px-6 py-2.5 font-label-md text-label-md font-semibold ${
-              isError
-                ? 'cursor-not-allowed border border-border-control bg-surface-container-highest text-text-muted transition-all'
-                : isUploading
-                  ? 'bg-pine-deep text-white opacity-70 transition-none select-none'
-                  : submitReady
-                    ? 'bg-pine-deep text-white shadow-xs transition-all enabled:hover:bg-pine-hover enabled:active:scale-95'
-                    : 'cursor-not-allowed bg-surface-container text-text-muted opacity-60 shadow-none transition-all'
-            }`}
-            disabled={!submitReady}
-            onClick={props.onSubmit}
-            title={
-              isUploading
-                ? t('uploading_submit_title')
-                : (submitReady
-                  ? undefined
-                  : t('upload_submit_hint'))
-            }
-            type="button"
-          >
-            {isUploading ? (
-              <PresensiSpinner className="h-4 w-4 text-amber-gold" />
-            ) : (
-              <span className="material-symbols-outlined text-[18px]">
-                {isError ? 'block' : 'check'}
-              </span>
-            )}
-            <span>{isUploading ? t('uploading_submit_label') : t('upload_submit')}</span>
-          </button>
-        </div>
-      </div>
+      <UploadActions
+        isError={isError}
+        uploading={isUploading}
+        ready={isDispensationUploadReady(props.state, draft)}
+        issueCount={issues.length}
+        onClose={props.onClose}
+        onSubmit={props.onSubmit}
+      />
     </>
   );
 }

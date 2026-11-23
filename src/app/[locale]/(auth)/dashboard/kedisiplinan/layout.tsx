@@ -28,5 +28,5 @@ export default async function DisciplineLayout(props: DisciplineLayoutProps) {
     redirect({ href: dashboardHrefForRoles(session.roles), locale });
   }
 
-  return props.children;
+  return await props.children;
 }

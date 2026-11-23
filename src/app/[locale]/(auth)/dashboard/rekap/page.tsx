@@ -6,7 +6,7 @@ import { redirect } from '@/libs/I18nNavigation';
 
 type DashboardRecapPageProps = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata(props: DashboardRecapPageProps): Promise<Metadata> {

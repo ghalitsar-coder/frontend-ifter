@@ -6,7 +6,6 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  Eye,
   FileText,
   Mail,
   Printer,
@@ -32,7 +31,7 @@ type WatchStudent = {
   parentName: string;
 };
 
-const initialWatchlist: WatchStudent[] = [
+const watchlist: WatchStudent[] = [
   {
     id: 'w-1',
     name: 'Rizky Pratama',
@@ -83,14 +82,19 @@ const initialWatchlist: WatchStudent[] = [
  * @returns Rendered watchlist monitoring screen.
  */
 export function DisciplineWatchlistView() {
-  const [watchlist] = useState<WatchStudent[]>(initialWatchlist);
   const [filterTab, setFilterTab] = useState<'all' | 'panggilan' | 'sp1'>('all');
-  const [selectedStudentForLetter, setSelectedStudentForLetter] = useState<WatchStudent | null>(null);
+  const [selectedStudentForLetter, setSelectedStudentForLetter] = useState<WatchStudent | null>(
+    null,
+  );
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const filtered = watchlist.filter((s) => {
-    if (filterTab === 'panggilan') return s.points >= 30 && s.points < 40;
-    if (filterTab === 'sp1') return s.points >= 40;
+    if (filterTab === 'panggilan') {
+      return s.points >= 30 && s.points < 40;
+    }
+    if (filterTab === 'sp1') {
+      return s.points >= 40;
+    }
     return true;
   });
 
@@ -106,8 +110,12 @@ export function DisciplineWatchlistView() {
   };
 
   const handleConfirmSendLetter = () => {
-    if (!selectedStudentForLetter) return;
-    showToast(`Surat panggilan resmi untuk wali murid ${selectedStudentForLetter.name} berhasil diterbitkan.`);
+    if (!selectedStudentForLetter) {
+      return;
+    }
+    showToast(
+      `Surat panggilan resmi untuk wali murid ${selectedStudentForLetter.name} berhasil diterbitkan.`,
+    );
     setSelectedStudentForLetter(null);
   };
 
@@ -181,7 +189,9 @@ export function DisciplineWatchlistView() {
 
         <div className="rounded-2xl border border-border bg-card p-4 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Kasus Selesai Restoratif</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Kasus Selesai Restoratif
+            </span>
             <UserCheck className="size-4 text-emerald-700" />
           </div>
           <p className="mt-2 font-heading text-2xl font-bold text-emerald-900">5 Siswa</p>
@@ -192,34 +202,40 @@ export function DisciplineWatchlistView() {
       {/* Tabs */}
       <div className="flex border-b border-border text-xs font-semibold">
         <button
-          className={`px-4 py-2.5 border-b-2 transition-colors ${
+          className={`border-b-2 px-4 py-2.5 transition-colors ${
             filterTab === 'all'
-              ? 'border-pine-deep text-pine-deep font-bold'
+              ? 'border-pine-deep font-bold text-pine-deep'
               : 'border-transparent text-muted-foreground hover:text-on-surface'
           }`}
-          onClick={() => setFilterTab('all')}
+          onClick={() => {
+            setFilterTab('all');
+          }}
           type="button"
         >
           Semua Siswa Waspada ({watchlist.length})
         </button>
         <button
-          className={`px-4 py-2.5 border-b-2 transition-colors ${
+          className={`border-b-2 px-4 py-2.5 transition-colors ${
             filterTab === 'panggilan'
-              ? 'border-pine-deep text-pine-deep font-bold'
+              ? 'border-pine-deep font-bold text-pine-deep'
               : 'border-transparent text-muted-foreground hover:text-on-surface'
           }`}
-          onClick={() => setFilterTab('panggilan')}
+          onClick={() => {
+            setFilterTab('panggilan');
+          }}
           type="button"
         >
           Ambang Panggilan Ortu (30–39 Poin)
         </button>
         <button
-          className={`px-4 py-2.5 border-b-2 transition-colors ${
+          className={`border-b-2 px-4 py-2.5 transition-colors ${
             filterTab === 'sp1'
-              ? 'border-pine-deep text-pine-deep font-bold'
+              ? 'border-pine-deep font-bold text-pine-deep'
               : 'border-transparent text-muted-foreground hover:text-on-surface'
           }`}
-          onClick={() => setFilterTab('sp1')}
+          onClick={() => {
+            setFilterTab('sp1');
+          }}
           type="button"
         >
           Mendekati SP1 (≥40 Poin)
@@ -230,14 +246,16 @@ export function DisciplineWatchlistView() {
       <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-on-surface">
-            <thead className="border-b border-border bg-surface-card/40 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <thead className="border-b border-border bg-surface-card/40 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
               <tr>
                 <th className="px-6 py-3.5">Nama & Rombel Siswa</th>
                 <th className="px-4 py-3.5">Akumulasi Poin</th>
                 <th className="px-6 py-3.5">Pelanggaran Terakhir</th>
                 <th className="px-4 py-3.5">Status Peringatan</th>
                 <th className="px-4 py-3.5">Pendamping BK</th>
-                <th className="px-6 py-3.5 text-right">Tindakan Cepat</th>
+                <th id="watchlist-actions" className="px-6 py-3.5 text-right">
+                  Tindakan Cepat
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/60">
@@ -246,16 +264,20 @@ export function DisciplineWatchlistView() {
 
                 return (
                   <tr className="transition-colors hover:bg-surface-card/40" key={student.id}>
-                    <td className="px-6 py-4">
+                    <td aria-label={student.name} className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div
-                          className={`flex size-9 items-center justify-center rounded-xl font-bold text-xs ${
+                          className={`flex size-9 items-center justify-center rounded-xl text-xs font-bold ${
                             student.points >= 40
-                              ? 'bg-red-100 text-red-700 border border-red-200'
-                              : 'bg-amber-surface text-amber-dark border border-amber-gold/40'
+                              ? 'border border-red-200 bg-red-100 text-red-700'
+                              : 'border border-amber-gold/40 bg-amber-surface text-amber-dark'
                           }`}
                         >
-                          {student.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                          {student.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .slice(0, 2)}
                         </div>
                         <div>
                           <div className="font-semibold text-on-surface">{student.name}</div>
@@ -266,8 +288,11 @@ export function DisciplineWatchlistView() {
                       </div>
                     </td>
 
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-2">
+                    <td aria-labelledby={`watchlist-points-${student.id}`} className="px-4 py-4">
+                      <div
+                        id={`watchlist-points-${student.id}`}
+                        className="flex items-center gap-2"
+                      >
                         <span className="font-heading text-base font-bold text-red-700">
                           {student.points}
                         </span>
@@ -295,7 +320,7 @@ export function DisciplineWatchlistView() {
                       <span
                         className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
                           student.points >= 40
-                            ? 'bg-red-100 text-red-800 border border-red-200'
+                            ? 'border border-red-200 bg-red-100 text-red-800'
                             : 'border border-amber-gold/40 bg-amber-surface text-amber-dark'
                         }`}
                       >
@@ -305,14 +330,21 @@ export function DisciplineWatchlistView() {
 
                     <td className="px-4 py-4 whitespace-nowrap">
                       <div className="text-xs font-medium text-on-surface">{student.counselor}</div>
-                      <div className="text-[11px] text-muted-foreground">Wali: {student.homeroom}</div>
+                      <div className="text-[11px] text-muted-foreground">
+                        Wali: {student.homeroom}
+                      </div>
                     </td>
 
-                    <td className="px-6 py-4 text-right whitespace-nowrap">
+                    <td
+                      aria-labelledby="watchlist-actions"
+                      className="px-6 py-4 text-right whitespace-nowrap"
+                    >
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           className="inline-flex items-center gap-1 rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-semibold text-on-surface shadow-xs transition-colors hover:bg-surface-card"
-                          onClick={() => handleSendLetter(student)}
+                          onClick={() => {
+                            handleSendLetter(student);
+                          }}
                           type="button"
                         >
                           <Mail className="size-3.5 text-amber-gold" />
@@ -320,7 +352,11 @@ export function DisciplineWatchlistView() {
                         </button>
                         <button
                           className="inline-flex items-center gap-1 rounded-lg bg-pine-deep px-2.5 py-1.5 text-xs font-semibold text-white shadow-xs transition-opacity hover:opacity-95"
-                          onClick={() => showToast(`Sesi konseling BK untuk ${student.name} dijadwalkan pada Kamis, 08 Okt 2026.`)}
+                          onClick={() => {
+                            showToast(
+                              `Sesi konseling BK untuk ${student.name} dijadwalkan pada Kamis, 08 Okt 2026.`,
+                            );
+                          }}
                           type="button"
                         >
                           <Calendar className="size-3.5 text-amber-gold" />
@@ -349,7 +385,9 @@ export function DisciplineWatchlistView() {
               </div>
               <button
                 className="rounded-lg p-1 text-muted-foreground hover:bg-surface-card hover:text-on-surface"
-                onClick={() => setSelectedStudentForLetter(null)}
+                onClick={() => {
+                  setSelectedStudentForLetter(null);
+                }}
                 type="button"
               >
                 <X className="size-5" />
@@ -359,7 +397,7 @@ export function DisciplineWatchlistView() {
             <div className="mt-4 space-y-4 rounded-xl border border-border bg-surface-card/60 p-5 text-xs leading-relaxed text-on-surface">
               {/* Header Surat */}
               <div className="border-b border-border/80 pb-3 text-center">
-                <h4 className="font-heading text-sm font-bold uppercase tracking-wider text-pine-deep">
+                <h4 className="font-heading text-sm font-bold tracking-wider text-pine-deep uppercase">
                   SD / SMP Islam Bakti Asih
                 </h4>
                 <p className="text-[11px] text-muted-foreground">
@@ -373,20 +411,38 @@ export function DisciplineWatchlistView() {
               {/* Isi Surat */}
               <div className="space-y-2">
                 <p>Kepada Yth. Bapak/Ibu Wali dari:</p>
-                <div className="rounded-lg bg-card p-3 border border-border space-y-1">
-                  <div className="font-semibold text-on-surface">{selectedStudentForLetter.name} ({selectedStudentForLetter.className})</div>
-                  <div className="text-[11px] text-muted-foreground">NIS: {selectedStudentForLetter.nis} • Akumulasi Poin: <span className="font-bold text-red-700">+{selectedStudentForLetter.points} Poin</span></div>
-                  <div className="text-[11px] text-muted-foreground">Catatan Terakhir: {selectedStudentForLetter.lastViolation}</div>
+                <div className="space-y-1 rounded-lg border border-border bg-card p-3">
+                  <div className="font-semibold text-on-surface">
+                    {selectedStudentForLetter.name} ({selectedStudentForLetter.className})
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    NIS: {selectedStudentForLetter.nis} • Akumulasi Poin:{' '}
+                    <span className="font-bold text-red-700">
+                      +{selectedStudentForLetter.points} Poin
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    Catatan Terakhir: {selectedStudentForLetter.lastViolation}
+                  </div>
                 </div>
 
                 <p>
-                  Mengharap kehadiran Bapak/Ibu ke sekolah guna koordinasi dan pembinaan bersama pada:
+                  Mengharap kehadiran Bapak/Ibu ke sekolah guna koordinasi dan pembinaan bersama
+                  pada:
                 </p>
-                <div className="grid grid-cols-2 gap-2 rounded-lg bg-card p-2.5 border border-border text-[11px]">
-                  <div><strong>Hari / Tanggal:</strong> Kamis, 08 Okt 2026</div>
-                  <div><strong>Pukul:</strong> 09.00 – 10.30 WIB</div>
-                  <div><strong>Tempat:</strong> Ruang Bimbingan Konseling (BK)</div>
-                  <div><strong>Menghadap:</strong> Tim Kesiswaan & Wali Kelas</div>
+                <div className="grid grid-cols-2 gap-2 rounded-lg border border-border bg-card p-2.5 text-[11px]">
+                  <div>
+                    <strong>Hari / Tanggal:</strong> Kamis, 08 Okt 2026
+                  </div>
+                  <div>
+                    <strong>Pukul:</strong> 09.00 – 10.30 WIB
+                  </div>
+                  <div>
+                    <strong>Tempat:</strong> Ruang Bimbingan Konseling (BK)
+                  </div>
+                  <div>
+                    <strong>Menghadap:</strong> Tim Kesiswaan & Wali Kelas
+                  </div>
                 </div>
               </div>
             </div>
@@ -394,14 +450,18 @@ export function DisciplineWatchlistView() {
             <div className="mt-6 flex items-center justify-end gap-2">
               <button
                 className="rounded-xl border border-border px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-card"
-                onClick={() => setSelectedStudentForLetter(null)}
+                onClick={() => {
+                  setSelectedStudentForLetter(null);
+                }}
                 type="button"
               >
                 Batal
               </button>
               <button
                 className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-4 py-2 text-xs font-semibold text-on-surface hover:bg-surface-card"
-                onClick={() => window.print()}
+                onClick={() => {
+                  window.print();
+                }}
                 type="button"
               >
                 <Printer className="size-3.5 text-pine-deep" />

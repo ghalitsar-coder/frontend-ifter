@@ -3,6 +3,14 @@ import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import type { DisciplineCategory, NewIncidentFormData } from '@/types/discipline';
 
+const categoryOptions: { value: DisciplineCategory; label: string }[] = [
+  { value: 'keterlambatan', label: 'Keterlambatan (+2 Poin)' },
+  { value: 'seragam', label: 'Atribut Seragam (+3 Poin)' },
+  { value: 'tatatertib', label: 'Tata Tertib Kelas (+5 Poin)' },
+  { value: 'barang_terlarang', label: 'Barang Terlarang (+25 Poin)' },
+  { value: 'bullying', label: 'Etika & Bullying (+50 Poin)' },
+];
+
 /**
  * Modal form for recording a new disciplinary violation for a student.
  *
@@ -32,9 +40,9 @@ export function DisciplineRecordModal(props: {
     const [name, nis, className] = studentChoice.split('|');
 
     props.onSubmit({
-      studentName: name || 'Rizky Pratama',
-      studentNis: nis || '00829103',
-      studentClass: className || 'IX A',
+      studentName: name ?? 'Rizky Pratama',
+      studentNis: nis ?? '00829103',
+      studentClass: className ?? 'IX A',
       categoryKey: category,
       dateTime,
       location: location.trim() || 'Lingkungan Sekolah',
@@ -106,15 +114,18 @@ export function DisciplineRecordModal(props: {
               <select
                 value={category}
                 onChange={(e) => {
-                  setCategory(e.target.value as DisciplineCategory);
+                  const option = categoryOptions.find((item) => item.value === e.target.value);
+                  if (option) {
+                    setCategory(option.value);
+                  }
                 }}
                 className="w-full rounded-xl border border-border bg-surface-container-low p-2.5 text-xs text-foreground focus:border-pine-deep focus:outline-hidden"
               >
-                <option value="keterlambatan">Keterlambatan (+2 Poin)</option>
-                <option value="seragam">Atribut Seragam (+3 Poin)</option>
-                <option value="tatatertib">Tata Tertib Kelas (+5 Poin)</option>
-                <option value="barang_terlarang">Barang Terlarang (+25 Poin)</option>
-                <option value="bullying">Etika & Bullying (+50 Poin)</option>
+                {categoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
 

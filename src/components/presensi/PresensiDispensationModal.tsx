@@ -53,8 +53,8 @@ export function PresensiDispensationModal(props: {
   const [percent, setPercent] = useState(0);
   const shell = SHELL_CLASSES[DISPENSATION_LAYOUT[state]];
 
-  function upload() {
-    const {document} = draft;
+  async function upload() {
+    const { document } = draft;
     const next = nextDispensationState(state, { draft, type: 'submit' });
     setState(next);
 
@@ -65,16 +65,15 @@ export function PresensiDispensationModal(props: {
     const controller = new AbortController();
     setAbort(controller);
     setPercent(0);
-    void readDispensationDocument({
+    const outcome = await readDispensationDocument({
       chunkPaceMs: CHUNK_PACE_MS,
       file: document,
       onProgress: setPercent,
       signal: controller.signal,
-    }).then((outcome) => {
-      if (outcome === 'done') {
-        setState(nextDispensationState('uploading', { type: 'verified' }));
-      }
     });
+    if (outcome === 'done') {
+      setState(nextDispensationState('uploading', { type: 'verified' }));
+    }
   }
 
   function cancelUpload() {
@@ -119,14 +118,18 @@ export function PresensiDispensationModal(props: {
           />
         );
       }
-      default: {
+      case 'initial':
+      case 'error':
+      case 'uploading': {
         return (
           <PresensiDispensationUpload
             draft={draft}
             onCancelUpload={cancelUpload}
             onClose={props.onClose}
             onDraftChange={setDraft}
-            onSubmit={upload}
+            onSubmit={() => {
+              void upload();
+            }}
             ordinal={props.ordinal}
             percent={percent}
             state={state}
@@ -134,28 +137,31 @@ export function PresensiDispensationModal(props: {
           />
         );
       }
+      default: {
+        return null;
+      }
     }
   }
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-space-sm backdrop-blur-md sm:p-space-lg ${shell.backdrop}`}
+    <dialog
+      aria-labelledby="dispensation-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        props.onClose();
+      }}
+      ref={(dialog) => {
+        if (dialog && !dialog.open) {
+          dialog.showModal();
+        }
+      }}
+      className={`fixed inset-0 z-50 m-0 flex h-dvh max-h-none w-screen max-w-none items-center justify-center overflow-y-auto p-space-sm backdrop-blur-md sm:p-space-lg ${shell.backdrop}`}
     >
       <div
-        aria-labelledby="dispensation-title"
-        aria-modal="true"
-        autoFocus
         className={`relative my-auto flex w-full flex-col overflow-hidden bg-surface-card text-on-surface transition-all duration-200 ${shell.card}`}
-        onKeyDown={(event) => {
-          if (event.key === 'Escape') {
-            props.onClose();
-          }
-        }}
-        role="dialog"
-        tabIndex={-1}
       >
         {body()}
       </div>
-    </div>
+    </dialog>
   );
 }

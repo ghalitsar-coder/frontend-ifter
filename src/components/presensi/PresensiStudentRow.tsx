@@ -93,7 +93,7 @@ export function PresensiStudentRow(props: {
         </span>
       </div>
 
-      <div className="hidden md:flex md:col-span-1 md:items-center">
+      <div className="hidden md:col-span-1 md:flex md:items-center">
         <span className="font-label-md text-label-md text-on-surface-variant">{student.nisn}</span>
       </div>
 

@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { setRequestLocale } from 'next-intl/server';
-import { AttendlyHeader } from '@/components/presensi/AttendlyHeader';
 import { CtaSection } from '@/components/landing/CtaSection';
 import { FeaturesSection } from '@/components/landing/FeaturesSection';
 import { GallerySection } from '@/components/landing/GallerySection';
@@ -9,6 +8,7 @@ import { LandingFooter } from '@/components/landing/LandingFooter';
 import { TestimonialsSection } from '@/components/landing/TestimonialsSection';
 import { TrustSection } from '@/components/landing/TrustSection';
 import { WorkflowSection } from '@/components/landing/WorkflowSection';
+import { AttendlyHeader } from '@/components/presensi/AttendlyHeader';
 
 type IndexPageProps = {
   params: Promise<{ locale: string }>;

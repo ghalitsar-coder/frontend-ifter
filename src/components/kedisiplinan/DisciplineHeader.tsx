@@ -1,4 +1,10 @@
-import { ClipboardCheck, FileSpreadsheet, PlusCircle, ShieldCheck, SlidersHorizontal } from 'lucide-react';
+import {
+  ClipboardCheck,
+  FileSpreadsheet,
+  PlusCircle,
+  ShieldCheck,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { useTranslations } from 'next-intl';
 
 /**

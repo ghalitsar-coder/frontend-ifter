@@ -40,15 +40,12 @@ function useCarousel() {
   return context;
 }
 
-function Carousel({
+function useCarouselControls({
   orientation = 'horizontal',
   opts,
   setApi,
   plugins,
-  className,
-  children,
-  ...props
-}: React.ComponentProps<'div'> & CarouselProps) {
+}: CarouselProps): CarouselContextProps {
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -56,16 +53,24 @@ function Carousel({
     },
     plugins,
   );
-  const [canScrollPrev, setCanScrollPrev] = React.useState(false);
-  const [canScrollNext, setCanScrollNext] = React.useState(false);
-
-  const onSelect = React.useCallback((api: CarouselApi) => {
-    if (!api) {
-      return;
-    }
-    setCanScrollPrev(api.canScrollPrev());
-    setCanScrollNext(api.canScrollNext());
-  }, []);
+  const subscribe = (notify: () => void) => {
+    api?.on('select', notify);
+    api?.on('reInit', notify);
+    return () => {
+      api?.off('select', notify);
+      api?.off('reInit', notify);
+    };
+  };
+  const canScrollPrev = React.useSyncExternalStore(
+    subscribe,
+    () => api?.canScrollPrev() ?? false,
+    () => false,
+  );
+  const canScrollNext = React.useSyncExternalStore(
+    subscribe,
+    () => api?.canScrollNext() ?? false,
+    () => false,
+  );
 
   const scrollPrev = React.useCallback(() => {
     api?.scrollPrev();
@@ -75,19 +80,6 @@ function Carousel({
     api?.scrollNext();
   }, [api]);
 
-  const handleKeyDown = React.useCallback(
-    (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === 'ArrowLeft') {
-        event.preventDefault();
-        scrollPrev();
-      } else if (event.key === 'ArrowRight') {
-        event.preventDefault();
-        scrollNext();
-      }
-    },
-    [scrollPrev, scrollNext],
-  );
-
   React.useEffect(() => {
     if (!api || !setApi) {
       return;
@@ -95,43 +87,50 @@ function Carousel({
     setApi(api);
   }, [api, setApi]);
 
-  React.useEffect(() => {
-    if (!api) {
-      return;
-    }
-    onSelect(api);
-    api.on('reInit', onSelect);
-    api.on('select', onSelect);
+  return {
+    carouselRef,
+    api,
+    opts,
+    orientation,
+    scrollPrev,
+    scrollNext,
+    canScrollPrev,
+    canScrollNext,
+  };
+}
 
-    return () => {
-      api?.off('select', onSelect);
-    };
-  }, [api, onSelect]);
+function Carousel({
+  orientation = 'horizontal',
+  opts,
+  setApi,
+  plugins,
+  className,
+  children,
+  ...props
+}: React.ComponentProps<'section'> & CarouselProps) {
+  const context = useCarouselControls({ orientation, opts, setApi, plugins });
+  function handleKeyDown(event: React.KeyboardEvent<HTMLElement>) {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      context.scrollPrev();
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      context.scrollNext();
+    }
+  }
 
   return (
-    <CarouselContext.Provider
-      value={{
-        carouselRef,
-        api,
-        opts,
-        orientation: orientation || (opts?.axis === 'y' ? 'vertical' : 'horizontal'),
-        scrollPrev,
-        scrollNext,
-        canScrollPrev,
-        canScrollNext,
-      }}
-    >
-      <div
+    <CarouselContext value={context}>
+      <section
         onKeyDownCapture={handleKeyDown}
         className={cn('relative', className)}
-        role="region"
         aria-roledescription="carousel"
         data-slot="carousel"
         {...props}
       >
         {children}
-      </div>
-    </CarouselContext.Provider>
+      </section>
+    </CarouselContext>
   );
 }
 
@@ -148,12 +147,11 @@ function CarouselContent({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function CarouselItem({ className, ...props }: React.ComponentProps<'div'>) {
+function CarouselItem({ className, ...props }: React.ComponentProps<'fieldset'>) {
   const { orientation } = useCarousel();
 
   return (
-    <div
-      role="group"
+    <fieldset
       aria-roledescription="slide"
       data-slot="carousel-item"
       className={cn(

@@ -34,7 +34,13 @@ type PaginationLinkProps = {
 } & Pick<React.ComponentProps<typeof Button>, 'size'> &
   React.ComponentProps<'a'>;
 
-function PaginationLink({ className, isActive, size = 'icon', ...props }: PaginationLinkProps) {
+function PaginationLink({
+  className,
+  children,
+  isActive,
+  size = 'icon',
+  ...props
+}: PaginationLinkProps) {
   return (
     <Button
       variant={isActive ? 'outline' : 'ghost'}
@@ -47,7 +53,9 @@ function PaginationLink({ className, isActive, size = 'icon', ...props }: Pagina
           data-slot="pagination-link"
           data-active={isActive}
           {...props}
-        />
+        >
+          {children}
+        </a>
       }
     />
   );

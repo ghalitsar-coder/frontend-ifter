@@ -39,11 +39,14 @@ type RecapPeriodFilterProps = {
 
 /**
  * Filter bar for the Rekap Absensi page — Kelas search, Bulan, Tahun, and action buttons.
+ * @param props - Current period, class filters and action handlers.
+ * @returns Controls for filtering and generating the attendance recap.
  */
 export function RecapPeriodFilter(props: RecapPeriodFilterProps) {
   const currentYear = new Date().getFullYear();
-  const years = [...new Set([currentYear - 2, currentYear - 1, currentYear, currentYear + 1, props.tahun])]
-    .sort((left, right) => left - right);
+  const years = [
+    ...new Set([currentYear - 2, currentYear - 1, currentYear, currentYear + 1, props.tahun]),
+  ].toSorted((left, right) => left - right);
 
   return (
     <div className="flex flex-col gap-3">
@@ -54,9 +57,11 @@ export function RecapPeriodFilter(props: RecapPeriodFilterProps) {
             className="h-12 rounded-xl border border-stone-200 bg-white px-3 text-sm font-semibold text-pine-deep shadow-sm focus:ring-2 focus:ring-amber-gold/60 focus:outline-none disabled:bg-stone-50"
             disabled={props.classFilterDisabled}
             value={props.classFilter}
-            onChange={(event) =>
-              props.onClassChange(event.target.value === 'all' ? 'all' : Number(event.target.value))
-            }
+            onChange={(event) => {
+              props.onClassChange(
+                event.target.value === 'all' ? 'all' : Number(event.target.value),
+              );
+            }}
           >
             <option value="all">{props.filterAllClassesLabel}</option>
             {props.classes.map((classOption) => (
@@ -72,7 +77,9 @@ export function RecapPeriodFilter(props: RecapPeriodFilterProps) {
           <select
             className="h-12 rounded-xl border border-stone-200 bg-white px-3 text-sm font-semibold text-pine-deep shadow-sm focus:ring-2 focus:ring-amber-gold/60 focus:outline-none"
             value={props.bulan}
-            onChange={(e) => props.onBulanChange(Number(e.target.value))}
+            onChange={(e) => {
+              props.onBulanChange(Number(e.target.value));
+            }}
           >
             {MONTHS.map((m) => (
               <option key={m.value} value={m.value}>
@@ -87,7 +94,9 @@ export function RecapPeriodFilter(props: RecapPeriodFilterProps) {
           <select
             className="h-12 rounded-xl border border-stone-200 bg-white px-3 text-sm font-semibold text-pine-deep shadow-sm focus:ring-2 focus:ring-amber-gold/60 focus:outline-none"
             value={props.tahun}
-            onChange={(e) => props.onTahunChange(Number(e.target.value))}
+            onChange={(e) => {
+              props.onTahunChange(Number(e.target.value));
+            }}
           >
             {years.map((y) => (
               <option key={y} value={y}>
@@ -104,12 +113,14 @@ export function RecapPeriodFilter(props: RecapPeriodFilterProps) {
             className="h-12 rounded-xl border border-stone-200 bg-white px-3 text-sm font-semibold text-pine-deep shadow-sm placeholder:font-normal placeholder:text-stone-400 focus:ring-2 focus:ring-amber-gold/60 focus:outline-none"
             placeholder={props.filterSearchLabel}
             value={props.classSearch}
-            onChange={(e) => props.onClassSearchChange(e.target.value)}
+            onChange={(e) => {
+              props.onClassSearchChange(e.target.value);
+            }}
           />
         </div>
       </div>
 
-      {props.showGenerate !== false ? (
+      {(props.showGenerate ?? true) && (
         <div className="flex flex-wrap items-center gap-2 print:hidden">
           <button
             type="button"
@@ -120,7 +131,7 @@ export function RecapPeriodFilter(props: RecapPeriodFilterProps) {
             {props.generating ? props.generatingLabel : props.btnGenerateLabel}
           </button>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }

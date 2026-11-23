@@ -91,17 +91,24 @@ function CodeBlockCopyButton({
   const [copied, setCopied] = React.useState(false);
 
   React.useEffect(() => {
-    if (!copied) {
-      return;
-    }
-
-    const timeout = setTimeout(() => {
-      setCopied(false);
-    }, 2000);
+    const timeout = copied
+      ? setTimeout(() => {
+          setCopied(false);
+        }, 2000)
+      : undefined;
     return () => {
       clearTimeout(timeout);
     };
   }, [copied]);
+
+  async function copy() {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  }
 
   return (
     <>
@@ -114,12 +121,7 @@ function CodeBlockCopyButton({
         className={cn(className)}
         onClick={(event) => {
           onClick?.(event);
-          navigator.clipboard
-            .writeText(value)
-            .then(() => {
-              setCopied(true);
-            })
-            .catch(() => {});
+          void copy();
         }}
         {...props}
       >
@@ -129,48 +131,6 @@ function CodeBlockCopyButton({
         {copied ? 'Copied' : ''}
       </span>
     </>
-  );
-}
-
-function CodeBlockContent({
-  className,
-  children,
-  style,
-  wrap = false,
-  lineNumbers = false,
-  startLine = 1,
-  ...props
-}: React.ComponentProps<'pre'> & {
-  wrap?: boolean;
-  lineNumbers?: boolean;
-  startLine?: number;
-}) {
-  return (
-    <pre
-      data-slot="code-block-content"
-      data-wrap={wrap || undefined}
-      data-numbered={lineNumbers || undefined}
-      dir="ltr"
-      tabIndex={0}
-      style={{ counterReset: `line ${startLine - 1}`, ...style }}
-      className={cn(
-        'min-h-0 min-w-0 scroll-fade-x scrollbar-thin overflow-auto px-3 py-3 text-start font-mono leading-relaxed outline-none group-has-data-[slot=code-block-footer]/code-block:pb-2 group-has-data-[slot=code-block-header]/code-block:pt-2 group-data-[size=sm]/code-block:px-2.5 group-data-[size=sm]/code-block:py-2.5 group-data-[size=sm]/code-block:group-has-data-[slot=code-block-header]/code-block:pt-1.5 data-wrap:scroll-fade-y data-wrap:wrap-break-word data-wrap:whitespace-pre-wrap',
-        className,
-      )}
-      {...props}
-    >
-      <code
-        data-slot="code-block-code"
-        className="grid min-h-lh min-w-max content-start in-data-numbered:grid-cols-[auto_1fr] in-data-wrap:min-w-0"
-      >
-        {lineNumbers && typeof children === 'string'
-          ? children
-              .replace(/\n$/, '')
-              .split('\n')
-              .map((line, index) => <CodeBlockLine key={index}>{line}</CodeBlockLine>)
-          : children}
-      </code>
-    </pre>
   );
 }
 
@@ -215,6 +175,49 @@ function CodeBlockLine({
         {empty ? '\n' : children}
       </span>
     </span>
+  );
+}
+
+function CodeBlockContent({
+  className,
+  children,
+  style,
+  wrap = false,
+  lineNumbers = false,
+  startLine = 1,
+  ...props
+}: React.ComponentProps<'pre'> & {
+  wrap?: boolean;
+  lineNumbers?: boolean;
+  startLine?: number;
+}) {
+  return (
+    <pre
+      data-slot="code-block-content"
+      data-wrap={wrap || undefined}
+      data-numbered={lineNumbers || undefined}
+      dir="ltr"
+      // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- Keyboard users scroll this overflow region.
+      tabIndex={0}
+      style={{ counterReset: `line ${startLine - 1}`, ...style }}
+      className={cn(
+        'min-h-0 min-w-0 scroll-fade-x scrollbar-thin overflow-auto px-3 py-3 text-start font-mono leading-relaxed outline-none group-has-data-[slot=code-block-footer]/code-block:pb-2 group-has-data-[slot=code-block-header]/code-block:pt-2 group-data-[size=sm]/code-block:px-2.5 group-data-[size=sm]/code-block:py-2.5 group-data-[size=sm]/code-block:group-has-data-[slot=code-block-header]/code-block:pt-1.5 data-wrap:scroll-fade-y data-wrap:wrap-break-word data-wrap:whitespace-pre-wrap',
+        className,
+      )}
+      {...props}
+    >
+      <code
+        data-slot="code-block-code"
+        className="grid min-h-lh min-w-max content-start in-data-numbered:grid-cols-[auto_1fr] in-data-wrap:min-w-0"
+      >
+        {lineNumbers && typeof children === 'string'
+          ? children
+              .replace(/\n$/u, '')
+              .split('\n')
+              .map((line, index) => <CodeBlockLine key={index}>{line}</CodeBlockLine>)
+          : children}
+      </code>
+    </pre>
   );
 }
 

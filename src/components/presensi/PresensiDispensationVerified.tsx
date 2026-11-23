@@ -168,7 +168,9 @@ export function PresensiDispensationVerified(props: {
             <div className="flex items-center gap-2 border-t border-emerald-100 pt-1">
               <button
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border-control bg-white px-3.5 py-1.5 font-label-md text-label-md font-semibold text-on-surface shadow-2xs transition-all hover:bg-surface-container"
-                onClick={() =>{  openDispensationDocument(props.file, 'preview'); }}
+                onClick={() => {
+                  openDispensationDocument(props.file, 'preview');
+                }}
                 type="button"
               >
                 <span className="material-symbols-outlined text-[16px] text-pine-deep">
@@ -178,7 +180,9 @@ export function PresensiDispensationVerified(props: {
               </button>
               <button
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border-control bg-white px-3.5 py-1.5 font-label-md text-label-md font-semibold text-on-surface shadow-2xs transition-all hover:bg-surface-container"
-                onClick={() =>{  openDispensationDocument(props.file, 'download'); }}
+                onClick={() => {
+                  openDispensationDocument(props.file, 'download');
+                }}
                 type="button"
               >
                 <span className="material-symbols-outlined text-[16px] text-pine-deep">
@@ -220,7 +224,9 @@ export function PresensiDispensationVerified(props: {
       <div className="flex items-center justify-between gap-3 border-t border-border-subtle bg-surface-container-low/70 p-4 sm:px-6">
         <button
           className="inline-flex items-center gap-2 rounded-xl border border-border-subtle bg-surface-card px-4 py-2.5 font-label-md text-label-md font-semibold text-on-surface shadow-xs transition-all hover:bg-surface-container active:scale-95"
-          onClick={() =>{  window.print(); }}
+          onClick={() => {
+            window.print();
+          }}
           type="button"
         >
           <span className="material-symbols-outlined text-[18px] text-on-surface-variant">

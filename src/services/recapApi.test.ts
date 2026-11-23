@@ -23,15 +23,13 @@ function makeStudentRecap(
   };
 }
 
-describe('toClassSummaries', () => {
+describe(toClassSummaries, () => {
   it('returns an empty array for an empty input', () => {
     expect(toClassSummaries([])).toStrictEqual([]);
   });
 
   it('groups a single student into one class summary', () => {
-    const summaries = toClassSummaries([
-      makeStudentRecap({ class_id: 1, class_name: '1A' }),
-    ]);
+    const summaries = toClassSummaries([makeStudentRecap({ class_id: 1, class_name: '1A' })]);
 
     expect(summaries).toHaveLength(1);
     expect(summaries[0]).toMatchObject({

@@ -37,7 +37,7 @@ const handbookRules: HandbookRule[] = [
     description: 'Tiba di sekolah setelah pukul 07.00 WIB saat apel pembiasaan pagi telah dimulai.',
     points: 2,
     badgeClass: 'bg-surface-card text-pine-deep border border-border',
-    directSanction: 'Membaca Al-Qur\'an / tadarus 1 juz di gazebo piket & doa bersama.',
+    directSanction: "Membaca Al-Qur'an / tadarus 1 juz di gazebo piket & doa bersama.",
     authority: 'Guru Piket',
   },
   {
@@ -45,7 +45,8 @@ const handbookRules: HandbookRule[] = [
     category: 'keterlambatan',
     categoryLabel: 'Keterlambatan',
     title: 'Terlambat Masuk Jam Pelajaran',
-    description: 'Terlambat masuk kelas setelah pergantian jam pelajaran atau istirahat lebih dari 10 menit.',
+    description:
+      'Terlambat masuk kelas setelah pergantian jam pelajaran atau istirahat lebih dari 10 menit.',
     points: 2,
     badgeClass: 'bg-surface-card text-pine-deep border border-border',
     directSanction: 'Mencatat materi tertinggal di bawah pengawasan guru mapel.',
@@ -56,7 +57,8 @@ const handbookRules: HandbookRule[] = [
     category: 'seragam',
     categoryLabel: 'Atribut Seragam',
     title: 'Tidak Memakai Dasi / Bet Lokasi',
-    description: 'Seragam tidak dilengkapi dasi resmi atau atribut badge lokasi dan lambang OSIS sekolah.',
+    description:
+      'Seragam tidak dilengkapi dasi resmi atau atribut badge lokasi dan lambang OSIS sekolah.',
     points: 3,
     badgeClass: 'bg-surface-card text-pine-deep border border-border',
     directSanction: 'Mencatat di buku piket & wajib melengkapi keesokan harinya.',
@@ -67,7 +69,8 @@ const handbookRules: HandbookRule[] = [
     category: 'seragam',
     categoryLabel: 'Atribut Seragam',
     title: 'Sepatu atau Kaus Kaki Tidak Sesuai Ketentuan',
-    description: 'Memakai sepatu selain warna hitam polos atau kaus kaki bukan putih standar pada hari upacara.',
+    description:
+      'Memakai sepatu selain warna hitam polos atau kaus kaki bukan putih standar pada hari upacara.',
     points: 3,
     badgeClass: 'bg-surface-card text-pine-deep border border-border',
     directSanction: 'Peringatan tertulis dan penggantian sementara bila tersedia.',
@@ -78,7 +81,8 @@ const handbookRules: HandbookRule[] = [
     category: 'seragam',
     categoryLabel: 'Atribut Seragam',
     title: 'Rambut Tidak Rapi / Pewarnaan Rambut',
-    description: 'Rambut putra melewati kerah atau telinga, atau rambut disemir dengan warna selain hitam alami.',
+    description:
+      'Rambut putra melewati kerah atau telinga, atau rambut disemir dengan warna selain hitam alami.',
     points: 3,
     badgeClass: 'bg-surface-card text-pine-deep border border-border',
     directSanction: 'Batas waktu perapian 2x24 jam sebelum pemanggilan orang tua.',
@@ -89,7 +93,8 @@ const handbookRules: HandbookRule[] = [
     category: 'tatatertib',
     categoryLabel: 'Tata Tertib',
     title: 'Menggunakan Smartphone Saat Jam KBM',
-    description: 'Bermain game, media sosial, atau menggunakan ponsel tanpa instruksi pembelajaran guru.',
+    description:
+      'Bermain game, media sosial, atau menggunakan ponsel tanpa instruksi pembelajaran guru.',
     points: 5,
     badgeClass: 'bg-amber-surface text-amber-dark border border-amber-gold/40',
     directSanction: 'Penyitaan smartphone sementara dan penyerahan hanya kepada orang tua.',
@@ -100,7 +105,8 @@ const handbookRules: HandbookRule[] = [
     category: 'tatatertib',
     categoryLabel: 'Tata Tertib',
     title: 'Meninggalkan Lingkungan Sekolah Tanpa Izin (Bolos)',
-    description: 'Keluar dari gerbang sekolah selama jam belajar tanpa surat izin guru piket atau UKS.',
+    description:
+      'Keluar dari gerbang sekolah selama jam belajar tanpa surat izin guru piket atau UKS.',
     points: 10,
     badgeClass: 'bg-amber-surface text-amber-dark border border-amber-gold/40',
     directSanction: 'Surat teguran tertulis & pemanggilan orang tua.',
@@ -111,7 +117,8 @@ const handbookRules: HandbookRule[] = [
     category: 'barang_terlarang',
     categoryLabel: 'Barang Terlarang',
     title: 'Membawa / Menghisap Rokok atau Vape',
-    description: 'Membawa, menyimpan, atau menghisap rokok/vape di dalam lingkungan maupun sekitar sekolah saat berseragam.',
+    description:
+      'Membawa, menyimpan, atau menghisap rokok/vape di dalam lingkungan maupun sekitar sekolah saat berseragam.',
     points: 25,
     badgeClass: 'bg-error-container text-red-700 border border-red-200',
     directSanction: 'Penyitaan barang bukti, SP1 langsung, dan pemanggilan orang tua mendesak.',
@@ -122,7 +129,8 @@ const handbookRules: HandbookRule[] = [
     category: 'barang_terlarang',
     categoryLabel: 'Barang Terlarang',
     title: 'Membawa Senjata Tajam / Benda Berbahaya',
-    description: 'Membawa sajam, pemukul, atau barang berbahaya yang tidak terkait kegiatan belajar.',
+    description:
+      'Membawa sajam, pemukul, atau barang berbahaya yang tidak terkait kegiatan belajar.',
     points: 50,
     badgeClass: 'bg-red-700 text-white',
     directSanction: 'Penyitaan, SP2 langsung, skorsing 3 hari & investigasi pleno.',
@@ -133,7 +141,8 @@ const handbookRules: HandbookRule[] = [
     category: 'bullying',
     categoryLabel: 'Etika & Bullying',
     title: 'Perkelahian / Tawuran Antar Pelajar',
-    description: 'Terlibat dalam adu fisik, perkelahian di dalam/luar sekolah, atau provokasi bentrok kelompok.',
+    description:
+      'Terlibat dalam adu fisik, perkelahian di dalam/luar sekolah, atau provokasi bentrok kelompok.',
     points: 50,
     badgeClass: 'bg-red-700 text-white',
     directSanction: 'SP2/SP3 langsung, pemanggilan orang tua darurat, ganti rugi medis bila ada.',
@@ -144,10 +153,12 @@ const handbookRules: HandbookRule[] = [
     category: 'bullying',
     categoryLabel: 'Etika & Bullying',
     title: 'Perundungan Fisik, Verbal, atau Cyberbullying',
-    description: 'Melakukan intimidasi, pemerasan uang jajan, penghinaan martabat teman di medsos atau kelas.',
+    description:
+      'Melakukan intimidasi, pemerasan uang jajan, penghinaan martabat teman di medsos atau kelas.',
     points: 40,
     badgeClass: 'bg-red-700 text-white',
-    directSanction: 'Sesi konseling intensif BK, penandatanganan pakta anti-bullying bersama orang tua.',
+    directSanction:
+      'Sesi konseling intensif BK, penandatanganan pakta anti-bullying bersama orang tua.',
     authority: 'Tim Pencegahan Bullying & BK',
   },
 ];
@@ -198,10 +209,6 @@ export function DisciplineHandbookView() {
     showToast('Mengunduh salinan resmi Buku Pedoman Tata Tertib Siswa (PDF)...');
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
     <div className="space-y-6">
       {/* Toast Alert */}
@@ -236,7 +243,9 @@ export function DisciplineHandbookView() {
         <div className="flex flex-wrap items-center gap-2">
           <button
             className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold text-on-surface shadow-xs transition-colors hover:bg-surface-card"
-            onClick={handlePrint}
+            onClick={() => {
+              window.print();
+            }}
             type="button"
           >
             <Printer className="size-3.5 text-pine-deep" />
@@ -255,7 +264,7 @@ export function DisciplineHandbookView() {
 
       {/* Sanction Threshold Banners */}
       <div className="space-y-2">
-        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
+        <div className="flex items-center gap-2 text-xs font-bold tracking-wider text-muted-foreground uppercase">
           <ShieldAlert className="size-4 text-amber-gold" />
           <span>Ambang Batas Poin Akumulasi & Jenjang Sanksi Resmi</span>
         </div>
@@ -269,7 +278,8 @@ export function DisciplineHandbookView() {
             </div>
             <h2 className="mt-2 text-sm font-bold text-on-surface">Peringatan Lisan</h2>
             <p className="mt-1 text-xs text-muted-foreground">
-              Teguran edukatif oleh wali kelas, pencatatan di buku pembinaan kelas, dan target perbaikan sikap 1 pekan.
+              Teguran edukatif oleh wali kelas, pencatatan di buku pembinaan kelas, dan target
+              perbaikan sikap 1 pekan.
             </p>
           </div>
 
@@ -282,7 +292,8 @@ export function DisciplineHandbookView() {
             </div>
             <h2 className="mt-2 text-sm font-bold text-amber-900">Panggilan Orang Tua I</h2>
             <p className="mt-1 text-xs text-amber-800">
-              Surat panggilan resmi kesiswaan kepada wali murid, sesi konseling BK, dan penandatanganan surat komitmen.
+              Surat panggilan resmi kesiswaan kepada wali murid, sesi konseling BK, dan
+              penandatanganan surat komitmen.
             </p>
           </div>
 
@@ -295,7 +306,8 @@ export function DisciplineHandbookView() {
             </div>
             <h2 className="mt-2 text-sm font-bold text-red-900">Surat Peringatan 1 (SP1)</h2>
             <p className="mt-1 text-xs text-red-700">
-              Penerbitan SP1 resmi sekolah, skorsing pembinaan di rumah selama 3 hari, dan monitoring ketat perilaku.
+              Penerbitan SP1 resmi sekolah, skorsing pembinaan di rumah selama 3 hari, dan
+              monitoring ketat perilaku.
             </p>
           </div>
 
@@ -308,7 +320,8 @@ export function DisciplineHandbookView() {
             </div>
             <h2 className="mt-2 text-sm font-bold text-red-950">SP2 / SP3 & Pleno</h2>
             <p className="mt-1 text-xs text-red-800">
-              Konferensi kasus tingkat pimpinan sekolah, SP2/SP3, hingga pengembalian siswa kepada orang tua/wali murid.
+              Konferensi kasus tingkat pimpinan sekolah, SP2/SP3, hingga pengembalian siswa kepada
+              orang tua/wali murid.
             </p>
           </div>
         </div>
@@ -320,7 +333,9 @@ export function DisciplineHandbookView() {
           <Search className="absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <input
             className="w-full rounded-xl border border-border bg-surface-card py-2 pr-4 pl-10 text-xs text-on-surface placeholder:text-muted-foreground focus:border-pine-deep focus:outline-hidden"
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+            }}
             placeholder="Cari kode pasal, nama pelanggaran, atau sanksi..."
             type="text"
             value={searchQuery}
@@ -338,7 +353,9 @@ export function DisciplineHandbookView() {
                     : 'border border-border bg-surface-card text-on-surface hover:border-pine-deep/40'
                 }`}
                 key={c.key}
-                onClick={() => setSelectedCategory(c.key)}
+                onClick={() => {
+                  setSelectedCategory(c.key);
+                }}
                 type="button"
               >
                 {c.label}
@@ -356,13 +373,15 @@ export function DisciplineHandbookView() {
             <h2 className="font-heading text-sm font-bold text-on-surface">
               Katalog Butir Pelanggaran & Sanksi Edukatif
             </h2>
-            <span className="text-xs text-muted-foreground">({filteredRules.length} Butir Ditemukan)</span>
+            <span className="text-xs text-muted-foreground">
+              ({filteredRules.length} Butir Ditemukan)
+            </span>
           </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-on-surface">
-            <thead className="border-b border-border bg-surface-card/30 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            <thead className="border-b border-border bg-surface-card/30 text-[11px] font-bold tracking-wider text-muted-foreground uppercase">
               <tr>
                 <th className="px-6 py-3.5">Kode & Kategori</th>
                 <th className="px-4 py-3.5">Nama & Uraian Pelanggaran</th>
@@ -376,7 +395,9 @@ export function DisciplineHandbookView() {
                 <tr className="transition-colors hover:bg-surface-card/40" key={rule.code}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="font-mono font-bold text-pine-deep">{rule.code}</span>
-                    <div className="mt-0.5 text-[11px] text-muted-foreground">{rule.categoryLabel}</div>
+                    <div className="mt-0.5 text-[11px] text-muted-foreground">
+                      {rule.categoryLabel}
+                    </div>
                   </td>
 
                   <td className="max-w-xs px-4 py-4">
@@ -385,7 +406,9 @@ export function DisciplineHandbookView() {
                   </td>
 
                   <td className="px-3 py-4 text-center whitespace-nowrap">
-                    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${rule.badgeClass}`}>
+                    <span
+                      className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-bold ${rule.badgeClass}`}
+                    >
                       +{rule.points} Poin
                     </span>
                   </td>
@@ -395,7 +418,7 @@ export function DisciplineHandbookView() {
                   </td>
 
                   <td className="px-4 py-4 whitespace-nowrap">
-                    <span className="inline-flex rounded-md bg-surface-card px-2 py-1 text-[11px] font-semibold text-muted-foreground border border-border">
+                    <span className="inline-flex rounded-md border border-border bg-surface-card px-2 py-1 text-[11px] font-semibold text-muted-foreground">
                       {rule.authority}
                     </span>
                   </td>

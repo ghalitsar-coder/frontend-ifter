@@ -34,7 +34,7 @@ export default defineConfig({
             provider: playwright(),
             api: {
               host: '127.0.0.1',
-              port: 64000,
+              port: 64_000,
               strictPort: true,
             },
             screenshotDirectory: 'vitest-test-results',

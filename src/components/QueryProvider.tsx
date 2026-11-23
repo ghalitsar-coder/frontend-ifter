@@ -5,9 +5,11 @@ import { useState } from 'react';
 
 /**
  * Provides one TanStack Query client for the whole app.
+ * @param props - Content that shares the query cache.
+ * @returns The query provider wrapping its children.
  */
 export const QueryProvider = (props: { children: React.ReactNode }) => {
-  // Created once per browser session so cache survives re-renders
+  // oxlint-disable-next-line react/hook-use-state -- the client lives for one provider mount and is never replaced
   const [queryClient] = useState(() => new QueryClient());
 
   return <QueryClientProvider client={queryClient}>{props.children}</QueryClientProvider>;

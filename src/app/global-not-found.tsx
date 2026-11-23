@@ -1,15 +1,9 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { getTranslations } from 'next-intl/server';
+import Link from 'next/link';
 import { AttendlyBrand } from '@/components/presensi/AttendlyBrand';
 import { AppConfig } from '@/utils/AppConfig';
 import '@/styles/global.css';
-
-const quickLinks = [
-  { href: '/dashboard/presensi', icon: 'fact_check', labelKey: 'quick_presensi' },
-  { href: '/dashboard/kedisiplinan', icon: 'gavel', labelKey: 'quick_kedisiplinan' },
-  { href: '/pendaftaran', icon: 'account_balance', labelKey: 'quick_pendaftaran' },
-] as const;
 
 // shortcut: global-not-found bypasses the [locale] layout, so this page renders in the default
 // locale only; upgrade to a localized 404 if search traffic to bad URLs becomes material.
@@ -34,11 +28,17 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function GlobalNotFound() {
   const t = await getTranslations({ locale, namespace: 'NotFoundPage' });
 
+  const quickLinks = [
+    { href: '/dashboard/presensi', icon: 'fact_check', label: t('quick_presensi') },
+    { href: '/dashboard/kedisiplinan', icon: 'gavel', label: t('quick_kedisiplinan') },
+    { href: '/pendaftaran', icon: 'account_balance', label: t('quick_pendaftaran') },
+  ] as const;
+
   return (
     <html lang={locale}>
-      {/* shortcut: next/font does not run in global-not-found, so load Inter like AttendlyShell does */}
+      {/* shortcut: next/font does not run in global-not-found, so load Inter for this standalone document */}
       <head>
-        {/* oxlint-disable-next-line next/no-page-custom-font -- next/font does not run in global-not-found, so load Inter like AttendlyShell does */}
+        {/* oxlint-disable-next-line next/no-page-custom-font -- next/font does not run in global-not-found, so load Inter for this standalone document */}
         <link
           href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
@@ -51,7 +51,7 @@ export default async function GlobalNotFound() {
         <header className="flex h-16 items-center justify-between border-b border-surface-container-high bg-surface px-margin">
           <AttendlyBrand />
           <Link
-            className="flex cursor-pointer items-center rounded-full bg-secondary-container px-space-md py-1.5 font-label-md text-label-md font-semibold text-primary transition-colors hover:bg-amber-gold active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-gold focus-visible:ring-offset-2"
+            className="flex cursor-pointer items-center rounded-full bg-secondary-container px-space-md py-1.5 font-label-md text-label-md font-semibold text-primary transition-colors hover:bg-amber-gold focus-visible:ring-2 focus-visible:ring-amber-gold focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98]"
             href="/sign-in"
           >
             {t('login_cta')}
@@ -71,7 +71,7 @@ export default async function GlobalNotFound() {
 
           <div className="mt-space-2xl flex w-full flex-col items-center justify-center gap-space-sm sm:w-auto sm:flex-row">
             <Link
-              className="flex h-11 w-full cursor-pointer items-center justify-center gap-space-xs rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md font-semibold text-white shadow-sm transition-all hover:bg-pine-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep focus-visible:ring-offset-2 sm:w-auto"
+              className="flex h-11 w-full cursor-pointer items-center justify-center gap-space-xs rounded-xl bg-pine-deep px-space-xl font-label-md text-label-md font-semibold text-white shadow-sm transition-all hover:bg-pine-hover focus-visible:ring-2 focus-visible:ring-pine-deep focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98] sm:w-auto"
               href="/"
             >
               <span className="material-symbols-outlined text-[18px]">home</span>
@@ -86,14 +86,14 @@ export default async function GlobalNotFound() {
             <div className="flex flex-col items-center justify-center gap-space-sm sm:flex-row sm:gap-space-xl">
               {quickLinks.map((link) => (
                 <a
-                  className="flex cursor-pointer items-center gap-space-xs rounded-lg px-space-sm py-1.5 font-label-md text-label-md text-pine-deep transition-colors hover:bg-surface-container active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pine-deep/40"
+                  className="flex cursor-pointer items-center gap-space-xs rounded-lg px-space-sm py-1.5 font-label-md text-label-md text-pine-deep transition-colors hover:bg-surface-container focus-visible:ring-2 focus-visible:ring-pine-deep/40 focus-visible:outline-none active:scale-[0.98]"
                   href={link.href}
-                  key={link.labelKey}
+                  key={link.href}
                 >
                   <span className="material-symbols-outlined text-[18px] text-amber-dark">
                     {link.icon}
                   </span>
-                  {link.labelKey === 'quick_presensi' ? t('quick_presensi') : link.labelKey === 'quick_kedisiplinan' ? t('quick_kedisiplinan') : t('quick_pendaftaran')}
+                  {link.label}
                 </a>
               ))}
             </div>

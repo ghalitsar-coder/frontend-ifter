@@ -235,7 +235,9 @@ function PendaftaranWorkspaceCard(props: {
         <div className="flex w-full items-center gap-space-sm sm:w-auto">
           <button
             className="flex cursor-pointer items-center justify-center gap-space-xs rounded-lg bg-surface-container-lowest px-space-md py-space-xs font-label-md text-label-md text-text-primary shadow-sm transition-colors hover:bg-surface-container-high focus-visible:ring-2 focus-visible:ring-[#173F36] focus-visible:ring-offset-2 focus-visible:outline-none active:scale-[0.98] sm:w-auto"
-            onClick={() => props.onCopy(WORKSPACE_URL)}
+            onClick={() => {
+              props.onCopy(WORKSPACE_URL);
+            }}
             type="button"
           >
             <span className="material-symbols-outlined text-[18px]">content_copy</span>
@@ -632,7 +634,9 @@ export function PendaftaranSuccessStep(props: {
   function copyToClipboard(value: string) {
     void navigator.clipboard.writeText(value);
     setIsCopied(true);
-    setTimeout(() => setIsCopied(false), COPY_TOAST_MS);
+    setTimeout(() => {
+      setIsCopied(false);
+    }, COPY_TOAST_MS);
   }
 
   return (

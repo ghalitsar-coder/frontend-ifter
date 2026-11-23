@@ -328,18 +328,22 @@ export function PendaftaranIdentityStep(props: {
                     })}
                   </p>
                   <div className="mt-space-sm flex flex-wrap gap-space-sm">
-                    {Object.keys(props.issues).map((field) => (
-                      <a
-                        className="inline-flex items-center gap-1 rounded-lg bg-surface-card px-space-sm py-1 font-caption text-caption font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container"
-                        href={`#${FIELD_IDS[field as PendaftaranField]}`}
-                        key={field}
-                      >
-                        <span className="material-symbols-outlined text-[14px] text-error">
-                          arrow_downward
-                        </span>
-                        {t(BANNER_LABELS[field as keyof typeof BANNER_LABELS])}
-                      </a>
-                    ))}
+                    {Object.keys(props.issues)
+                      .filter((field): field is keyof typeof BANNER_LABELS =>
+                        Object.hasOwn(BANNER_LABELS, field),
+                      )
+                      .map((field) => (
+                        <a
+                          className="inline-flex items-center gap-1 rounded-lg bg-surface-card px-space-sm py-1 font-caption text-caption font-semibold text-pine-deep shadow-sm transition-colors hover:bg-surface-container"
+                          href={`#${FIELD_IDS[field]}`}
+                          key={field}
+                        >
+                          <span className="material-symbols-outlined text-[14px] text-error">
+                            arrow_downward
+                          </span>
+                          {t(BANNER_LABELS[field])}
+                        </a>
+                      ))}
                   </div>
                 </div>
               </div>

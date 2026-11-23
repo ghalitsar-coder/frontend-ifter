@@ -17,11 +17,11 @@ import {
   fetchStudentViolations,
   fetchViolationTypes,
   postRecordViolation,
-  type StudentViolationRecord,
   updateViolationFollowup,
-  type ViolationTypeRecord,
 } from '@/services/disciplineApi';
-import { type ClassRecord, getClasses } from '@/services/presensiApi';
+import type { StudentViolationRecord, ViolationTypeRecord } from '@/services/disciplineApi';
+import { getClasses } from '@/services/presensiApi';
+import type { ClassRecord } from '@/services/presensiApi';
 import type {
   DisciplineCategory,
   DisciplineFilterState,
@@ -135,7 +135,7 @@ function mapRecordToIncident(r: StudentViolationRecord): DisciplineIncident {
   return {
     id: String(r.id),
     date: r.tanggal,
-    time: r.created_at.slice(11, 16) + ' WIB',
+    time: `${r.created_at.slice(11, 16)} WIB`,
     studentName: r.student_name,
     studentNis: r.nis ?? '-',
     studentClass: r.nama_kelas ?? '1A',
@@ -152,6 +152,14 @@ function mapRecordToIncident(r: StudentViolationRecord): DisciplineIncident {
     studentPointStatus: getStudentPointStatus(r.poin),
     status,
   };
+}
+
+async function refreshData<T>(request: Promise<T>, update: (data: T) => void) {
+  try {
+    update(await request);
+  } catch {
+    // Keep the displayed data when this resource is unavailable.
+  }
 }
 
 /**
@@ -185,26 +193,13 @@ export function DisciplineManager() {
   };
 
   const loadData = () => {
-    getClasses()
-      .then((data) => {
-        setClasses(data);
-      })
-      .catch(() => {});
-
-    fetchViolationTypes()
-      .then((types) => {
-        setViolationTypes(types);
-      })
-      .catch(() => {});
-
-    fetchStudentViolations()
-      .then((records) => {
-        if (records.length > 0) {
-          const mapped = records.map(mapRecordToIncident);
-          setIncidents(mapped);
-        }
-      })
-      .catch(() => {});
+    void refreshData(getClasses(), setClasses);
+    void refreshData(fetchViolationTypes(), setViolationTypes);
+    void refreshData(fetchStudentViolations(), (records) => {
+      if (records.length > 0) {
+        setIncidents(records.map(mapRecordToIncident));
+      }
+    });
   };
 
   useEffect(() => {

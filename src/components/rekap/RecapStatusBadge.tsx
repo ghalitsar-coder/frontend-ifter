@@ -1,9 +1,13 @@
 import { useTranslations } from 'next-intl';
+import type { RecapStatus } from '@/types/recap';
 
 /**
- * Pill badge that reflects whether a recap row is still editable (draft) or locked (dikunci).
+ * Displays the verification status of a recap row.
+ *
+ * @param props - Current verification status.
+ * @returns The localized draft or locked badge.
  */
-export function RecapStatusBadge(props: { status: 'draft' | 'dikunci' }) {
+export function RecapStatusBadge(props: { status: RecapStatus }) {
   const t = useTranslations('RecapPage');
 
   if (props.status === 'dikunci') {

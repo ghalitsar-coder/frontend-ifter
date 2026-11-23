@@ -15,19 +15,20 @@ export function PresensiRfidModal(props: { onClose: () => void }) {
   const t = useTranslations('PresensiPage');
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary/40 p-margin backdrop-blur-sm">
-      <div
-        aria-labelledby="rfid-title"
-        aria-modal="true"
-        className="relative flex w-full max-w-sm animate-in flex-col items-center rounded-xl bg-surface-card p-space-xl text-center shadow-xl duration-150 zoom-in-95 fade-in"
-        onKeyDown={(event) => {
-          if (event.key === 'Escape') {
-            props.onClose();
-          }
-        }}
-        role="dialog"
-        tabIndex={-1}
-      >
+    <dialog
+      aria-labelledby="rfid-title"
+      onCancel={(event) => {
+        event.preventDefault();
+        props.onClose();
+      }}
+      ref={(dialog) => {
+        if (dialog && !dialog.open) {
+          dialog.showModal();
+        }
+      }}
+      className="fixed inset-0 z-50 m-0 flex h-dvh max-h-none w-screen max-w-none items-center justify-center bg-primary/40 p-margin backdrop-blur-sm"
+    >
+      <div className="relative flex w-full max-w-sm animate-in flex-col items-center rounded-xl bg-surface-card p-space-xl text-center shadow-xl duration-150 zoom-in-95 fade-in">
         <button
           aria-label={t('modal_close')}
           className="absolute top-space-md right-space-md text-text-muted hover:text-text-primary"
@@ -42,7 +43,7 @@ export function PresensiRfidModal(props: { onClose: () => void }) {
           <span className="absolute inset-0 animate-ping rounded-full border-2 border-pine-deep/30" />
         </div>
 
-        <h3 className="mb-1 font-headline-sm text-headline-sm text-text-primary">
+        <h3 id="rfid-title" className="mb-1 font-headline-sm text-headline-sm text-text-primary">
           {t('rfid_title')}
         </h3>
         <p className="mb-space-lg font-body-md text-body-md text-text-muted">{t('rfid_body')}</p>
@@ -60,6 +61,6 @@ export function PresensiRfidModal(props: { onClose: () => void }) {
           {t('rfid_cancel')}
         </button>
       </div>
-    </div>
+    </dialog>
   );
 }

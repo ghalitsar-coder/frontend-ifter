@@ -8,6 +8,7 @@ import { PresensiNotice } from '@/components/presensi/PresensiNotice';
 import { StaffQrCodePanel } from '@/components/presensi/StaffQrCodePanel';
 import { StaffQrSessionForm } from '@/components/presensi/StaffQrSessionForm';
 import { Button } from '@/components/ui/button';
+import type { StaffQrCode, StaffQrSession } from '@/services/presensiApi';
 import {
   closeStaffQrSession,
   createStaffQrSession,
@@ -18,6 +19,10 @@ import {
 
 const QR_QUERY_KEY = ['staff-qr-code'] as const;
 const ACTIVE_SESSION_QUERY_KEY = ['staff-qr-session'] as const;
+
+function isNetworkInterruption(error: Error) {
+  return error instanceof TypeError || (error instanceof PresensiApiError && error.status >= 500);
+}
 
 /**
  * Restore the school's open QR session and display its current signed code.
@@ -32,22 +37,30 @@ export function StaffQrWorkspace() {
     queryFn: getActiveStaffQrSession,
     gcTime: 0,
     refetchInterval: 15_000,
-    retry: false,
+    retry: (_attempt, error) =>
+      Boolean(queryClient.getQueryData<StaffQrSession | null>(ACTIVE_SESSION_QUERY_KEY)) &&
+      isNetworkInterruption(error),
+    retryDelay: 3000,
   });
   const session = activeSession.data ?? null;
+  const codeKey = [...QR_QUERY_KEY, session?.id];
   const code = useQuery({
     enabled: session?.status === 'aktif',
     queryFn: async () => await getStaffQrCode(session?.id ?? 0),
-    queryKey: [...QR_QUERY_KEY, session?.id],
+    queryKey: codeKey,
     gcTime: 0,
     refetchInterval: 3000,
-    retry: false,
+    staleTime: ({ state }) =>
+      state.data ? Math.max(0, Date.parse(state.data.valid_until) - state.dataUpdatedAt) : 0,
+    retry: (_attempt, error) =>
+      queryClient.getQueryData<StaffQrCode>(codeKey) !== undefined && isNetworkInterruption(error),
+    retryDelay: 3000,
   });
   const validCode =
     !code.isError &&
     code.data !== undefined &&
     code.data.session_id === session?.id &&
-    Date.parse(code.data.valid_until) > code.dataUpdatedAt
+    !code.isStale
       ? code.data
       : undefined;
   let codeErrorMessage = t('code_unavailable');
@@ -132,7 +145,7 @@ export function StaffQrWorkspace() {
         <StaffQrCodePanel
           session={session}
           code={validCode}
-          error={code.isError ? codeErrorMessage : null}
+          error={code.isError || code.failureCount > 0 ? codeErrorMessage : null}
           closing={close.isPending}
           onClose={(id) => {
             close.mutate(id);
